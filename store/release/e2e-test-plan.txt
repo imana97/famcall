@@ -258,8 +258,16 @@ after restoration. The first complete two-second waveform match gives a
 conservative observation bound. A missing match is not automatically proof of
 missing speech: inspect resumed audio, timing drift, and input validity first.
 STOI, waveform matching, and returning packets do not replace listener scores,
-simultaneous two-way speech, N1/N2 outage tests, or physical-device G4/G5 evidence.
+simultaneous two-way speech, the complete N1/N2 outage matrix, or physical-device G4/G5 evidence.
 Keep invalid attempts and unconfirmed recovery cases in the evidence record.
+
+FAMCALL_OUTAGE_PROFILE selects baseline, modest, weak or stress for the link
+surrounding an outage. Only packet loss changes during the drop; the initial
+bandwidth cap, delay, jitter and random-loss rate must return afterward. The
+actual selected profile and realized network statistics belong in every report.
+Do not equate a per-leg preset with an end-to-end N1/N2 result without checking
+the measured conditions. Each case retains private, PID-filtered native app logs
+and capture metadata to help diagnose missing statistics and native failures.
 
 Native test builds also collect playout buffer delay, emitted samples and
 acceleration/deceleration counters. scripts/analyze-audio-timing.py separates

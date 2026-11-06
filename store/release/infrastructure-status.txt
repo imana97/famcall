@@ -10,6 +10,8 @@ CONFIGURED
   alerts. Alerts do not cap spending. Hosting site famcall.web.app reserved.
 - Phone authentication enabled. Provider daily send_verification_code effective
   quota read back as 50. Real SMS boundary/concurrency behavior not yet exercised.
+  The current SMS region policy reads allowByDefault with no denied regions.
+  This read-only check sent no SMS and does not prove carrier delivery.
 - Dedicated Cloudflare TURN credentials stored in Google Secret Manager, with
   runtime-only read access. Previously exposed setup key revoked and replaced.
 - Google API keys limited to needed Firebase APIs; browser key limited to the

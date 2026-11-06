@@ -13,6 +13,19 @@ class ExperimentEvidenceTests(unittest.TestCase):
         self.assertFalse(planned_outage(base, base, changes, {**outage, "seconds": 15}))
         self.assertFalse(planned_outage(base, base, changes + changes, outage))
 
+    def test_outage_preserves_the_underlying_weak_link(self):
+        weak = {"transport": "udp", "proxy": True, "loss": 0.0151,
+                "kbps": 64, "delayMs": 75, "jitterMs": 25}
+        changes = [{"at": 1000, "config": {**weak, "loss": 1}},
+                   {"at": 3000, "config": weak}]
+        outage = {"seconds": 2, "blockedAt": 1001, "restoredAt": 3001, "droppedPackets": 80}
+        self.assertTrue(planned_outage(weak, weak, changes, outage))
+        altered_drop = [{"at": 1000, "config": {**weak, "loss": 1, "delayMs": 0}}, changes[1]]
+        self.assertFalse(planned_outage(weak, weak, altered_drop, outage))
+        healthy = {**weak, "loss": 0, "kbps": 0, "delayMs": 0, "jitterMs": 0}
+        self.assertFalse(planned_outage(weak, healthy,
+            [changes[0], {"at": 3000, "config": healthy}], outage))
+
     def test_rejects_a_profile_changed_and_restored_during_capture(self):
         weak = {"transport": "udp", "loss": 0.03, "kbps": 64}
         healthy = {"transport": "udp", "loss": 0, "kbps": 0}

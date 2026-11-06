@@ -24,7 +24,8 @@ from evidence import stable_profile, verified_path, planned_outage
 from recovery import speech_recovery
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / ".local/audio-proto"))
+PROTO_DIR = Path(os.environ.get("FAMCALL_AUDIO_PROTO_DIR", str(ROOT / ".local/audio-proto"))).expanduser().resolve()
+sys.path.insert(0, str(PROTO_DIR))
 import emulator_controller_pb2 as pb
 import emulator_controller_pb2_grpc as rpc
 
@@ -45,7 +46,8 @@ def client(port):
             status = stub.getStatus(Empty(), metadata=metadata, timeout=5)
             if not status.booted:
                 raise RuntimeError("Emulator has not booted")
-            return channel, stub, metadata, {"pid": pid, "port": port, "discoveryStamp": file.stat().st_mtime_ns}
+            return channel, stub, metadata, {"pid": pid, "port": port, "discoveryStamp": file.stat().st_mtime_ns,
+                                            "emulatorVersion": status.version}
     raise RuntimeError("No authenticated emulator gRPC service on requested port")
 
 
@@ -211,6 +213,8 @@ def main():
               "captureFormats": sorted(formats), "capturePackets": len(captured), "buffered": args.buffered,
               "inputRate": args.input_rate,
               "measurementSourceHashes": measurement_sources,
+              "protoDescriptorSha256": hashlib.sha256(pb.DESCRIPTOR.serialized_pb).hexdigest(),
+              "grpcVersion": grpc.__version__,
               "injectionStartedAt": injection_started_at,
               "injectionFinishedAt": injection_finished_at,
               "injectionProgress": injection_progress,

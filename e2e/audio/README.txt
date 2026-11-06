@@ -32,6 +32,15 @@ mkdir -p .local/audio-proto
 
 Use the proto shipped with the exact emulator binary. Confirm the generated
 files import successfully before running. ANDROID_HOME must name the SDK.
+For a separate emulator installation, set FAMCALL_EMULATOR_BIN to its executable
+and FAMCALL_AUDIO_PROTO_DIR to a directory generated from that installation's
+lib/emulator_controller.proto. The default generated directory is .local/audio-proto.
+Reports record each running emulator's reported version, the protocol descriptor
+hash and the gRPC library version; preserve these when comparing toolchains.
+FAMCALL_AUDIO_INPUT_RATE selects 8000, 16000 or 48000 Hz (default 48000) for
+synthetic microphone input. Keep it fixed across comparison samples and record
+it with results. Matching a native recording rate is a diagnostic experiment,
+not proof of a reliable fixture; retain silent and otherwise invalid attempts.
 
 SYNTHETIC REFERENCE
 Generate only between runs; never replace the reference during a matrix:
@@ -95,6 +104,23 @@ upper bound, not exact speech latency. Delayed capture delivery makes that bound
 later. The reported post-recovery STOI is an estimate for up to ten seconds;
 it is not a word-understanding score, a simultaneous two-way test, or a G4/G5 pass.
 These baseline-link outage cases do not cover outages on N1/N2 impaired links.
+
+To retain an impaired link on both sides of the outage, use:
+FAMCALL_OUTAGE_PROFILE=weak node scripts/run-audio-matrix.mjs --outages 2 5
+The available underlying profiles are baseline (the default), modest, weak and
+stress, with the same settings as the fixed-profile matrix. During the outage
+only loss changes to 100%; afterward the original loss, cap, delay and jitter
+must all return. Evidence validation rejects a restoration to a healthier link.
+The profile is recorded in provenance and the case names. These per-relay-leg
+presets do not directly establish the end-to-end N1/N2 release conditions.
+
+Each case also saves PID-filtered native logs from both test apps before dialing,
+through measurement and hangup. Their hashes, process IDs and capture lifetime
+are retained beside the report. This helps investigate lost statistics or native
+errors. It does not follow a restarted app process. Raw logs can contain sensitive
+diagnostic values and stay in ignored .local; never publish them.
+Private system-audio snapshots after connection and measurement record mute,
+route and audio-device state for diagnosing a silent input or output fixture.
 
 The detector uses a fixed correlation threshold of 0.35 and two-second windows,
 sampled every 250 ms. Preserve these settings and the reference with the evidence.

@@ -11,9 +11,10 @@ PASS
   evidence block public submission.
 - Three connection-policy tests cover initial ICE setup stalls, coalesced
   credential-refresh restarts, and cancellation after connection/close.
-  Nine Python evidence tests cover profile changes, wrong relay paths, missing
+  Ten Python evidence tests cover profile changes, wrong relay paths, missing
   outage drops, restored speech, silent output, replayed pre-outage audio, and
-  timing counter deltas, resets, missing values and stream isolation.
+  timing counter deltas, resets, missing values and stream isolation. An impaired
+  outage must restore the same weak-link conditions rather than a healthier link.
 - Android native standalone test build compiles, including WebRTC, Firebase,
   native calling integration, native timers, and the background call-end worker.
 - Maestro on two Android API 36 emulators: phone verification using fictional
@@ -37,6 +38,8 @@ PASS
   the local preview. The public site is not deployed yet.
 - GCP provider quota effectiveLimit and override both read back as 50/day for
   send_verification_code, including after phone authentication was initialized.
+  A later read-only check confirmed phone sign-in remains enabled and the SMS
+  region policy allows by default with no denied regions. Delivery is untested.
 - Public source scanned for secret patterns and exact dedicated TURN secrets;
   no matches. Private configurations, logs, recordings, and signing material
   are excluded from source control.
@@ -45,7 +48,8 @@ ANDROID AUDIO PILOT — VALID MEASUREMENTS, NOT RELEASE APPROVAL
 Eight 30-second generated-speech samples completed: one in each direction for
 four profiles, with a fresh pair of emulator processes for each profile.
 Android API 36 ARM64; emulator 36.1.9.0; the same installed test APK on both peers.
-Opus starts at 16 kbps, mono, 40 ms packet time. Every sample selected Cloudflare
+Opus negotiation requests 16 kbps, mono, and 40 ms packet time; actual encoded
+packet duration has not yet been independently verified. Every sample selected Cloudflare
 UDP relay media and retained received audio plus statistics from both peers.
 
 Profile   Cap/leg   Delay/leg   Jitter/leg   Loss/leg   STOI A→B / B→A
@@ -222,6 +226,53 @@ Diagnostic APK SHA-256:
 cd3839c692ceb8d97305779c99de8dd5736f6feb9a3c7635cdbad5de79310cc7
 Queue-limit candidate APK SHA-256:
 89030b363b085f522c281623aed33f7f7c9289a694a6c664841598cb0eb75845
+
+WEAK-LINK OUTAGE PILOT AND INPUT-FIXTURE INVESTIGATION
+The outage runner now preserves the weak profile before and after a drop:
+64 kbps, 75 ms delay, 25 ms jitter and 1.51% random loss on each relay leg.
+Only loss changes to 100% during the planned interval. Reports verify the actual
+drops, restoration of the original profile, and selected paths at both peers.
+All samples below use the unchanged diagnostic APK cd3839c6 identified above;
+none changes the app's queue, retry policy, codec settings or recovery threshold.
+
+The initial four attempts used emulator 36.1.9.0 and buffered 48 kHz input:
+Outage    A-to-B confirmation bound    B-to-A confirmation bound
+2 s       3.762 s                      Invalid silent input
+5 s       Invalid silent input        Invalid silent input
+The valid two-second recording had post-recovery STOI 0.875 over ten seconds
+and median measured RTT 371 ms. The invalid attempts remain in the record.
+Private run: recovery-2026-11-06T17-14-25.364Z.
+
+A separate emulator 37.2.13 installation, with its matching generated protocol,
+also produced invalid silent input for two-second B-to-A at 48 kHz. Updating the
+emulator alone did not resolve the fixture. Native logs from before dialing and
+system-audio snapshots showed 8 kHz WebRTC microphone recording at both peers,
+with the microphone's API/switch/restriction/system mute states all false.
+Private run: recovery-2026-11-06T17-29-56.282Z.
+
+Using the same 37.2.13 toolchain with buffered 8 kHz synthetic input produced a
+valid two-second B-to-A sample, confirming new speech within 5.016 seconds;
+post-recovery STOI was 0.548 over ten seconds. The subsequent five-second A-to-B
+sample was valid and confirmed within 8.268 seconds, with post-recovery STOI
+0.814 over ten seconds and median RTT 384.5 ms. Input rate is now explicit in
+runner provenance. Scores from different input rates are not direct quality
+comparisons, and these observations do not establish a dependable fixture.
+Private runs: recovery-2026-11-06T17-34-21.333Z and
+recovery-2026-11-06T17-40-29.317Z.
+The latter run's B-to-A setup stopped before dialing: Android's System UI was
+unresponsive and its dialog covered the contacts screen. The failure screenshot
+and Maestro output are retained separately; no speech sample was attempted.
+A separate fresh-pair five-second B-to-A retry again had invalid silent input
+before the outage, despite using 8 kHz input. Changing the input rate therefore
+did not reliably fix the fixture. Private run: recovery-2026-11-06T17-46-00.662Z.
+Across this investigation, eight measurements and one pre-call setup failure
+are retained. Three measurements were valid and confirmed recovery; five had
+invalid input. Mixed settings and this small sample cannot estimate reliability.
+
+These are individual-direction pilot observations with mixed fixture settings,
+not simultaneous two-way tests, a reliability rate, or the full N1/N2 release
+matrix. Raw native logs and system-audio snapshots remain private. The detector
+threshold is unchanged; invalid input is never counted as a successful recovery.
 
 OFFLINE CALLER HANGUP — ONE ANDROID EMULATOR CASE PASSED
 On the restored diagnostic APK identified above, Maestro placed and answered a
