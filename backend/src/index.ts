@@ -207,6 +207,7 @@ export const startCall = onCall(secure, async (request) => {
       db.doc("activeCalls/" + callee),
       db.doc("accountDeletions/" + uid),
       db.doc("accountDeletions/" + callee),
+      db.doc("users/" + uid + "/cancelledStarts/" + data.requestId),
     ];
     const [
       previous,
@@ -216,6 +217,7 @@ export const startCall = onCall(secure, async (request) => {
       calleeActive,
       callerDeleting,
       calleeDeleting,
+      cancelledStart,
     ] = await t.getAll(...refs);
     if (previous.exists) {
       const old = previous.data() as CallRecord;
@@ -223,6 +225,8 @@ export const startCall = onCall(secure, async (request) => {
         throw new HttpsError("already-exists", "Try starting a new call.");
       return old;
     }
+    if (cancelledStart.exists)
+      throw new HttpsError("cancelled", "This call was cancelled.");
     if (blockedByCallee.exists || blockedByCaller.exists || callerDeleting.exists || calleeDeleting.exists)
       throw new HttpsError(
         "unavailable",
@@ -255,6 +259,7 @@ export const updateCall = onCall(secure, async (request) => {
     }),
     request.data,
   );
+  if (data.action === "end") await rateLimit(uid, "ends-minute", 30, 60_000);
   return transition(data.callId, uid, data.action);
 });
 
@@ -268,7 +273,19 @@ async function transition(
   return db.runTransaction(async (t) => {
     const ref = db.doc("calls/" + id);
     const snap = await t.get(ref);
-    if (!snap.exists) throw new HttpsError("not-found", "This call has ended.");
+    if (!snap.exists) {
+      // The caller already knows its request UUID while startCall is in flight.
+      // Serialize cancellation with creation, including when cancellation wins.
+      if (actor && action === "end") {
+        if ((await t.get(db.doc("accountDeletions/" + actor))).exists)
+          throw new HttpsError("permission-denied", "This account is being deleted.");
+        t.set(db.doc("users/" + actor + "/cancelledStarts/" + id), {
+          createdAt: FieldValue.serverTimestamp(), expiresAt: ttl(HISTORY_DAYS),
+        });
+        return { id, status: "cancelled" as const };
+      }
+      throw new HttpsError("not-found", "This call has ended.");
+    }
     const call = snap.data() as CallRecord;
     if (actor && !call.participants.includes(actor))
       throw new HttpsError("permission-denied", "This call is unavailable.");

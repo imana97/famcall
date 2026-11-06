@@ -16,6 +16,7 @@
   "fieldOverrides": [
     { "collectionGroup": "limits", "fieldPath": "expiresAt", "ttl": true, "indexes": [] },
     { "collectionGroup": "devices", "fieldPath": "expiresAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "cancelledStarts", "fieldPath": "expiresAt", "ttl": true, "indexes": [] },
     { "collectionGroup": "accountDeletions", "fieldPath": "expiresAt", "ttl": true, "indexes": [] }
   ]
 }

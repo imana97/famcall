@@ -300,5 +300,14 @@ blocked behind a lookup, mismatched answer IDs are rejected, and stale results
 cannot revive a finished call. The actual OS push and lifecycle matrix remains
 required: unit scheduling is not a substitute for cold-start tests on phones.
 
+scripts/test-pending-call-cancel.mjs takes before-request, after-response or
+after-native. The isolated demo build holds that setup boundary while Maestro
+cancels. Require immediate local cancellation, persistent server receipt/terminal
+state, no native binding or active lease after release, and both contact screens.
+The lab gate has a deadline and is disabled in production builds. These controlled
+application delays complement the network matrix; they do not simulate packet
+loss or prove a physical OS lifecycle. Backend tests separately serialize
+concurrent creation/cancellation and check caller isolation and account deletion.
+
 Emulator lifecycle investigation (used as a hypothesis, then checked locally):
 https://github.com/kaeawc/auto-mobile/issues/13634

@@ -118,6 +118,39 @@ describe.skipIf(!enabled)(
         responses.filter((r) => r.error?.status === "FAILED_PRECONDITION"),
       ).toHaveLength(1);
     }, 30_000);
+    it("remembers cancellation before creation and never takes either call lease", async () => {
+      const [a, b] = await Promise.all([user(), user()]);
+      const callId = randomUUID();
+      expect((await callApi(a, "updateCall", { callId, action: "end" })).result?.status).toBe("cancelled");
+      expect((await start(a, b, callId)).error?.status).toBe("CANCELLED");
+      expect((await start(a, b, callId)).error?.status).toBe("CANCELLED");
+      const db = getFirestore(app!);
+      for (const path of ["calls/" + callId, "activeCalls/" + a.uid, "activeCalls/" + b.uid])
+        expect((await db.doc(path).get()).exists).toBe(false);
+    }, 30_000);
+    it("scopes pre-creation cancellation to its caller, not a guessed request UUID", async () => {
+      const [a, b, outsider] = await Promise.all([user(), user(), user()]);
+      const callId = randomUUID();
+      await callApi(outsider, "updateCall", { callId, action: "end" });
+      expect((await start(a, b, callId)).result?.status).toBe("ringing");
+      expect((await callApi(outsider, "updateCall", { callId, action: "end" })).error?.status).toBe("PERMISSION_DENIED");
+    }, 30_000);
+    it("serializes simultaneous creation and cancellation without leaving a ringing call", async () => {
+      const [a, b] = await Promise.all([user(), user()]);
+      const callId = randomUUID();
+      const [created, ended] = await Promise.all([
+        start(a, b, callId), callApi(a, "updateCall", { callId, action: "end" }),
+      ]);
+      expect(ended.result?.status).toBe("cancelled");
+      expect(created.result?.status === "ringing" || created.result?.status === "cancelled" || created.error?.status === "CANCELLED").toBe(true);
+      const db = getFirestore(app!);
+      const doc = await db.doc("calls/" + callId).get();
+      expect(!doc.exists || doc.data()?.status === "cancelled").toBe(true);
+      expect((await db.doc("activeCalls/" + a.uid).get()).exists).toBe(false);
+      expect((await db.doc("activeCalls/" + b.uid).get()).exists).toBe(false);
+      const retry = await start(a, b, callId);
+      expect(retry.result?.status === "cancelled" || retry.error?.status === "CANCELLED").toBe(true);
+    }, 30_000);
     it("prevents an outsider accepting, ending, or obtaining relay credentials", async () => {
       const [a, b, outsider] = await Promise.all([user(), user(), user()]);
       const started = await start(a, b);
@@ -190,6 +223,9 @@ describe.skipIf(!enabled)(
       const [a, b] = await Promise.all([user(), user()]);
       await callApi(a, "registerProfile", {});
       await callApi(a, "saveContact", {phone: b.phone, name: "Test contact"});
+      const cancelledId = randomUUID();
+      await callApi(a, "updateCall", { callId: cancelledId, action: "end" });
+      expect((await getFirestore(app!).doc("users/" + a.uid + "/cancelledStarts/" + cancelledId).get()).exists).toBe(true);
       const {result} = await start(a, b);
       expect((await callApi(a, "deleteAccount", {})).result?.accepted).toBe(true);
       expect((await callApi(a, "registerProfile", {})).error?.status).toBe("PERMISSION_DENIED");
@@ -198,6 +234,8 @@ describe.skipIf(!enabled)(
         {timeout: 20_000, interval: 300}).toBe("complete");
       expect((await db.doc("users/" + a.uid).get()).exists).toBe(false);
       expect((await db.collection("users/" + a.uid + "/contacts").get()).empty).toBe(true);
+      expect((await db.collection("users/" + a.uid + "/cancelledStarts").get()).empty).toBe(true);
+      expect((await callApi(a, "updateCall", { callId: randomUUID(), action: "end" })).error?.status).toBe("PERMISSION_DENIED");
       expect((await db.doc("calls/" + result.id).get()).exists).toBe(false);
       expect((await db.doc("activeCalls/" + b.uid).get()).exists).toBe(false);
       expect((await start(b, a)).error?.status).toBe("UNAVAILABLE");

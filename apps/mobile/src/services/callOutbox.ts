@@ -4,7 +4,7 @@ import { api } from "./firebase";
 type Intent = { callId: string; createdAt: number };
 const key = (uid: string) => "famcall-call-outbox:" + uid;
 let serial: Promise<unknown> = Promise.resolve();
-const flights = new Map<string, Promise<void>>();
+const flights = new Map<string, { promise: Promise<void>; requested: boolean }>();
 const locallyEnded = new Set<string>();
 
 function locked<T>(work: () => Promise<T>): Promise<T> {
@@ -37,24 +37,37 @@ export async function restoreCallOutbox(uid: string) {
 }
 export function flushCallOutbox(uid: string): Promise<void> {
   const existing = flights.get(uid);
-  if (existing) return existing;
-  const flight = (async () => {
-    for (const intent of await read(uid)) {
-      try {
-        await api("updateCall", { callId: intent.callId, action: "end" });
-      } catch (error) {
-        const code = String((error as { code?: string }).code);
-        if (!code.endsWith("not-found") && !code.endsWith("permission-denied"))
-          throw error;
+  if (existing) {
+    existing.requested = true;
+    return existing.promise;
+  }
+  const flight = { requested: true, promise: Promise.resolve() };
+  flight.promise = Promise.resolve().then(async () => {
+    try {
+      while (flight.requested) {
+        flight.requested = false;
+        for (const intent of await read(uid)) {
+          try {
+            await api("updateCall", { callId: intent.callId, action: "end" });
+          } catch (error) {
+            const code = String((error as { code?: string }).code);
+            if (!code.endsWith("not-found") && !code.endsWith("permission-denied"))
+              throw error;
+          }
+          await locked(async () => {
+            const remaining = (await read(uid)).filter(
+              (i) => i.callId !== intent.callId,
+            );
+            await AsyncStorage.setItem(key(uid), JSON.stringify(remaining));
+          });
+        }
       }
-      await locked(async () => {
-        const remaining = (await read(uid)).filter(
-          (i) => i.callId !== intent.callId,
-        );
-        await AsyncStorage.setItem(key(uid), JSON.stringify(remaining));
-      });
+    } finally {
+      // Delete in the same turn as the final requested check. A new flush must
+      // either request another pass or start a new flight, never join a finished one.
+      flights.delete(uid);
     }
-  })().finally(() => flights.delete(uid));
+  });
   flights.set(uid, flight);
-  return flight;
+  return flight.promise;
 }

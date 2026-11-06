@@ -18,6 +18,8 @@ import { isTerminal, type CallRecord } from "@famcall/core";
 import { api, database, isE2E } from "../services/firebase";
 import { consumeNativeEvents } from "../services/nativeEvents";
 import { NativeCallCoordinator } from "../services/NativeCallCoordinator";
+import { OutgoingCallAttempt } from "../services/OutgoingCallAttempt";
+import { recordTestMetric, waitForTestCallStart } from "../services/e2eDiagnostics";
 import { VoicePeer, type VoiceState } from "../services/VoicePeer";
 import { errorMessage } from "../services/errors";
 import {
@@ -35,6 +37,7 @@ interface CallView {
   speaker: boolean;
   error: string | null;
   connectedAt: number | null;
+  cancelledBeforeStart: boolean;
 }
 interface Calling extends CallView {
   start: (phone: string) => Promise<void>;
@@ -50,6 +53,7 @@ const initial: CallView = {
   speaker: false,
   error: null,
   connectedAt: null,
+  cancelledBeforeStart: false,
 };
 const Context = createContext<Calling>({
   ...initial,
@@ -69,8 +73,8 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
   const answerRequest = useRef<string | null>(null);
   const watchedId = useRef<string | null>(null);
   const callUnsubscribe = useRef<(() => void) | null>(null);
-  const starting = useRef(false);
-  const ending = useRef(false);
+  const outgoing = useRef<OutgoingCallAttempt | null>(null);
+  const endedNativeIds = useRef(new Set<string>());
   const reporting = useRef<string | null>(null);
   const flushPending = useRef<() => void>(() => undefined);
   const update = (patch: Partial<CallView>) => {
@@ -184,43 +188,76 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     }
   }
   async function start(phone: string) {
-    if (starting.current || !user) return;
+    if (outgoing.current?.active || !user) return;
     if (current.current.call && !isTerminal(current.current.call.status))
       return;
-    starting.current = true;
+    const uid = user.uid;
+    const id = randomUUID();
+    const flush = flushPending.current;
+    watchedId.current = null;
+    callUnsubscribe.current?.();
+    callUnsubscribe.current = null;
     update({ ...initial });
-    let call: CallRecord | undefined;
-    try {
-      call = await api<CallRecord>("startCall", {
-        phone,
-        requestId: randomUUID(),
-      });
-      update({ call });
-      nativeId.current = await Calls.startOutgoingCall(
-        { id: call.calleeId, phoneNumber: phone, displayName: phone },
-        { hasVideo: false, supportsDTMF: false, supportsHolding: false },
-      );
-      watch(call.id);
-      if (current.current.call?.status === "accepted") void connect(current.current.call);
-      router.replace({ pathname: "/call/[id]", params: { id: call.id } });
-    } catch (e) {
-      if (call)
-        await api("updateCall", { callId: call.id, action: "cancel" }).catch(
-          () => undefined,
+    const attempt: OutgoingCallAttempt = new OutgoingCallAttempt(id, {
+      isCurrent: () => outgoing.current === attempt && (!watchedId.current || watchedId.current === id),
+      hasEndedLocally: () => hasEndedLocally(id) ||
+        (current.current.call?.id === id && isTerminal(current.current.call.status)),
+      nativeEnded: systemId => endedNativeIds.current.has(systemId),
+      create: async () => {
+        await waitForTestCallStart("before-request", id);
+        const call = await api<CallRecord>("startCall", { phone, requestId: id });
+        await waitForTestCallStart("after-response", id);
+        return call;
+      },
+      startNative: async call => {
+        const systemId = await Calls.startOutgoingCall(
+          { id: call.calleeId, phoneNumber: phone, displayName: phone },
+          { hasVideo: false, supportsDTMF: false, supportsHolding: false },
         );
-      fail(e);
-      throw e;
-    } finally {
-      starting.current = false;
-    }
+        try { await waitForTestCallStart("after-native", id); }
+        catch (error) { await Calls.endCall(systemId); throw error; }
+        return systemId;
+      },
+      endNative: Calls.endCall,
+      persistEnd: () => queueCallEnd(uid, id).then(flush),
+      record: call => {
+        // Firestore can deliver an answer/terminal state before the callable
+        // response. Do not replace that newer state with its ringing snapshot.
+        if (current.current.call?.id !== id) update({ call });
+      },
+      ready: (call, systemId) => {
+        recordTestMetric({ kind: "outgoing-bound", callId: id });
+        nativeId.current = systemId;
+        watch(call.id);
+        if (current.current.call?.status === "accepted") void connect(current.current.call);
+        router.replace({ pathname: "/call/[id]", params: { id: call.id } });
+      },
+      cancelled: () => { void end(); },
+      error: error => {
+        const call = current.current.call;
+        if (call?.id === id && !isTerminal(call.status))
+          update({ call: { ...call, status: "failed", endedAtMs: Date.now() } });
+        fail(error);
+      },
+    });
+    outgoing.current = attempt;
+    recordTestMetric({ kind: "outgoing-start", callId: id, uid });
+    await attempt.run();
+    if (outgoing.current === attempt) outgoing.current = null;
+    if (isE2E) void Calls.getActiveCallSession().then(session => {
+      recordTestMetric({ kind: "outgoing-finished", callId: id,
+        nativeSession: session ? { id: session.id, status: session.status } : null });
+    }).catch(() => undefined);
   }
   async function answer() {
     if (nativeId.current) await Calls.answerCall(nativeId.current);
   }
   async function end() {
-    if (ending.current) return;
-    ending.current = true;
     const call = current.current.call;
+    const attempt = outgoing.current && (!call || call.id === outgoing.current.id)
+      ? outgoing.current : null;
+    const pendingEnd = attempt?.cancel();
+    const flush = flushPending.current;
     const systemId = nativeId.current;
     nativeId.current = null;
     peer.current?.close();
@@ -240,13 +277,14 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
             endedAtMs: Date.now(),
           },
         });
-        await queueCallEnd(user.uid, call.id);
-        flushPending.current();
+      } else if (!call && attempt) {
+        update({ cancelledBeforeStart: true });
       }
+      if (pendingEnd) await pendingEnd;
+      else if (call && user && !isTerminal(call.status)) await queueCallEnd(user.uid, call.id);
+      flush();
     } catch (e) {
-      fail(e);
-    } finally {
-      ending.current = false;
+      if ((call && current.current.call?.id === call.id) || (attempt && outgoing.current === attempt)) fail(e);
     }
   }
   const watchEvent = useEffectEvent(watch);
@@ -290,6 +328,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       },
       mute: (event) => muteEvent(event.isMuted),
       end: (event) => {
+        endedNativeIds.current.add(event.id);
         if (event.id === nativeId.current) void endEvent();
         // The native session can be known before Firestore supplies CallView.
         // Persist its server ID even when end() has no loaded call to enqueue.
@@ -354,6 +393,8 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       appState.remove();
       detachEvents();
       coordinator.dispose();
+      void outgoing.current?.cancel().catch(() => undefined);
+      outgoing.current = null;
       tokens.remove();
       active();
       callUnsubscribe.current?.();

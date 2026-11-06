@@ -181,6 +181,18 @@ covers participant hangup/process restart, not every offline-call state or
 physical-device background behavior. The replay
 observation after detecting a default network is not exact reconnection latency.
 
+To cancel while outgoing setup is pending, run each stage separately:
+node scripts/test-pending-call-cancel.mjs before-request
+node scripts/test-pending-call-cancel.mjs after-response
+node scripts/test-pending-call-cancel.mjs after-native
+Both emulators must start on contacts. Use the latest backend build and test APK.
+The demo-only callStartGate delays one application boundary, up to 35 seconds.
+The runner cancels before releasing it, then checks server cancellation, native
+session teardown, cleared leases and no screen resurrection. It restores the gate
+to none on completion/interruption and retains private source/native-log evidence.
+An interrupted or failed attempt can leave a call on screen; end it before the
+next run. This is controlled scheduling, not a poor-network audio measurement.
+
 Interrupting the matrix restores the network profile. An interrupted run may
 leave a lab call active; end it before starting another run. All reports and
 recordings remain in .local; do not publish raw diagnostic logs.

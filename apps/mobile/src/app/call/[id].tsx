@@ -53,7 +53,7 @@ export default function CallScreen() {
     params.name ??
     displayPhone(phone);
   const incoming = call?.calleeId === user.uid && call.status === "ringing";
-  const ended = !!call && isTerminal(call.status);
+  const ended = calling.cancelledBeforeStart || (!!call && isTerminal(call.status));
   const terminal: Record<string, TranslationKey> = {
     ended: "callEnded",
     cancelled: "callCancelled",
@@ -62,7 +62,7 @@ export default function CallScreen() {
     failed: "callFailed",
   };
   const status: TranslationKey = ended
-    ? (terminal[call!.status] ?? "callEnded")
+    ? (calling.cancelledBeforeStart ? "callCancelled" : terminal[call!.status] ?? "callEnded")
     : incoming
       ? "incoming"
       : calling.voice === "reconnecting"

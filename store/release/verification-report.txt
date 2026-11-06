@@ -2,8 +2,8 @@ FAMCALL — VERIFICATION RECORD
 6 November 2026. Development evidence, not release approval.
 
 PASS
-- 21 automated local tests: 7 shared-logic tests, 6 Firestore isolation tests,
-  8 callable-backend integration tests. Includes call idempotency, concurrent
+- 25 automated local tests: 7 shared-logic tests, 7 Firestore isolation tests,
+  11 callable-backend integration tests. Includes call idempotency, concurrent
   callers, outsider rejection, answer/hangup races, late answers, blocking,
   lease renewal/expiry, and durable account deletion with stale-token denial.
 - An additional release-workflow test verifies that a tested source commit may
@@ -17,6 +17,10 @@ PASS
   Twelve native-event sequence tests cover restored mute, actions arriving during
   startup, stale lookup/answer results, hangup while a lookup is pending, missed
   session-added events, durable local hangup, disposal and storage-read failure.
+  Eight outgoing-attempt tests cover cancellation during server/native setup,
+  stale completions, uncertain create responses, terminal retries and storage
+  failures. Three outbox tests cover in-flight additions, retry and restoration;
+  the in-flight addition test fails on the old implementation and passes now.
   Ten Python evidence tests cover profile changes, wrong relay paths, missing
   outage drops, restored speech, silent output, replayed pre-outage audio, and
   timing counter deltas, resets, missing values and stream isolation. An impaired
@@ -392,6 +396,62 @@ The same APK also passed the seven-phase, two-call mute check, including a muted
 first track after answer, unmute/remute, cleared system mute after hangup and an
 unmuted next call. Private run: mute-1793991458329. This checks UI, JavaScript
 track state and Android system flags, not received-audio silence or iPhone mute.
+
+CANCELLATION WHILE OUTGOING SETUP IS PENDING
+Outgoing attempts now own their request UUID before contacting the server.
+End Call updates the screen immediately and persists that ID even before a
+CallRecord exists. Late server/native completions cannot bind or navigate the
+cancelled attempt; a late native UUID is closed independently of any newer call.
+An uncertain create response also queues cleanup, since a timeout does not prove
+the server failed to create the call. A newer Firestore call state is preserved
+instead of being overwritten by an older callable response.
+
+The backend transaction records an end-before-create receipt under the caller's
+own user record. startCall reads it in the creation transaction. Other users'
+receipts cannot cancel a guessed request ID, and existing-call membership checks
+still apply. Receipts are server-only, expire with the 90-day history retention,
+and are removed by account deletion. A transactional deletion check prevents a
+concurrent deletion from being followed by a new receipt. Deployment must include
+the cancelledStarts TTL configuration; no production deployment was performed.
+
+The outbox now processes an end intent added during an existing delivery. Its
+previous single snapshot could leave that intent queued until another network
+event. The controlled regression delivered only the first intent on the old code
+and both intents with the fix. The final backend suite also verifies deletion of
+cancellation receipts and denial of the deleted identity.
+
+Three Android Maestro cases passed with controlled delays at before-request,
+after-response and after-native boundaries. Each showed Call cancelled promptly,
+returned to contacts, and remained there after releasing the delayed work.
+The before-request case created no server call; the other two ended their ringing
+records. No active-call lease remained, no cancelled attempt bound a native call,
+and the native session query after completion was empty or ended. Both phones
+returned to contacts. Private native logs, installed-APK hashes and source
+snapshots were audited. These are setup/control checks, not packet-loss, speech,
+background-push or physical-device measurements.
+Private runs:
+pending-cancel-before-request-1793992552017
+pending-cancel-after-response-1793992647413
+pending-cancel-after-native-1793992706540
+These three runs preceded the final transactional account-deletion check; their
+exact backend source and compiled hashes are retained in their snapshots.
+Android APK SHA-256:
+3f5213c2aecd3dab4bf5396c459f5d323d2cb91254199cac5b6e27a7fa7a697b
+
+After adding the transactional account-deletion guard, all eleven backend tests
+passed, including receipt deletion and stale-identity denial. The before-request
+Android case passed again with the rebuilt backend:
+pending-cancel-before-request-1793992795599. The same APK and final backend passed
+the seven-phase, two-call mute regression, mute-1793992871099. Source/build/native
+log provenance was audited. As above, mute evidence concerns control/track/system
+flags, not silence in received audio.
+
+The final caller-offline regression also passed: stable End Call bounds during
+reconnection, immediate local hangup, a changed process ID after restarting
+offline, accepted server state until reconnection, then ended state, both leases
+removed and both contact screens. Private run: offline-hangup-1793992988164.
+This repeats the caller case on the new APK/backend; callee offline evidence
+above belongs to its earlier, explicitly identified builds.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen

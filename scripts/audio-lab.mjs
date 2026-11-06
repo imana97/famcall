@@ -13,6 +13,7 @@ let config = {
   delayMs: 0,
   jitterMs: 0,
   kbps: 0,
+  callStartGate: "none",
 };
 try {
   config = { ...config, ...JSON.parse(await readFile(configuration, "utf8")) };
@@ -50,6 +51,7 @@ const server = http.createServer(async (req, res) => {
       if (
         !["udp", "tcp", "tls", "direct"].includes(next.transport) ||
         typeof next.proxy !== "boolean" ||
+        !["none", "before-request", "after-response", "after-native"].includes(next.callStartGate) ||
         !Number.isFinite(next.loss) ||
         next.loss < 0 ||
         next.loss > 1 ||

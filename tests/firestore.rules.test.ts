@@ -65,6 +65,13 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)(
         getDoc(doc(db("bob"), "users", "alice", "contacts", "+12025550102")),
       );
     });
+    it("keeps cancellation receipts server-only, including for their owner", async () => {
+      for (const uid of ["alice", "bob"]) {
+        const receipt = doc(db(uid), "users", "alice", "cancelledStarts", id);
+        await assertFails(getDoc(receipt));
+        await assertFails(setDoc(receipt, { createdAt: 1 }));
+      }
+    });
     it("does not allow participants to rewrite call state or membership", async () => {
       await assertFails(
         updateDoc(doc(db("alice"), "calls", id), {

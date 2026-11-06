@@ -39,3 +39,27 @@ export function recordTestMetric(data: Record<string, unknown>) {
     signal: AbortSignal.timeout(2000),
   }).catch(() => undefined);
 }
+
+/** Hold one setup boundary in the isolated demo build for cancellation tests. */
+export async function waitForTestCallStart(
+  phase: "before-request" | "after-response" | "after-native",
+  callId: string,
+) {
+  if (!enabled) return;
+  const selected = async () => {
+    const response = await fetch(base + "/config", { signal: AbortSignal.timeout(1500) });
+    return (await response.json()).callStartGate === phase;
+  };
+  try { if (!await selected()) return; }
+  catch { return; }
+  recordTestMetric({ kind: "call-start-gate", phase, callId, event: "waiting" });
+  const deadline = Date.now() + 35_000;
+  while (Date.now() < deadline) {
+    await new Promise(resolve => setTimeout(resolve, 250));
+    if (!await selected()) {
+      recordTestMetric({ kind: "call-start-gate", phase, callId, event: "released" });
+      return;
+    }
+  }
+  throw new Error("test-call-start-gate-timeout");
+}

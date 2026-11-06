@@ -1,0 +1,9 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- tapOn:
+    id: end-call
+- extendedWaitUntil:
+    visible: Call cancelled
+    timeout: 5000
+- tapOn: Done
+- assertVisible: Your people.

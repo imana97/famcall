@@ -87,6 +87,7 @@ try {
   });
   const files = ['scripts/test-offline-hangup.mjs', 'apps/mobile/src/state/Calling.tsx', 'apps/mobile/src/services/callOutbox.ts',
     'apps/mobile/src/services/NativeCallCoordinator.ts', 'apps/mobile/src/services/nativeEvents.ts',
+    'apps/mobile/src/services/OutgoingCallAttempt.ts', 'backend/src/index.ts', 'backend/lib/index.js',
     'apps/mobile/src/app/call/[id].tsx', 'apps/mobile/src/components/ui.tsx',
     ...['open-people', 'start-call', 'answer-call', 'end-call', 'dismiss-ended'].map(f => 'e2e/maestro/' + f + '.yaml')];
   report.sourceHashes = Object.fromEntries(await Promise.all(files.map(async f => [f, createHash('sha256').update(await readFile(resolve(root, f))).digest('hex')])));
