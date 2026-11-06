@@ -110,6 +110,8 @@ def main():
     captured = []
     capture_chunks = []
     captured_samples = 0
+    injection_progress = []
+    injection_finished_at = None
     formats = set()
     errors = []
     stream = receiver.streamAudio(fmt, metadata=rm, timeout=duration + 6)
@@ -120,7 +122,7 @@ def main():
             for packet in stream:
                 captured.append(bytes(packet.audio))
                 captured_samples += len(packet.audio) // 2
-                capture_chunks.append({"at": int(time.time() * 1000), "endSample": captured_samples // 3})
+                capture_chunks.append({"at": int(time.time() * 1000), "emulatorTimestampUs": int(packet.timestamp), "endSample": captured_samples // 3})
                 formats.add((packet.format.samplingRate, packet.format.channels, packet.format.format))
         except grpc.RpcError as error:
             if error.code() not in (grpc.StatusCode.CANCELLED, grpc.StatusCode.DEADLINE_EXCEEDED):
@@ -170,6 +172,8 @@ def main():
             wait = started + offset / (args.input_rate * 2) - time.monotonic()
             if not args.buffered and wait > 0:
                 time.sleep(wait)
+            if offset % (args.input_rate * 2) == 0:
+                injection_progress.append({"at": int(time.time() * 1000), "sourceSeconds": offset / (args.input_rate * 2)})
             yield pb.AudioPacket(format=input_fmt, timestamp=int(time.time() * 1_000_000), audio=input_pcm[offset:offset + size])
 
     def terminate(_signal, _frame):
@@ -178,6 +182,7 @@ def main():
     previous_term = signal.signal(signal.SIGTERM, terminate)
     try:
         sender.injectAudio(packets(), metadata=sm, timeout=duration + 8)
+        injection_finished_at = int(time.time() * 1000)
         time.sleep(2)
     except grpc.RpcError as error:
         errors.append("Audio injection failed: " + str(error.code()))
@@ -207,6 +212,9 @@ def main():
               "inputRate": args.input_rate,
               "measurementSourceHashes": measurement_sources,
               "injectionStartedAt": injection_started_at,
+              "injectionFinishedAt": injection_finished_at,
+              "injectionProgress": injection_progress,
+              "injectionTimingScope": "Generator handoff to gRPC, not proof of microphone consumption time.",
               "captureChunks": capture_chunks,
               "senderProcess": sender_process, "receiverProcess": receiver_process,
               "limitation": "STOI is a laboratory intelligibility estimate, not a MOS score or a physical-device listening test."}

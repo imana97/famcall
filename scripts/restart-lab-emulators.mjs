@@ -30,6 +30,8 @@ for (const d of devices) {
   identified.push(d);
 }
 for (const d of identified) {
+  // Commit recent APK/data writes before terminating the dedicated emulator.
+  command(['-s', d.serial, 'shell', 'sync']);
   try { command(['-s', d.serial, 'emu', 'kill']); } catch { /* Already stopped. */ }
 }
 const stoppedDeadline = Date.now() + 30_000;

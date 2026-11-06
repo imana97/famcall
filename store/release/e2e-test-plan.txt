@@ -261,5 +261,20 @@ STOI, waveform matching, and returning packets do not replace listener scores,
 simultaneous two-way speech, N1/N2 outage tests, or physical-device G4/G5 evidence.
 Keep invalid attempts and unconfirmed recovery cases in the evidence record.
 
+Native test builds also collect playout buffer delay, emitted samples and
+acceleration/deceleration counters. scripts/analyze-audio-timing.py separates
+each stream and outage phase, rejects reset counter deltas, and preserves missing
+values. These diagnostics help distinguish delayed playback from missing input;
+they do not relax the speech detector or establish end-to-end latency. Preserve
+the exact input delivery mode when comparing experiments. The experimental
+realtime emulator injection mode has not supplied a valid comparative sample.
+
+scripts/test-offline-hangup.mjs covers one J08 combination on the dedicated
+Android AVDs: disable both caller networks, end locally, restart the app while
+offline, then restore connectivity and verify durable server/recipient cleanup.
+It records the installed APKs, no-default-network observation, changed process
+identity and active-lease removal. Extend coverage to callee hangup, other call
+states, longer outages and physical devices; do not generalize this one result.
+
 Emulator lifecycle investigation (used as a hypothesis, then checked locally):
 https://github.com/kaeawc/auto-mobile/issues/13634

@@ -61,6 +61,10 @@ RUN
    code of zero means measurements were valid, not that voice quality passed a
    release threshold. Listen to the synthetic captures and review packet data.
 
+For a focused regression run, FAMCALL_AUDIO_PROFILES=baseline,weak selects only
+those fixed profiles. Omit it for all four. Selection is saved in provenance;
+do not describe a subset as the complete matrix. It is rejected in outage mode.
+
 The baseline/modest/weak/stress labels describe experimental configurations,
 not an advertised support envelope. Delay/loss/jitter are applied independently
 on both endpoint relay legs. Report measured RTT and RTP loss. Bandwidth includes
@@ -98,6 +102,23 @@ Unit checks cover restored audio, silent packet streams, replayed old audio,
 profile changes and missing packet drops. Run them with the audio virtualenv:
 .local/audio-venv/bin/python -m unittest discover -s e2e/audio -p 'test_*.py'
 
+TIMING DIAGNOSTICS
+Test builds record native receiver buffer and acceleration counters. For an
+outage report, preserve a diagnostic extract with:
+python3 scripts/analyze-audio-timing.py .local/audio-lab/RUN/outage-15-b-to-a.json \
+  --output .local/audio-lab/timing-diagnostic.json
+The extract preserves selected raw observations and report/analysis source hashes.
+It separates each peer, stream, and before/during/after interval; missing counters
+remain missing and counter resets invalidate the affected delta. Mean buffer delay
+uses the change in cumulative delay divided by emitted samples. This describes
+receiver buffering, not end-to-end latency, and never grants a speech pass.
+
+Reports also retain the emulator's capture timestamps and progress handing
+generated input to gRPC. Handoff time is not microphone consumption time.
+FAMCALL_AUDIO_DELIVERY=realtime selects the emulator's experimental paced mode
+for a controlled comparison. Buffered remains the default; a realtime pilot
+produced no valid input, so that mode is not a validated workaround.
+
 To observe an already-connected call's selected path and packet continuity:
 node scripts/measure-transport-session.mjs udp 30
 The first argument is udp, tcp, tls, or direct; the second is 15–7200 seconds.
@@ -117,6 +138,18 @@ The first blocks the relay during initial setup, verifies a signaling retry,
 restores it after 22 seconds, and checks received packets at both phones. The
 second keeps it blocked and requires the call to end within 90 seconds. Neither
 injects audio or sends SMS. Both restore the baseline lab network afterward.
+
+To check durable caller hangup with both signaling and media unavailable:
+node scripts/test-offline-hangup.mjs
+End any existing call first. This uses only famcall_a/famcall_b and the isolated
+test app. It places a call, disables the caller's emulator Wi-Fi and mobile data,
+checks that no default network remains, hangs up locally, and restarts the app
+while still offline. The server call must remain accepted until connectivity is
+restored; afterward it must end, clear both leases, and disappear at the recipient.
+The caller must remain on the contacts screen. Original network settings are
+restored on completion/interruption. This covers caller hangup/process restart,
+not every offline-call state or physical-device background behavior. The replay
+observation after detecting a default network is not exact reconnection latency.
 
 Interrupting the matrix restores the network profile. An interrupted run may
 leave a lab call active; end it before starting another run. All reports and

@@ -9,6 +9,11 @@ const maestro = process.env.MAESTRO_BIN ?? 'maestro';
 const outageMode = process.argv[2] === '--outages';
 const requestedOutages = process.argv.slice(3).map(Number);
 const requestedDirection = process.env.FAMCALL_AUDIO_DIRECTION;
+const requestedProfiles = process.env.FAMCALL_AUDIO_PROFILES?.split(',');
+if (requestedProfiles && (outageMode || requestedProfiles.some(name => !['baseline', 'modest', 'weak', 'stress'].includes(name))))
+  throw new Error('FAMCALL_AUDIO_PROFILES accepts comma-separated baseline,modest,weak,stress for fixed-profile runs only.');
+const delivery = process.env.FAMCALL_AUDIO_DELIVERY ?? 'buffered';
+if (!['buffered', 'realtime'].includes(delivery)) throw new Error('FAMCALL_AUDIO_DELIVERY must be buffered or realtime.');
 if (requestedDirection && !['a-to-b', 'b-to-a'].includes(requestedDirection)) throw new Error('FAMCALL_AUDIO_DIRECTION must be a-to-b or b-to-a.');
 const directions = [['a-to-b', 8554, 8556], ['b-to-a', 8556, 8554]].filter(([direction]) => !requestedDirection || direction === requestedDirection);
 if (outageMode && requestedOutages.some(n => ![2, 5, 15, 30].includes(n))) throw new Error('Outages must be 2, 5, 15, or 30 seconds.');
@@ -27,7 +32,7 @@ const command = (bin, args) => execFileSync(bin, args, { cwd: root, encoding: 'u
 await writeFile(resolve(folder, 'provenance.json'), JSON.stringify({
   capturedAt: new Date().toISOString(), workspaceBaseCommit: command('git', ['rev-parse', 'HEAD']),
   uncommittedChanges: Boolean(command('git', ['status', '--porcelain'])),
-  node: process.version, files: hashes, referenceSha256,
+  node: process.version, files: hashes, referenceSha256, delivery, requestedProfiles,
   emulator: command(process.env.FAMCALL_EMULATOR_BIN ?? resolve(sdk, 'emulator/emulator'), ['-version']).split('\n')[0],
   scope: 'Workspace commit is context only; each profile records the actual installed APK hash.',
 }, null, 2) + '\n');
@@ -40,7 +45,7 @@ const profiles = outageMode ? (requestedOutages.length ? requestedOutages : [2, 
   { name: 'modest', loss: 0.005, delayMs: 35, jitterMs: 10, kbps: 128 },
   { name: 'weak', loss: 0.0151, delayMs: 75, jitterMs: 25, kbps: 64 },
   { name: 'stress', loss: 0.03, delayMs: 150, jitterMs: 50, kbps: 48 },
-];
+].filter(profile => !requestedProfiles || requestedProfiles.includes(profile.name));
 const configure = async config => {
   const r = await fetch('http://127.0.0.1:8787/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) });
   if (!r.ok) throw new Error('Lab configuration failed.');
@@ -96,7 +101,7 @@ try {
         console.log('Measuring ' + name + '/' + direction);
         const output = resolve(folder, name + '-' + direction + '.json');
         const status = await run(resolve(root, '.local/audio-venv/bin/python'), [resolve(root, 'e2e/audio/measure.py'),
-          '--buffered', '--source', reference, '--sender', String(sender), '--receiver', String(receiver),
+          ...(delivery === 'buffered' ? ['--buffered'] : []), '--source', reference, '--sender', String(sender), '--receiver', String(receiver),
           '--seconds', String(outageSeconds ? outageSeconds + 32 : 30), '--output', output,
           ...(outageSeconds ? ['--outage-seconds', String(outageSeconds)] : [])], name + '-' + direction);
         if (status !== 0) failed++;
