@@ -62,6 +62,25 @@ https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats-totalaudioenergy
 This checks microphone activity, not matching speech content or voice quality.
 Keep failed runs: an input failure may originate in the app or the fixture.
 
+ANDROID RECORDING-BUFFER DIAGNOSTICS
+For an investigation, rebuild the separate test app with APP_VARIANT=e2e and
+FAMCALL_AUDIO_RECORD_DIAGNOSTICS=1 during both Expo prebuild and the Android
+build. The config plugin installs an energy callback on the Java audio device
+module with its normal settings. Production configuration rejects this flag.
+The callback reports one aggregate window per second under the native log tag
+FamCallAudioRecord: session, timestamps, format, sample count, RMS, peak and zero
+fraction. It neither retains PCM nor writes speech recordings. The existing
+lab recorder still captures only generated test speech as described below.
+
+These callback samples are the SDK recording buffer after Java microphone mute;
+they are not physical-microphone measurements before Android audio effects.
+Correlate them with the sender's source-energy windows and native mute/route
+state. Callback overhead and earlier audio-module construction may affect timing,
+so retain the instrumented build hash and do not count it as a production audio
+benchmark. Rebuild without the flag for normal measurements. Prebuilding with
+the flag unset removes both the generated installation call and helper class;
+never edit the generated Android project or patch the WebRTC SDK to enable it.
+
 SYNTHETIC REFERENCE
 Generate only between runs; never replace the reference during a matrix:
 say -v Samantha -f e2e/audio/phrases.txt -o .local/audio-source.aiff

@@ -2,6 +2,9 @@ import type { ExpoConfig } from "expo/config";
 import path from "node:path";
 
 const e2e = process.env.APP_VARIANT === "e2e";
+const audioRecordDiagnostics = process.env.FAMCALL_AUDIO_RECORD_DIAGNOSTICS === "1";
+if (audioRecordDiagnostics && !e2e)
+  throw new Error("Audio recording diagnostics require the separate e2e app.");
 const root = path.resolve(__dirname, "../..");
 if (!e2e && process.env.EXPO_PUBLIC_EMULATOR_HOST)
   throw new Error("Emulator settings require the separate e2e app.");
@@ -104,6 +107,7 @@ const config: ExpoConfig = {
     ],
     "./plugins/withAudioOnly",
     "./plugins/withCallEndReceiver",
+    ["./plugins/withAudioRecordDiagnostics", { enabled: audioRecordDiagnostics }],
   ],
   extra: {
     ...(e2e ? {} : { eas: { projectId: "76a56f3e-a64d-4917-9da0-d9f9018de627" } }),

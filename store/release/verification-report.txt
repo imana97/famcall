@@ -21,6 +21,8 @@ PASS
   stale completions, uncertain create responses, terminal retries and storage
   failures. Three outbox tests cover in-flight additions, retry and restoration;
   the in-flight addition test fails on the old implementation and passes now.
+  Two diagnostic-plugin tests reject production enablement, remove generated
+  diagnostic code when disabled, and fail on an unrecognized native template.
   Sixteen Python evidence tests cover profile changes, wrong relay paths, missing
   outage drops, restored speech, silent output, replayed pre-outage audio, and
   timing counter deltas, resets, missing values and stream/peer isolation in
@@ -615,6 +617,42 @@ source activity across 27.004 seconds and recorded 32.629 seconds, with STOI
 measurement source set, reference, both UDP relay paths and native-log lifetimes
 were audited. This is one successful sample alongside retained failures; it
 does not establish repeatability or explain why the previous source stopped.
+
+ANDROID RECORDING-CALLBACK INVESTIGATION
+An opt-in, e2e-only config plugin adds JavaAudioDeviceModule recording callbacks
+with the usual audio settings. It reports aggregate PCM energy, peak, zero
+fraction, sample count and recording-session timestamps; the callback retains
+no PCM or speech files. Production configuration rejects the flag. A real
+prebuild on/off/on check verified removal of both the generated installation
+call and helper class when disabled. The standalone Android diagnostic build
+compiled, with APK SHA-256 54330e5d3113655dcda26ee8a85e06b1a755f1d32ae0483a2b02688d274da209.
+The packaged native library matches the inspected org.jitsi:webrtc:155.0.1 AAR.
+
+Two fresh-pair B-to-A baseline calls used API 36, emulator 37.2.13, buffered
+48 kHz generated input and 8 kHz output capture, without debugger pauses:
+- matrix-2026-11-06T21-03-38.303Z: invalid source activity and no measurable
+  received speech. Twenty-nine complete callback windows wholly within the
+  injection interval contained 29.39 seconds of exactly zero PCM. Android's
+  API/system mute flags were false, its recording configuration was not silenced,
+  and the app's microphone track was enabled. The recording thread continued
+  delivering samples from one session; it did not stop during the measurement.
+- matrix-2026-11-06T21-07-12.359Z: positive control with sustained source energy
+  and nonzero callback PCM. Its raw full-clip STOI was 0.900. This validates that
+  the diagnostic can observe nonzero input; it is not a production benchmark.
+
+Both cases retain actual relay paths, complete build/source/reference hashes,
+native-log hashes/lifetimes, recording-session identity and separate callback
+analysis. Device/host timestamp offsets varied by 10 ms and 2 ms respectively;
+comparison windows exclude callback records crossing source-stat boundaries.
+The bounded investigation stopped after the failed case and positive control.
+No third attempt was needed, and no success-rate estimate is made.
+
+For the failed case, silence was already present in the SDK recording buffer
+before media transmission. The callback is after Java microphone mute and
+Android audio effects; this does not isolate those stages from emulator injection
+or establish a physical-device defect. Callback overhead and earlier audio-module
+construction may affect timing. Both instrumented cases are excluded from
+release-quality evidence. Production audio behavior has not been changed.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
