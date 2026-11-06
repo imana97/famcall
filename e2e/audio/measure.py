@@ -60,6 +60,7 @@ def main():
     parser.add_argument("--seconds", type=float, default=20)
     parser.add_argument("--buffered", action="store_true")
     parser.add_argument("--input-rate", type=int, choices=[8000,16000,48000], default=48000)
+    parser.add_argument("--capture-rate", type=int, choices=[8000,16000,48000], default=48000)
     parser.add_argument("--outage-seconds", type=int, choices=[2, 5, 15, 30])
     args = parser.parse_args()
     if not 3 <= args.seconds <= 3600:
@@ -105,7 +106,7 @@ def main():
         sc.close()
         rc.close()
         raise RuntimeError("Restart the sending emulator before another audio injection.") from None
-    fmt = pb.AudioFormat(samplingRate=48000, channels=pb.AudioFormat.Mono,
+    fmt = pb.AudioFormat(samplingRate=args.capture_rate, channels=pb.AudioFormat.Mono,
                          format=pb.AudioFormat.AUD_FMT_S16, mode=pb.AudioFormat.MODE_UNSPECIFIED if args.buffered else pb.AudioFormat.MODE_REAL_TIME)
     input_fmt = pb.AudioFormat(samplingRate=args.input_rate, channels=pb.AudioFormat.Mono,
                          format=pb.AudioFormat.AUD_FMT_S16, mode=fmt.mode)
@@ -124,7 +125,7 @@ def main():
             for packet in stream:
                 captured.append(bytes(packet.audio))
                 captured_samples += len(packet.audio) // 2
-                capture_chunks.append({"at": int(time.time() * 1000), "emulatorTimestampUs": int(packet.timestamp), "endSample": captured_samples // 3})
+                capture_chunks.append({"at": int(time.time() * 1000), "emulatorTimestampUs": int(packet.timestamp), "endSample": captured_samples * 16000 // args.capture_rate})
                 formats.add((packet.format.samplingRate, packet.format.channels, packet.format.format))
         except grpc.RpcError as error:
             if error.code() not in (grpc.StatusCode.CANCELLED, grpc.StatusCode.DEADLINE_EXCEEDED):
@@ -202,16 +203,16 @@ def main():
     with wave.open(str(recording), "wb") as destination:
         destination.setnchannels(1)
         destination.setsampwidth(2)
-        destination.setframerate(48000)
+        destination.setframerate(args.capture_rate)
         destination.writeframes(b"".join(captured))
     reference = resample_poly(np.frombuffer(pcm, dtype="<i2").astype(float) / 32768, 1, 3)
-    received = resample_poly(np.frombuffer(b"".join(captured), dtype="<i2").astype(float) / 32768, 1, 3) if captured else np.array([])
+    received = resample_poly(np.frombuffer(b"".join(captured), dtype="<i2").astype(float) / 32768, 16000, args.capture_rate) if captured else np.array([])
     result = {"source": "generated speech; no host microphone", "sourceSha256": source_hash, "sender": args.sender,
               "receiver": args.receiver, "referenceSeconds": duration, "receivedSeconds": len(received) / 16000,
               "rms": float(np.sqrt(np.mean(received ** 2))) if len(received) else 0,
               "errors": errors, "stoi": None,
               "captureFormats": sorted(formats), "capturePackets": len(captured), "buffered": args.buffered,
-              "inputRate": args.input_rate,
+              "inputRate": args.input_rate, "captureRate": args.capture_rate,
               "measurementSourceHashes": measurement_sources,
               "protoDescriptorSha256": hashlib.sha256(pb.DESCRIPTOR.serialized_pb).hexdigest(),
               "grpcVersion": grpc.__version__,
@@ -303,7 +304,7 @@ def main():
         result["comparedSeconds"] = length / 16000
         result["stoi"] = float(stoi(ref[:length], deg[:length], 16000, extended=False))
     reasons = list(errors)
-    if formats != {(48000, pb.AudioFormat.Mono, pb.AudioFormat.AUD_FMT_S16)}:
+    if formats != {(args.capture_rate, pb.AudioFormat.Mono, pb.AudioFormat.AUD_FMT_S16)}:
         reasons.append("Capture did not supply the requested PCM format")
     if result["stoi"] is None or not np.isfinite(result["stoi"]):
         reasons.append("No measurable received speech")

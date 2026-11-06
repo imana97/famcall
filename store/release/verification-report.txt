@@ -536,6 +536,49 @@ launching the second app. Its driver log and empty measurement summary are
 retained separately; the cause of that transient disconnect is undiagnosed.
 These four measurements and one setup failure are not a reliability estimate.
 
+EMULATOR AUDIO PIPELINE DIAGNOSTICS
+Four additional B-to-A baseline calls used read-only debugger snapshots of the
+dedicated emulator's virtual microphone. All are excluded from speech-quality
+and latency results because inspection pauses execution. The first three
+paused before injection and again during it: the selected microphone was the
+active stream, and later probes found nonzero PCM through the emulator's
+conversion and guest-facing buffers, while WebRTC source energy stayed flat.
+Those pauses could themselves disrupt recording; these cases do not diagnose
+the earlier unpaused silent-input failures.
+
+The fourth call had no inspection pause before injection. Its retained counters
+from before the first attach show B's source energy increasing by 1.704 and A's
+received energy by 1.837 over about three seconds. Its final recording still
+contained only 2.258 seconds for a 30-second request and no measurable captured
+speech. This distinguishes a short output-recording symptom from absent source
+energy in that case; energy counters alone do not establish intelligibility.
+It does not explain every earlier input failure or prove a specific emulator
+defect. No app audio workaround was introduced from these observations.
+
+Private diagnostic folders: matrix-2026-11-06T20-16-23.847Z,
+matrix-2026-11-06T20-20-49.377Z, matrix-2026-11-06T20-24-12.509Z and
+matrix-2026-11-06T20-29-38.989Z. Source snapshots, APK cc94bd07, reference and
+native-log hashes/lifetimes were audited; the fourth retains peer identities
+and counters captured before inspection. A separate no-early-pause attempt,
+matrix-2026-11-06T20-27-48.357Z, failed during the second app's Maestro launch
+with ADB device offline, before a call or injection. Its driver logs remain.
+
+The test runner now records independent input and output-capture sample rates.
+Output capture defaults to the existing 48 kHz; optional 8/16 kHz capture adjusts
+WAV metadata, sample positions and resampling consistently. Unexpected formats
+still invalidate the measurement. These settings affect the test recorder,
+not FamCall's codec or microphone configuration.
+
+A fresh, unpaused B-to-A baseline check kept APK cc94bd07, emulator 37.2.13 and
+48 kHz generated input, and requested 8 kHz output capture. It received 32.634
+seconds with the requested PCM format and enough audio for a full 30-second
+comparison, but its STOI was only 0.069. Source and receiver energy counters
+advanced. This passes the recording-format/duration checks, not voice quality;
+it does not establish a reliable fixture or justify changing app audio settings.
+Private folder: matrix-2026-11-06T20-34-34.408Z. Both actual UDP relay paths,
+installed APKs, source/reference hashes and native-log lifetimes were audited.
+Keep the differing capture rates explicit when comparing this with earlier runs.
+
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
   lock/background, incoming push after process reclamation, audio routes and

@@ -24,7 +24,9 @@ if (requestedProfiles && (outageMode || requestedProfiles.some(name => !['baseli
   throw new Error('FAMCALL_AUDIO_PROFILES accepts comma-separated baseline,modest,weak,stress for fixed-profile runs only.');
 const delivery = process.env.FAMCALL_AUDIO_DELIVERY ?? 'buffered';
 const inputRate = Number(process.env.FAMCALL_AUDIO_INPUT_RATE ?? 48000);
+const captureRate = Number(process.env.FAMCALL_AUDIO_CAPTURE_RATE ?? 48000);
 if (![8000, 16000, 48000].includes(inputRate)) throw new Error('FAMCALL_AUDIO_INPUT_RATE must be 8000, 16000, or 48000.');
+if (![8000, 16000, 48000].includes(captureRate)) throw new Error('FAMCALL_AUDIO_CAPTURE_RATE must be 8000, 16000, or 48000.');
 if (!['buffered', 'realtime'].includes(delivery)) throw new Error('FAMCALL_AUDIO_DELIVERY must be buffered or realtime.');
 if (requestedDirection && !['a-to-b', 'b-to-a'].includes(requestedDirection)) throw new Error('FAMCALL_AUDIO_DIRECTION must be a-to-b or b-to-a.');
 const directions = [['a-to-b', 8554, 8556], ['b-to-a', 8556, 8554]].filter(([direction]) => !requestedDirection || direction === requestedDirection);
@@ -44,7 +46,7 @@ const command = (bin, args) => execFileSync(bin, args, { cwd: root, encoding: 'u
 await writeFile(resolve(folder, 'provenance.json'), JSON.stringify({
   capturedAt: new Date().toISOString(), workspaceBaseCommit: command('git', ['rev-parse', 'HEAD']),
   uncommittedChanges: Boolean(command('git', ['status', '--porcelain'])),
-  node: process.version, files: hashes, referenceSha256, delivery, inputRate, requestedProfiles,
+  node: process.version, files: hashes, referenceSha256, delivery, inputRate, captureRate, requestedProfiles,
   outageProfile: outageMode ? outageProfile : null,
   audioProtoDirectory: process.env.FAMCALL_AUDIO_PROTO_DIR ?? resolve(root, '.local/audio-proto'),
   emulator: command(process.env.FAMCALL_EMULATOR_BIN ?? resolve(sdk, 'emulator/emulator'), ['-version']).split('\n')[0],
@@ -116,7 +118,7 @@ try {
         const output = resolve(folder, name + '-' + direction + '.json');
         const status = await run(resolve(root, '.local/audio-venv/bin/python'), [resolve(root, 'e2e/audio/measure.py'),
           ...(delivery === 'buffered' ? ['--buffered'] : []), '--source', reference, '--sender', String(sender), '--receiver', String(receiver),
-          '--input-rate', String(inputRate),
+          '--input-rate', String(inputRate), '--capture-rate', String(captureRate),
           '--seconds', String(outageSeconds ? outageSeconds + 32 : 30), '--output', output,
           ...(outageSeconds ? ['--outage-seconds', String(outageSeconds)] : [])], name + '-' + direction);
         if (status !== 0) failed++;

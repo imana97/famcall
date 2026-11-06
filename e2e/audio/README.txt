@@ -41,6 +41,11 @@ FAMCALL_AUDIO_INPUT_RATE selects 8000, 16000 or 48000 Hz (default 48000) for
 synthetic microphone input. Keep it fixed across comparison samples and record
 it with results. Matching a native recording rate is a diagnostic experiment,
 not proof of a reliable fixture; retain silent and otherwise invalid attempts.
+FAMCALL_AUDIO_CAPTURE_RATE independently selects 8000, 16000 or 48000 Hz
+(default 48000) for the receiving emulator's output recording. WAV headers,
+capture sample positions and analysis resampling follow that requested rate;
+unexpected response formats invalidate the measurement. This is a recording
+diagnostic, not an app codec setting. Preserve both rates when comparing results.
 
 SYNTHETIC REFERENCE
 Generate only between runs; never replace the reference during a matrix:
