@@ -654,6 +654,41 @@ or establish a physical-device defect. Callback overhead and earlier audio-modul
 construction may affect timing. Both instrumented cases are excluded from
 release-quality evidence. Production audio behavior has not been changed.
 
+ANDROID 15 IMAGE COMPARISON
+A separate, clean API 35 Google Play phone image used the same emulator 37.2.13,
+diagnostic APK, Pixel 7 hardware profile, generated reference, buffered 48 kHz
+input, 8 kHz capture and baseline UDP proxy. The API 36 AVDs were preserved.
+New userdata and system services also differ, so this is not an isolated test
+of the Android version. One Pixel Launcher ANR dialog on each fresh phone
+interrupted initial signup; both screenshots and successful signup retries remain.
+
+- matrix-2026-11-06T21-23-26.460Z: sustained sender input, but the receiver process
+  stopped about nine seconds into measurement. Android's package-specific exit
+  record identifies PID 3822, reason 16 PACKAGE UPDATED, with the description
+  "stop com.google.android.gms due to installPackageLI". The receiver's Google
+  Play services update time matches this interruption. Only 13.028 seconds of
+  audio were captured and connection evidence disappeared; the measurement is
+  invalid. Its partial-recording score is not quality evidence.
+- matrix-2026-11-06T21-27-03.525Z: after both phones reported Play services
+  26.43.30, silent input reproduced. Twenty-eight complete recording-callback
+  windows inside injection contained 28.38 seconds of exactly zero PCM. The
+  sender's Android mute flags were false; both original app PIDs remained
+  present after measurement. The source-activity gate rejected the sample,
+  despite a complete output file and verified UDP relay paths.
+
+Both attempts retain source/build/reference hashes, actual device fingerprints,
+native-log lifetimes and recording-callback analyses. Both archives passed
+integrity checks; the first retains its failed path verification. The comparison
+stopped on the reproduced silent case, within its three-attempt maximum. This
+shows the symptom also occurs on this API 35 setup; changing the Android image
+did not resolve it. It does not establish the cause or a population failure rate.
+
+Native-log collection now saves a hashed process snapshot and package-specific
+Android exit history at stop. A controlled idle-app check force-stopped A while
+leaving B running: A was recorded as absent with the matching force-stop exit
+record, and B retained its original PID. This verifies diagnostic collection,
+not in-call recovery. An end snapshot is not continuous process monitoring.
+
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
   lock/background, incoming push after process reclamation, audio routes and

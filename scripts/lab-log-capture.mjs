@@ -1,4 +1,4 @@
-import { spawn, execFileSync } from 'node:child_process';
+import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { open, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -19,9 +19,17 @@ export async function captureNativeLogs(adb, folder, prefix) {
       entry.record.exit = exit;
       entry.record.bytes = bytes.length;
       entry.record.sha256 = createHash('sha256').update(bytes).digest('hex');
+      const process = captureProcessState(adb, entry.record.serial, entry.record.pid);
+      const processFile = prefix + '-' + entry.record.serial + '-process-stop.json';
+      const processBytes = JSON.stringify(process, null, 2) + '\n';
+      await writeFile(resolve(folder, processFile), processBytes);
+      entry.record.processAtStop = {
+        file: processFile, capturedAt: process.capturedAt, pid: process.pid,
+        status: process.status, sha256: createHash('sha256').update(processBytes).digest('hex'),
+      };
     }
     await writeFile(resolve(folder, prefix + '-native-log-capture.json'), JSON.stringify({
-      scope: 'Private Android test-app logs; may contain sensitive diagnostic values. Never publish raw logs. PID filtering does not follow an app process restart.',
+      scope: 'Private Android test-app logs; may contain sensitive diagnostic values. Never publish raw logs. PID filtering does not follow an app process restart. Process state at stop is a snapshot, not proof of continuous process availability.',
       captures: entries.map(entry => entry.record),
     }, null, 2) + '\n');
   };
@@ -46,6 +54,26 @@ export async function captureNativeLogs(adb, folder, prefix) {
     }
     return stop;
   } catch (error) { await stop(); throw error; }
+}
+
+function captureProcessState(adb, serial, expectedPid) {
+  const state = { serial, expectedPid, capturedAt: Date.now(), pid: null, status: 'unavailable' };
+  const result = spawnSync(adb, ['-s', serial, 'shell', 'pidof', 'com.silvergridtech.famcall.e2e'], {
+    encoding: 'utf8', timeout: 10_000, stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const pid = result.stdout?.trim() ?? '';
+  if (result.status === 0 && /^\d+$/.test(pid)) {
+    state.pid = pid;
+    state.status = pid === expectedPid ? 'same-pid' : 'different-pid';
+  } else if (!result.error && result.status === 1 && !pid && !result.stderr?.trim()) {
+    state.status = 'absent';
+  }
+  try {
+    state.exitHistory = execFileSync(adb, ['-s', serial, 'shell', 'dumpsys', 'activity', 'exit-info', 'com.silvergridtech.famcall.e2e'], {
+      encoding: 'utf8', timeout: 10_000, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 2 * 1024 * 1024,
+    });
+  } catch { state.exitHistory = { unavailable: true }; }
+  return state;
 }
 
 export async function captureAudioState(adb, folder, prefix, phase) {

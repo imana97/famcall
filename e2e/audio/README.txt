@@ -158,6 +158,12 @@ through measurement and hangup. Their hashes, process IDs and capture lifetime
 are retained beside the report. This helps investigate lost statistics or native
 errors. It does not follow a restarted app process. Raw logs can contain sensitive
 diagnostic values and stay in ignored .local; never publish them.
+Stopping native-log capture also saves a hashed, package-specific process
+snapshot and Android exit history. It distinguishes the original PID still
+present, a different PID, no running process, and an unavailable observation.
+Use the exit record's PID and time to distinguish a package update, force-stop
+or crash from an audio-path failure. The final snapshot alone does not prove
+that the process stayed available throughout the call.
 Private system-audio snapshots after connection and measurement record mute,
 route and audio-device state for diagnosing a silent input or output fixture.
 
