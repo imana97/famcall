@@ -178,14 +178,13 @@
     "effective_limit_verified": 50
   },
   "pending": [
-    "Working release candidate and approved UI",
     "Measured weak-network behavior",
     "Real screenshots matching the candidate build",
-    "Final device support and app identifiers",
     "Verified hosting URLs and final app privacy policy",
     "Actual store data, content, age and encryption declarations",
-    "Working in-app and external account deletion",
     "Private reviewer credentials and complete contact details",
-    "Store account enrollment and submission access"
+    "Store account enrollment and submission access",
+    "Production release candidate validation (UI approved; native simulator builds pass)",
+    "Physical-device deletion and external support-process verification"
   ]
 }

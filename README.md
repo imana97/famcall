@@ -8,7 +8,9 @@ The app uses React Native with Expo development builds, native WebRTC and Opus, 
 
 ## Development status
 
-This is a working prototype, not a published service. Two Android emulators have exchanged generated speech through the dedicated relay. Local tests cover phone normalization, contact creation, answering, hanging up, concurrent calls, blocking, authorization, and account deletion. Impaired-network measurements are still being evaluated; physical-device background calls, Apple push delivery, store signing, and production authentication remain release gates.
+This is a working prototype, not a published service. Android and iOS simulator builds compile. Maestro covers signup, persistent sign-in, contacts, and navigation on both platforms, plus call controls and blocking on two Android emulators. The 21 local logic, database-rule, and backend tests pass.
+
+Earlier Android calls exchanged generated speech, but repeated measurements are currently blocked by the emulator's virtual microphone. The iOS simulator also ends incoming native calls immediately with a system error. Neither is a passing call-quality result. Physical-device calling, push delivery, production authentication, and a reproducible poor-network audio test remain release gates.
 
 The production backend and website require an owner-approved deployment. Production mobile releases go through Google Play internal testing and TestFlight first. Nothing in this repository bypasses that approval.
 
@@ -57,6 +59,8 @@ See `store/release/e2e-test-plan.txt` for the full release matrix. Maestro drive
 Production uses phone-based Firebase authentication and App Check, private per-user data, participant-only signaling, expiring relay credentials, bounded ringing, retryable hangup intents, and three-minute call leases. The configured GCP verification quota is 50 requests per project per day; the real-provider boundary test is a separate release check. Cloud billing alerts do not impose a spending cap.
 
 The `backend` and `release` GitHub environments require `silvergrid` approval. Cloud deployment uses restricted workload identity federation, not a checked-in service-account key. `infra/configure-github-cloud.py` records the project-specific setup. Forks must configure their own cloud project and identities. Store workflows also need Expo and store credentials in protected environments. The current configuration and unresolved release gates are tracked in `store/release/submission-checklist.txt`.
+
+Android upload signing and iOS distribution signing are configured. The App Store listing is an unpublished draft; Play setup still needs publisher declarations. `testing-release.yml` builds and submits to the testing channels. `public-release.yml` promotes an explicit tested build only after the checked-in candidate record contains passing evidence and the owner approves the workflow. See `store/release/infrastructure-status.txt` for remaining account setup.
 
 ## Contributing
 

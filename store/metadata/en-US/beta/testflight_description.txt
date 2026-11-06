@@ -1,6 +1,6 @@
 FamCall is a simple voice-calling app designed with weak and unstable internet connections in mind.
 
-This beta focuses on phone-number signup, adding contacts, incoming calls, two-way voice, and recovery after short connection interruptions. Both callers need the beta app and internet access.
+This internal test version focuses on phone-number signup, adding contacts, incoming calls, two-way voice, and recovery after short connection interruptions. Both callers need the test app and internet access.
 
 Help us find the moments when a call takes too long to ring, speech becomes hard to follow, or reconnection needs improvement. Send feedback through TestFlight or email info@silvergridtech.com.
 

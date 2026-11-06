@@ -1,29 +1,50 @@
 {
-  "cli": { "version": "27.5.0", "appVersionSource": "remote" },
+  "cli": {
+    "version": "27.5.0",
+    "appVersionSource": "remote"
+  },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "environment": "development"
+      "environment": "development",
+      "node": "24.22.2"
     },
     "store": {
       "distribution": "store",
       "environment": "production",
       "autoIncrement": true,
-      "android": { "buildType": "app-bundle" }
+      "android": {
+        "buildType": "app-bundle",
+        "credentialsSource": "local"
+      },
+      "node": "24.22.2"
     },
     "download": {
       "distribution": "internal",
       "environment": "production",
       "autoIncrement": true,
-      "android": { "buildType": "apk" }
+      "android": {
+        "buildType": "apk",
+        "credentialsSource": "local"
+      },
+      "node": "24.22.2"
     }
   },
   "submit": {
     "testing": {
-      "android": { "track": "internal", "releaseStatus": "completed" },
-      "ios": {}
+      "android": {
+        "track": "internal",
+        "releaseStatus": "completed",
+        "serviceAccountKeyPath": "../../.local/store-access/play-credentials.json"
+      },
+      "ios": {
+        "ascAppId": "6831551843",
+        "appleTeamId": "ZGBBX2Y24U",
+        "ascApiKeyPath": "../../.local/store-access/AuthKey.p8",
+        "ascApiKeyId": "824PKL27T3",
+        "ascApiKeyIssuerId": "c824ef09-93ae-4905-8efd-7c9280cf8731"
+      }
     }
   }
 }
-

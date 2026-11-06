@@ -1,12 +1,20 @@
 FAMCALL — SCREENSHOT STORYBOARD
 Design draft • 6 November 2026 • Five portrait panels per platform
 
-IMPORTANT
-These panels describe future captures from the working app. Wireframes and
-marketing mockups are not final app screenshots and must not be submitted as if
-they show an implemented app. After UI approval and implementation, capture the
-shipping build on each platform and replace the concept content. Keep actual
-controls, wording, and available features faithful to that build.
+CURRENT CAPTURES
+Actual development-build screenshots are in store/assets/screenshots-draft.
+Android: people, recents, settings and add-person screens.
+iOS: people, recents, settings and add-person screens.
+The capture manifest records simulator/OS/version/locale and limitations.
+These are genuine UI captures with fictional contacts, not release screenshots.
+Recapture the signed release candidate before submission. No incoming, connected-call or reconnection panel is included while those
+validation gates remain open. An attempted Android dialing capture had already
+ended and was excluded from store assets.
+
+FUTURE RELEASE PANELS
+The following storyboard is conditional on the corresponding behavior passing
+on the release candidate. Omit unverified panels. Never substitute a generated
+interface or a wireframe for an actual app capture.
 
 VISUAL DIRECTION
 Warm ivory, deep green, generous spacing, large readable headings, and one clear

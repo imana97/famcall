@@ -2,16 +2,20 @@ FAMCALL — RELEASE PREPARATION
 Planning document • Checked 6 November 2026
 
 CURRENT STATE
-The brand and written store assets are drafts. The app is not built, the UI is
-under review, and no mobile release has been uploaded. This checklist is the
-route to submission, not evidence that submission requirements are complete.
+The approved UI is implemented. Native Android and iOS simulator builds and
+local automated checks pass as detailed in verification-report.txt. Store copy
+and screenshot captures remain drafts until the release candidate is validated.
+No mobile release has been uploaded. This checklist tracks remaining submission
+work; it is not evidence of approval.
 
 1. PUBLISHER AND APP RECORDS
 - Use the developer account belonging to SilverGrid Technologies LLC. Confirm
   its legal identity, enrollment, roles, agreements, and required business details.
-- Confirm the final Apple bundle ID, Android application ID, Apple SKU, and
-  availability of the desired store name. Prepared copy does not reserve a name.
-- Set the supported OS versions and devices. iPad availability is undecided.
+- Apple record created: app 6831551843, SKU famcall-ios, version 0.1.0.
+  Both platform identifiers are com.silvergridtech.famcall. Apple signing is
+  configured; Play app creation still awaits publisher declarations.
+- iPhone and Android phones are configured; iPad support is disabled. Verify
+  generated minimum OS versions against the candidate build.
 - Confirm pricing, audience, countries of distribution, ads, content rating, and
   any current declarations from the real product. Do not infer an age rating
   or children-directed audience from the word "Fam" or family photography.
@@ -33,7 +37,7 @@ route to submission, not evidence that submission requirements are complete.
   safe logs. Confirm no debug auth bypass, permanent relay secrets, or admin
   credentials are shipped in the application.
 
-3. BETA DISTRIBUTION — REQUESTED CHANNELS
+3. INTERNAL TEST DISTRIBUTION — REQUESTED CHANNELS
 Android: Google Play internal testing. Upload a signed Android App Bundle to the
 internal track, configure the intended tester list, and verify the real opt-in
 link on a tester's Google account. Internal testing supports up to 100 testers.
@@ -57,12 +61,12 @@ type; do not assume internal testing satisfies that separate requirement.
   the current format and content requirements. Launcher icons are separate.
 - Integrate the Apple app icon into the app asset catalog/build, then verify the
   icon App Store Connect extracts. Test system masks and any themed variants.
-- Replace screenshot concepts with actual captures. Keep captions accurate and
-  UI prominent. No fabricated usage, ratings, awards, or availability badges.
+- Recapture the signed release candidate; actual development captures are
+  already available in screenshots-draft. Keep captions accurate and UI prominent. No fabricated usage, ratings, awards, or availability badges.
 - If supported, supply the additional device-specific screenshot sets. Do not
   stretch phone screenshots into tablet screenshots.
 - Set a live support page containing a working contact route, and confirm the
-  marketing URL. The intended Firebase subdomain is not a verified URL yet.
+  marketing URL. The famcall.web.app site is reserved; its pages await owner-approved deployment.
 
 5. PRIVACY, DELETION, AND DISCLOSURES
 - Inventory data processed by the app, servers, Firebase, the call provider,
@@ -89,9 +93,12 @@ type; do not assume internal testing satisfies that separate requirement.
 - Check all supplied URLs from a signed-out browser and a mobile connection.
 - Inspect the store listing preview for truncation, crops, and mismatched assets.
 - Confirm legal contact details, screenshots, metadata, and build refer to the
-  same version. Use manual public release initially so both platforms can be
-  coordinated after review. Do not display live download badges before links work.
-- Submit each store release, resolve the actual review feedback, and verify the
+  same version. The listing remains manual until the owner approves the public
+  workflow. That workflow requests publication after store review for the explicit
+  tested build. Do not display live download badges before links work.
+- Use the owner-protected GitHub public-release workflow for store submissions.
+  Populate candidate.json with the tested source commit, build numbers and
+  passing evidence references first. Resolve review feedback, and verify the
   public listing and installation after approval. No approval is guaranteed by
   satisfying this preparation checklist.
 

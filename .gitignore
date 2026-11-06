@@ -14,6 +14,11 @@ node_modules/
 *.apk
 .DS_Store
 coverage/
+__pycache__/
+*.pyc
+/fastlane/report.xml
+/fastlane/README.md
+/fastlane/Preview.html
 dist/
 .firebase/
 /apps/mobile/android/

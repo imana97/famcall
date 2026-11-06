@@ -1,0 +1,46 @@
+name: Submit tested build for public release
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        type: choice
+        description: Store to publish after review, using the checked-in candidate record
+        options: [android, ios]
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: famcall-store-build
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.repository == 'silvergrid/famcall' && github.ref == 'refs/heads/main' && github.actor == 'silvergrid' && github.triggering_actor == 'silvergrid'
+    environment: release
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      FAMCALL_PLATFORM: ${{ inputs.platform }}
+      FASTLANE_SKIP_UPDATE_CHECK: '1'
+      FASTLANE_HIDE_CHANGELOG: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version-file: .nvmrc
+      - name: Check the tested build and release evidence
+        run: node scripts/check-release-candidate.mjs
+      - uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94 # v1
+        with:
+          ruby-version: '3.3'
+      - name: Install the pinned store submission tool
+        run: gem install fastlane --version 2.234.0 --no-document --user-install
+      - name: Submit the reviewed candidate
+        env:
+          FAMCALL_APPLE_API_KEY_JSON: ${{ secrets.FAMCALL_APPLE_API_KEY_JSON }}
+          FAMCALL_PLAY_API_KEY_JSON: ${{ secrets.FAMCALL_PLAY_API_KEY_JSON }}
+        run: |
+          export PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
+          fastlane "public_$FAMCALL_PLATFORM"

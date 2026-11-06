@@ -11,7 +11,7 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: phone-number
 - inputText: ${PHONE}
-- hideKeyboard
+- tapOn: Make room for a familiar voice.
 - tapOn:
     id: send-code
 - extendedWaitUntil:

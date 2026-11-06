@@ -20,7 +20,7 @@ Made for imperfect connections
 FamCall focuses on keeping conversation understandable when bandwidth is limited. If the connection is interrupted, it tries to reconnect and shows you what is happening.
 
 Keep it simple
-One-to-one voice calls. A clear contact list. An easy way to answer, talk, and hang up.
+One-to-one voice calls. A clear contact list. An easy way to answer, talk, and hang up. Recent and missed calls, with blocking when you need it.
 
 Both people need FamCall and an internet connection. Call availability and performance depend on the connection at each end. Mobile data charges may apply.
 
@@ -46,12 +46,12 @@ google = {
 beta = {
     'testflight_description': '''FamCall is a simple voice-calling app designed with weak and unstable internet connections in mind.
 
-This beta focuses on phone-number signup, adding contacts, incoming calls, two-way voice, and recovery after short connection interruptions. Both callers need the beta app and internet access.
+This internal test version focuses on phone-number signup, adding contacts, incoming calls, two-way voice, and recovery after short connection interruptions. Both callers need the test app and internet access.
 
 Help us find the moments when a call takes too long to ring, speech becomes hard to follow, or reconnection needs improvement. Send feedback through TestFlight or email info@silvergridtech.com.
 
 This is an early test version from SilverGrid Technologies LLC. Features and performance may change before release.''',
-    'testflight_what_to_test': '''Please test with another FamCall beta user.
+    'testflight_what_to_test': '''Use two test phones with this FamCall build installed.
 
 1. Verify your phone number and reopen the app. Check that you remain signed in.
 2. Add someone from contacts, then try adding a number manually with its country code. Try again with contact access declined.
@@ -82,7 +82,7 @@ metadata = {
     'schema_version': 1,
     'locale': 'en-US',
     'checked_on': DATE,
-    'status': 'DRAFT — app implementation, claims validation, real screenshots, and release review pending',
+    'status': 'DRAFT — native prototypes and development screenshots exist; production call reliability and publisher review pending',
     'publisher': 'SilverGrid Technologies LLC',
     'support_email': 'info@silvergridtech.com',
     'brand': {'name': 'FamCall', 'headline': 'A little signal. A familiar voice.', 'positioning': 'Simple voice calls designed for weak and unstable internet connections.', 'geographic_targeting_in_public_copy': False},
@@ -95,18 +95,20 @@ metadata = {
         'support_url': None,
         'privacy_policy_url': None,
         'external_account_deletion_url': None,
-        'url_status': 'Root task will verify hosting; do not submit unverified URLs. Website-only privacy text is not the app privacy policy.',
-        'apple_bundle_id': None,
-        'android_application_id': None,
-        'apple_sku': None,
+        'url_status': 'Hosting reserved. App-specific privacy, terms, support and deletion pages are prepared; public deployment and link verification pending.',
+        'apple_bundle_id': 'com.silvergridtech.famcall',
+        'android_application_id': 'com.silvergridtech.famcall',
+        'apple_sku': 'famcall-ios',
+        'apple_app_id': '6831551843',
+        'initial_version': '0.1.0',
         'apple_primary_category_proposed': 'Social Networking',
         'google_play_category_proposed': 'Communication',
         'pricing': None,
         'minimum_os_versions': None,
-        'ipad_supported': None,
+        'ipad_supported': False,
         'age_rating_questionnaire': None,
         'target_audience_and_content_questionnaire': None,
-        'contains_ads': None,
+        'contains_ads': False,
         'app_privacy_answers': None,
         'google_data_safety_answers': None,
         'encryption_export_compliance': None,

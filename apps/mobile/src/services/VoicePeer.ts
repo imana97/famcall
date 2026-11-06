@@ -389,6 +389,7 @@ export class VoicePeer {
               "local-candidate",
               "remote-candidate",
               "transport",
+              "media-source",
             ].includes(String(r.type))
           ) {
             const keep = [
@@ -418,6 +419,7 @@ export class VoicePeer {
               "candidateType",
               "protocol",
               "relayProtocol",
+              "audioLevel",
             ];
             rows.push(
               Object.fromEntries(

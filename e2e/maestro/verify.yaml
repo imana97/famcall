@@ -3,7 +3,7 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: verification-code
 - inputText: ${OTP}
-- hideKeyboard
+- tapOn: Check your messages.
 - tapOn:
     id: verify-number
 - extendedWaitUntil:

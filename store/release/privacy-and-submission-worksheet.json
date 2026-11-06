@@ -1,20 +1,101 @@
 {
-  "status": "UNANSWERED — inspect the implemented app and service providers before submission",
+  "status": "IMPLEMENTATION INVENTORY — proposed classifications require publisher review before submission",
   "prepared_on": "2026-11-06",
   "publisher": "SilverGrid Technologies LLC",
   "contact_email": "info@silvergridtech.com",
   "warning": "This worksheet is not a privacy policy, a completed store disclosure, or a claim that data is not collected.",
-  "website_privacy_is_app_privacy": false,
+  "website_privacy_is_app_privacy": true,
   "candidate_data_inventory": [
-    {"data": "Verified phone number and account identifier", "planned_purpose": "Account creation, authentication, and contact identity", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
-    {"data": "Device address-book entries or discovery inputs", "planned_purpose": "Optional contact discovery", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
-    {"data": "Manually entered contacts", "planned_purpose": "Saving people to call", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
-    {"data": "Live microphone audio", "planned_purpose": "Delivering the voice call", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
-    {"data": "Call signaling, participants, timing and call state", "planned_purpose": "Call setup, ringing and recovery", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
-    {"data": "Notification tokens and device/app integrity signals", "planned_purpose": "Incoming calls and abuse prevention", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
-    {"data": "IP addresses, network telemetry and service logs", "planned_purpose": "Connectivity and operation diagnostics", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
-    {"data": "Crash reports or analytics, if selected", "planned_purpose": null, "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
-    {"data": "Support correspondence and voluntary test feedback", "planned_purpose": "Customer support and beta testing", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null}
+    {
+      "data": "Verified phone number and account identifier",
+      "planned_purpose": "Account creation, authentication, and contact identity",
+      "actual_processing": "Verified phone number and Firebase UID; app stores normalized E.164 number and account timestamps.",
+      "providers": "Google Firebase Authentication; Google Cloud Firestore",
+      "stored_where": "Firebase Authentication and private Firestore user record",
+      "retention": "Until account deletion; Google may keep abuse-prevention records under its policy.",
+      "deletion": "Durable server deletion disables the Auth user, removes account data, then removes Auth user.",
+      "store_classification": "Proposed: phone number, user ID; linked to user; app functionality/security."
+    },
+    {
+      "data": "Device address-book entries or discovery inputs",
+      "planned_purpose": "Optional contact discovery",
+      "actual_processing": "Only a contact explicitly selected in the native picker is copied into the add-person form. No bulk address-book upload.",
+      "providers": "Device contact picker; selected saved fields then Google Cloud Firestore",
+      "stored_where": "Device before save; private user contacts after save",
+      "retention": "Until replaced by saving the same number, or account deletion.",
+      "deletion": "Removed with the account; another person’s own address book remains under their control.",
+      "store_classification": "Proposed: contacts; optional, linked to user; app functionality."
+    },
+    {
+      "data": "Manually entered contacts",
+      "planned_purpose": "Saving people to call",
+      "actual_processing": "Entered name and normalized phone number are saved; blocked numbers are stored privately.",
+      "providers": "Google Cloud Firestore",
+      "stored_where": "Private user subcollections",
+      "retention": "Contacts until replaced or account deletion; blocking until unblocked or account deletion.",
+      "deletion": "Recursive account deletion includes saved contacts and blocking data.",
+      "store_classification": "Proposed: contacts / other user content; optional, linked to user; app functionality."
+    },
+    {
+      "data": "Live microphone audio",
+      "planned_purpose": "Delivering the voice call",
+      "actual_processing": "Native WebRTC transports live voice with encrypted media. No app/server recording feature is implemented.",
+      "providers": "Peer phone; Cloudflare TURN when relayed",
+      "stored_where": "Transient media buffers; no FamCall audio archive",
+      "retention": "Live call only.",
+      "deletion": "Transient buffers close with the call.",
+      "store_classification": "Review ephemeral-processing exceptions separately for Apple and Google; do not mark audio as recorded."
+    },
+    {
+      "data": "Call signaling, participants, timing and call state",
+      "planned_purpose": "Call setup, ringing and recovery",
+      "actual_processing": "Call documents include participant UIDs/numbers, times and outcome. SDP/ICE can expose connection addresses to the peer and signaling backend.",
+      "providers": "Google Cloud Firestore; peer phone",
+      "stored_where": "Shared call document with participant-only rules; signaling subcollections",
+      "retention": "History 90 days; signaling deleted after terminal state with retryable trigger.",
+      "deletion": "Account deletion removes associated call documents and subcollections.",
+      "store_classification": "Proposed: product interaction / other usage data and identifiers; linked to user; app functionality."
+    },
+    {
+      "data": "Notification tokens and device/app integrity signals",
+      "planned_purpose": "Incoming calls and abuse prevention",
+      "actual_processing": "Installation identifier, OS push token and token type registered for ringing. App Attest/Play Integrity validate genuine apps.",
+      "providers": "Apple APNs/App Attest/DeviceCheck; Google FCM/App Check",
+      "stored_where": "Private Firestore device registration; provider verification systems",
+      "retention": "Device registrations expire after 60 days without renewal; provider retention must be reviewed.",
+      "deletion": "Device records removed on account deletion.",
+      "store_classification": "Proposed: device identifiers; linked to user; app functionality/security."
+    },
+    {
+      "data": "IP addresses, network telemetry and service logs",
+      "planned_purpose": "Connectivity and operation diagnostics",
+      "actual_processing": "Providers receive ordinary network information. Production app sends no lab RTC diagnostics. Per-user abuse counters protect calls/contacts/relay issuance.",
+      "providers": "Google Cloud/Firebase; Cloudflare; Apple for push",
+      "stored_where": "Cloud service logs and private rate-limit counters",
+      "retention": "Counters 2 days; operational logs target 30 days; provider-required security/audit records may differ.",
+      "deletion": "Counters/logs expire by configured retention; verify deployed settings.",
+      "store_classification": "Review diagnostics and IP-derived location classification with each provider’s current policy."
+    },
+    {
+      "data": "Crash reports or analytics, if selected",
+      "planned_purpose": null,
+      "actual_processing": "No Firebase Analytics, Crashlytics or advertising SDK selected. No app analytics endpoint in production.",
+      "providers": "None selected",
+      "stored_where": "Not applicable",
+      "retention": "Not applicable",
+      "deletion": "Not applicable",
+      "store_classification": "Proposed: no advertising tracking; recheck final binary and SDK manifests."
+    },
+    {
+      "data": "Support correspondence and voluntary test feedback",
+      "planned_purpose": "Customer support and beta testing",
+      "actual_processing": "Support emails are received only when the person chooses to contact support.",
+      "providers": "Publisher email service",
+      "stored_where": "Publisher support mailbox",
+      "retention": "Owner must set and operate the support retention policy.",
+      "deletion": "Handled by support after proportionate ownership verification.",
+      "store_classification": "Proposed: email address and support content, optional, linked where provided; customer support."
+    }
   ],
   "questions_for_each_data_item": [
     "Does it leave the device, and can a provider access it beyond servicing the request in real time?",
@@ -26,20 +107,20 @@
     "Who receives it, where is it stored, how long is it kept, and what happens on deletion?"
   ],
   "must_resolve": {
-    "app_specific_privacy_policy_url": null,
-    "terms_or_license_choice": null,
-    "in_app_deletion_path": null,
-    "external_account_deletion_url": null,
-    "deletion_verification_process": null,
-    "deletion_completion_window": null,
-    "retained_data_and_reason": null,
-    "retention_periods": null,
+    "app_specific_privacy_policy_url": "https://famcall.web.app/privacy (prepared; not deployed)",
+    "terms_or_license_choice": "MIT source license; service terms draft at /terms",
+    "in_app_deletion_path": "Settings → Delete account → recent phone verification → confirm",
+    "external_account_deletion_url": "https://famcall.web.app/delete-account (prepared; not deployed)",
+    "deletion_verification_process": "Recent Firebase phone auth in app; ownership verification by support for external requests",
+    "deletion_completion_window": "Asynchronous server retries; external support response time requires publisher policy",
+    "retained_data_and_reason": "Completion marker 30 days for retry safety; provider security/legal records per provider policy",
+    "retention_periods": "See implemented inventory and production retention verification gate",
     "app_privacy_answers": null,
     "data_safety_answers": null,
     "encryption_export_answers": null,
     "age_and_target_audience_answers": null,
-    "ads_declaration": null,
-    "required_sdk_privacy_manifests": null,
+    "ads_declaration": "No ads implemented; publisher to confirm final submission",
+    "required_sdk_privacy_manifests": "Inspect final archived build; simulator build alone is insufficient",
     "reviewer_accounts_and_access": null,
     "legal_contact_details_required_by_distribution_markets": null
   },

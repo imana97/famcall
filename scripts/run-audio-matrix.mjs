@@ -8,6 +8,7 @@ const cases = [
   { name: 'severe-a-to-b', sender: 8554, receiver: 8556, loss: 0.08, delayMs: 250, jitterMs: 100, kbps: 32 },
 ];
 const configure = config => fetch('http://127.0.0.1:8787/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) }).then(r => { if (!r.ok) throw new Error('Lab configuration failed'); });
+let failed = 0;
 try {
   for (const { name, sender, receiver, ...config } of cases) {
     console.log('Starting ' + name);
@@ -18,7 +19,12 @@ try {
         '--sender', String(sender), '--receiver', String(receiver), '--seconds', '20', '--output',
         resolve(root, '.local/audio-lab', name + '.json')], { cwd: root, stdio: 'inherit' });
       child.on('exit', resolveExit);
+      child.on('error', () => resolveExit(1));
     });
-    if (status !== 0) console.log('Audio measurement did not pass for ' + name);
+    if (status !== 0) {
+      failed++;
+      console.log('Invalid audio measurement for ' + name);
+    }
   }
 } finally { await configure({ loss: 0, delayMs: 0, jitterMs: 0, kbps: 0 }); }
+if (failed) process.exitCode = 1;

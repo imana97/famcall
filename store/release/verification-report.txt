@@ -6,13 +6,27 @@ PASS
   8 callable-backend integration tests. Includes call idempotency, concurrent
   callers, outsider rejection, answer/hangup races, late answers, blocking,
   lease renewal/expiry, and durable account deletion with stale-token denial.
+- An additional release-workflow test verifies that a tested source commit may
+  receive evidence updates, while subsequent app changes or missing network
+  evidence block public submission.
 - Android native standalone test build compiles, including WebRTC, Firebase,
   native calling integration, native timers, and the background call-end worker.
 - Maestro on two Android API 36 emulators: phone verification using fictional
   numbers, 00/+ normalization, persistent sign-in, manual contacts, outgoing
   call, answer, hangup, decline, history blocking, blocked-call rejection,
   unblocking, and another answered call.
-- TypeScript checks and ESLint.
+- iOS standalone simulator build compiles with native WebRTC/Firebase/calling
+  modules. Maestro on iPhone 17 Pro Max / iOS 26.5 verifies phone signup,
+  persistent sign-in, manual contacts (including 00 normalization), and navigation.
+- TypeScript checks, ESLint, GitHub workflow validation with actionlint, and
+  fastlane lane discovery. Incomplete release evidence is rejected by the
+  public-release guard. Invalid audio injection/capture produces a failing
+  measurement report rather than a quality pass.
+- Protected Android upload signing key created and backed up; upload SHA-1/SHA-256
+  registered with Firebase. Apple bundle ID, distribution certificate, active
+  provisioning profile and unpublished App Store app record created.
+  App Attest and Play Integrity configurations registered; actual device
+  attestation and Play App Signing SHA/project linkage remain unverified.
 - Original Apple/Play icons and Play feature graphic exported at required sizes.
 - Website checked at desktop and phone widths; privacy/deletion links work in
   the local preview. The public site is not deployed yet.
@@ -23,11 +37,13 @@ PASS
   are excluded from source control.
 
 IN PROGRESS / NOT A PASS
-- iOS native build and simulator validation.
 - Repeated generated-speech measurements under packet loss, delay, jitter,
   and limited bandwidth. Earlier calls carried speech in both directions, but
-  subsequent emulator audio runs produced silence. Investigating the audio
-  input/output harness before assigning a supported network envelope.
+  subsequent emulator audio runs produced silence. A separate Android AudioRecord
+  probe also captured silence from generated input, on emulator versions 36.1.9
+  and 37.2.13. A later injection attempt crashed emulator 37.2.13. The
+  virtual-microphone test path is unresolved. No supported
+  network envelope or weak-network pass is claimed.
 - Credential refresh, full interruptions, TCP/TLS fallback, and offline hangup.
 
 RELEASE GATES
@@ -48,3 +64,10 @@ an intelligibility estimate, not a MOS score, human listening result, or proof o
 physical-device performance. Tests check the actual selected ICE candidate path.
 Per-leg impairment settings must not be reported as end-to-end loss/latency.
 Only completed, reproducible cases with valid source/capture signals count.
+
+ADDITIONAL SIMULATOR FINDING
+The iOS 26.5 simulator accepts reportNewIncomingCall, then its system call
+service ends the call almost immediately (disconnect reason 55 / generic error).
+Its logs also show failure to open the incoming-call system interface. This
+reproduces without an active iOS Maestro flow. It is not counted as an incoming
+call pass; validate the actual signed app on an iPhone before release.

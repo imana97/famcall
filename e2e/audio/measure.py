@@ -47,6 +47,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--seconds", type=float, default=20)
     parser.add_argument("--buffered", action="store_true")
+    parser.add_argument("--input-rate", type=int, choices=[8000,16000,48000], default=48000)
     args = parser.parse_args()
     started_at = int(time.time() * 1000)
     with urllib.request.urlopen("http://127.0.0.1:8787/config", timeout=3) as response:
@@ -58,10 +59,13 @@ def main():
         wanted = int(args.seconds * 48000) * 2
         pcm = (original * (wanted // len(original) + 1))[:wanted]
     duration = len(pcm) / (48000 * 2)
+    input_pcm = pcm if args.input_rate == 48000 else resample_poly(np.frombuffer(pcm, dtype="<i2").astype(float), args.input_rate, 48000).astype("<i2").tobytes()
     sc, sender, sm = client(args.sender)
     rc, receiver, rm = client(args.receiver)
     fmt = pb.AudioFormat(samplingRate=48000, channels=pb.AudioFormat.Mono,
                          format=pb.AudioFormat.AUD_FMT_S16, mode=pb.AudioFormat.MODE_UNSPECIFIED if args.buffered else pb.AudioFormat.MODE_REAL_TIME)
+    input_fmt = pb.AudioFormat(samplingRate=args.input_rate, channels=pb.AudioFormat.Mono,
+                         format=pb.AudioFormat.AUD_FMT_S16, mode=fmt.mode)
     captured = []
     formats = set()
     errors = []
@@ -82,16 +86,18 @@ def main():
     started = time.monotonic()
 
     def packets():
-        size = 960 * 2  # 20 ms of PCM.
-        for offset in range(0, len(pcm), size):
-            wait = started + offset / (48000 * 2) - time.monotonic()
+        size = args.input_rate // 50 * 2  # 20 ms of PCM.
+        for offset in range(0, len(input_pcm), size):
+            wait = started + offset / (args.input_rate * 2) - time.monotonic()
             if wait > 0:
                 time.sleep(wait)
-            yield pb.AudioPacket(format=fmt, timestamp=int(time.time() * 1_000_000), audio=pcm[offset:offset + size])
+            yield pb.AudioPacket(format=input_fmt, timestamp=int(time.time() * 1_000_000), audio=input_pcm[offset:offset + size])
 
     try:
         sender.injectAudio(packets(), metadata=sm, timeout=duration + 8)
         time.sleep(2)
+    except grpc.RpcError as error:
+        errors.append("Audio injection failed: " + str(error.code()))
     finally:
         stream.cancel()
         thread.join(timeout=5)
@@ -111,6 +117,7 @@ def main():
               "rms": float(np.sqrt(np.mean(received ** 2))) if len(received) else 0,
               "errors": errors, "stoi": None,
               "captureFormats": sorted(formats), "capturePackets": len(captured), "buffered": args.buffered,
+              "inputRate": args.input_rate,
               "limitation": "STOI is a laboratory intelligibility estimate, not a MOS score or a physical-device listening test."}
     with urllib.request.urlopen("http://127.0.0.1:8787/config", timeout=3) as response:
         network_at_end = json.load(response)
@@ -120,7 +127,8 @@ def main():
     # Verify the actual selected path; a requested relay setting alone is not evidence.
     paths = []
     samples = []
-    for line in (ROOT / ".local/audio-lab/metrics.jsonl").read_text().splitlines():
+    metrics_path = ROOT / ".local/audio-lab/metrics.jsonl"
+    for line in metrics_path.read_text().splitlines() if metrics_path.exists() else []:
         entry = json.loads(line)
         if entry.get("kind") != "stats" or not started_at <= entry.get("receivedAt", 0) <= result["finishedAt"]:
             continue
@@ -155,9 +163,24 @@ def main():
         result["alignmentSeconds"] = lag / 16000
         result["comparedSeconds"] = length / 16000
         result["stoi"] = float(stoi(ref[:length], deg[:length], 16000, extended=False))
+    reasons = list(errors)
+    if formats != {(48000, pb.AudioFormat.Mono, pb.AudioFormat.AUD_FMT_S16)}:
+        reasons.append("Capture did not supply the requested PCM format")
+    if result["stoi"] is None:
+        reasons.append("No measurable received speech")
+    if result["receivedSeconds"] < duration * 0.85:
+        reasons.append("Too little captured audio for the requested interval")
+    if not result["stableProfile"]:
+        reasons.append("Network profile changed during measurement")
+    if network_at_start["transport"] != "direct" and not result["relayVerified"]:
+        reasons.append("Requested relay path was not verified")
+    if len(result["packetWindows"]) != 2 or any(w["seconds"] < duration * 0.5 for w in result["packetWindows"]):
+        reasons.append("Missing packet evidence from both call participants")
+    result["measurementValid"] = not reasons
+    result["invalidReasons"] = reasons
     args.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result))
-    if result["stoi"] is None or errors:
+    if not result["measurementValid"]:
         sys.exit(1)
 
 

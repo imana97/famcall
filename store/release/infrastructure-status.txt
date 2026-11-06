@@ -1,0 +1,69 @@
+FAMCALL — ACCOUNT AND RELEASE SETUP
+Checked 6 November 2026. No production service or store build has been deployed.
+
+CONFIGURED
+- Public repository silvergrid/famcall; development fork imana97/famcall.
+  Main requires quality checks, a code-owner review by silvergrid, and resolved
+  conversations. Protected backend/release environments require silvergrid.
+- Draft implementation PR: https://github.com/silvergrid/famcall/pull/1
+- Firebase/GCP project famcall; existing billing account; $10 monthly budget
+  alerts. Alerts do not cap spending. Hosting site famcall.web.app reserved.
+- Phone authentication enabled. Provider daily send_verification_code effective
+  quota read back as 50. Real SMS boundary/concurrency behavior not yet exercised.
+- Dedicated Cloudflare TURN credentials stored in Google Secret Manager, with
+  runtime-only read access. Previously exposed setup key revoked and replaced.
+- Google API keys limited to needed Firebase APIs; browser key limited to the
+  FamCall Firebase domains. Native application restrictions remain a validation
+  gate because phone-auth browser fallback uses the API key.
+- Android upload key generated, private local copy plus Secret Manager backup
+  and protected GitHub release secret FAMCALL_ANDROID_SIGNING_JSON. Upload SHA-1
+  and SHA-256 registered with Firebase. This is NOT the Play App Signing key.
+- Apple bundle com.silvergridtech.famcall registered; push capability enabled.
+  App Store Connect app 6831551843 created, SKU famcall-ios. Version 0.1.0
+  English listing saved as an unpublished draft, with manual release selected.
+  Distribution certificate and active App Store provisioning profile M5Y73QMBS4
+  are held by EAS. No signed store build has been produced or uploaded.
+  App Store Connect API credential stored in the protected GitHub release
+  environment as FAMCALL_APPLE_API_KEY_JSON.
+  Apple team ZGBBX2Y24U linked to the Firebase iOS app.
+- App Check App Attest and Play Integrity providers registered with one-hour
+  tokens. Production callable functions require App Check in source. Firestore
+  and Authentication enforcement require successful real-device validation.
+- Play Integrity currently requires Play-recognized app, not Play licensing;
+  this supports Play plus off-Play distribution after Play recognizes the same
+  signed build. Do not promise an arbitrary unsigned/sideloaded build will pass.
+- Refreshed native Firebase configuration files stored as EAS production secret
+  files. Expo project: https://expo.dev/accounts/imano66/projects/famcall
+- Restricted GitHub OIDC cloud federation for the owner-approved main-branch
+  backend workflow; no long-lived GCP deployment key.
+
+PREPARED / OWNER OR STORE ACTION NEEDED
+- Apple FamCall Voice key: production APNs restricted to FamCall, DeviceCheck
+  enabled; prepared at Register, awaiting confirmation. After creation, store
+  APNS_PRIVATE_KEY / APNS_KEY_ID / APNS_TEAM_ID, configure Firebase phone-auth
+  APNs and DeviceCheck fallback, and validate TestFlight delivery. This key will
+  not cover development sandbox pushes; use TestFlight for production push tests.
+- EXPO_TOKEN for the protected GitHub release environment; no token in source.
+- Google Play app creation requires publisher declarations. Then link Play
+  Integrity to project famcall, register Play App Signing fingerprints, configure
+  publisher automation access and testing recipients, and make the first upload.
+- Store legal identity/contact, age/audience, encryption, data safety and privacy
+  declarations require publisher review. Apple currently displays SilverGrid
+  Technology LLC; requested public copy says SilverGrid Technologies LLC.
+- Workflow files become available on the upstream repository after owner review
+  and merge. Backend workflow supports website-only deployment separately.
+- Testing workflow builds Android/iOS through EAS and submits to internal testing
+  and TestFlight once credentials are configured. public-release.yml promotes
+  an explicit tested build using fastlane, after the candidate record contains
+  passing evidence and the owner approves. Apple submission requests automatic
+  publication after Apple review; Android promotes internal to production.
+  These workflows have not been exercised against live store builds.
+- FAMCALL_PLAY_API_KEY_JSON is still required for protected store automation.
+- Direct Android APK distribution has a build profile but no public download
+  yet. Play Integrity recognition and signing compatibility must be validated.
+
+RELEASE BLOCKERS
+Valid two-way audio and interruption/recovery evidence, actual iPhone call delivery,
+physical-device background/push/audio routes, production auth/App Check fallbacks,
+store signing/distribution, and owner review remain mandatory gates. Refer to
+verification-report.txt; a successful simulator UI check does not clear them.

@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 const root = resolve(import.meta.dirname, '..');
 const device = process.env.DEVICE ?? 'emulator-5554';
 const phone = process.env.PHONE ?? '+12025550101';
-if (!/^\+1202555010[12]$/.test(phone)) throw new Error('Use one of the two fictional lab numbers.');
+if (!/^\+1202555010[1-3]$/.test(phone)) throw new Error('Use one of the three fictional lab numbers.');
 const maestro = process.env.MAESTRO_BIN ?? 'maestro';
 function run(flow, values) {
   const args = ['--device', device, 'test', '--test-output-dir', resolve(root, '.local/maestro', device, flow)];

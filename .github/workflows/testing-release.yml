@@ -28,9 +28,23 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck && npm run lint
+      - name: Restore protected store submission access
+        env:
+          FAMCALL_PLATFORM: ${{ inputs.platform }}
+          FAMCALL_APPLE_API_KEY_JSON: ${{ secrets.FAMCALL_APPLE_API_KEY_JSON }}
+          FAMCALL_PLAY_API_KEY_JSON: ${{ secrets.FAMCALL_PLAY_API_KEY_JSON }}
+        run: node scripts/restore-store-access.mjs
+      - name: Restore protected Android signing files
+        if: inputs.platform != 'ios'
+        env:
+          FAMCALL_ANDROID_SIGNING_JSON: ${{ secrets.FAMCALL_ANDROID_SIGNING_JSON }}
+        run: node scripts/restore-android-signing.mjs
       - name: Build and submit to testing channels
         working-directory: apps/mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           FAMCALL_PLATFORM: ${{ inputs.platform }}
         run: npx --yes eas-cli@27.5.0 build --platform "$FAMCALL_PLATFORM" --profile store --auto-submit-with-profile testing --non-interactive --wait
+      - name: Remove temporary signing files
+        if: always()
+        run: rm -f apps/mobile/credentials.json .local/android-signing/upload.jks .local/store-access/AuthKey.p8 .local/store-access/play-credentials.json

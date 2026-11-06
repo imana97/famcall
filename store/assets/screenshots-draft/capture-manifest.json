@@ -1,0 +1,37 @@
+{
+  "status": "DRAFT: actual development build captures; recapture the signed release candidate before store upload",
+  "capturedOn": "2026-11-06",
+  "locale": "en",
+  "version": "0.1.0",
+  "appVariant": "e2e; isolated Firebase demo project; fictional 202-555-01xx identities",
+  "android": {
+    "device": "Pixel 7 emulator",
+    "system": "Android API 36",
+    "captureSize": [
+      1080,
+      1920
+    ],
+    "note": "Emulator display set to the capture size; interface is not stretched."
+  },
+  "ios": {
+    "device": "iPhone 17 Pro Max simulator",
+    "system": "iOS 26.5",
+    "captureSize": [
+      1320,
+      2868
+    ]
+  },
+  "limitations": [
+    "No Android connected-call screenshot is included. The attempted dialing capture had already transitioned to Call declined and was removed from the store draft.",
+    "iOS incoming-call capture is withheld while investigating immediate native call termination.",
+    "No reconnection/quality claims or fabricated connected-call screen included."
+  ],
+  "privacy": "Only fictional test contacts; no verification codes, secrets or real contacts.",
+  "screens": [
+    "people",
+    "recents",
+    "settings",
+    "add-person"
+  ],
+  "visuallyReviewedOn": "2026-11-06"
+}

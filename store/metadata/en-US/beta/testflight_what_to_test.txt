@@ -1,4 +1,4 @@
-Please test with another FamCall beta user.
+Use two test phones with this FamCall build installed.
 
 1. Verify your phone number and reopen the app. Check that you remain signed in.
 2. Add someone from contacts, then try adding a number manually with its country code. Try again with contact access declined.
