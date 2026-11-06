@@ -17,6 +17,13 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: "com.silvergridtech.famcall" + (e2e ? ".e2e" : ""),
     supportsTablet: false,
+    ...(e2e
+      ? {}
+      : {
+          entitlements: {
+            "com.apple.developer.devicecheck.appattest-environment": "production",
+          },
+        }),
     googleServicesFile:
       process.env.GOOGLE_SERVICE_INFO_PLIST ??
       path.join(

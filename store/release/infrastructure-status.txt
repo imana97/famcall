@@ -18,11 +18,15 @@ CONFIGURED
 - Android upload key generated, private local copy plus Secret Manager backup
   and protected GitHub release secret FAMCALL_ANDROID_SIGNING_JSON. Upload SHA-1
   and SHA-256 registered with Firebase. This is NOT the Play App Signing key.
-- Apple bundle com.silvergridtech.famcall registered; push capability enabled.
+- Apple bundle com.silvergridtech.famcall registered; push and App Attest
+  capabilities enabled. Production app configuration requests the App Attest
+  production entitlement; generated simulator-test configuration omits it.
   App Store Connect app 6831551843 created, SKU famcall-ios. Version 0.1.0
   English listing saved as an unpublished draft, with manual release selected.
-  Distribution certificate and active App Store provisioning profile M5Y73QMBS4
-  are held by EAS. No signed store build has been produced or uploaded.
+  Distribution certificate retained. App Store provisioning profile T23QGW5RTW
+  replaces the earlier profile after enabling App Attest; its decoded entitlement
+  permits production attestation and production push notifications. EAS holds
+  the current profile. No signed store build has been produced or uploaded.
   App Store Connect API credential stored in the protected GitHub release
   environment as FAMCALL_APPLE_API_KEY_JSON.
   Apple team ZGBBX2Y24U linked to the Firebase iOS app.
@@ -51,17 +55,21 @@ CONFIGURED
   Project ID 76a56f3e-a64d-4917-9da0-d9f9018de627 is set in app.config.ts.
   These separate personal accounts cannot transfer directly with current
   access. The unreleased imano66 project remains available for recovery.
-  Its iOS signing certificate/profile were downloaded securely and backed up
-  in Secret Manager as FAMCALL_IOS_SIGNING_JSON for reuse. Restore those
-  credentials and the production Firebase configuration files to silvergrid
-  after the restricted Expo workflow token is approved.
+  Existing iOS signing credentials were restored to silvergrid, then the profile
+  was refreshed for App Attest. The private recovery backup is in Secret Manager
+  as FAMCALL_IOS_SIGNING_JSON. Production GOOGLE_SERVICES_JSON and
+  GOOGLE_SERVICE_INFO_PLIST are project-scoped secret file variables in EAS.
+- Owner-approved FamCall GitHub release Expo token created with Developer
+  access limited to the silvergrid account. EXPO_TOKEN is stored in Secret
+  Manager and the protected GitHub release environment. CLI authentication
+  confirms silvergrid and the intended FamCall project. Expo limits this token
+  by account, so it can access other silvergrid projects at the same role.
 - Restricted GitHub OIDC cloud federation for the owner-approved main-branch
   backend workflow; no long-lived GCP deployment key.
 
 PREPARED / OWNER OR STORE ACTION NEEDED
 - Validate Firebase phone-auth APNs, DeviceCheck/App Attest, and production
   notification delivery on real devices.
-- EXPO_TOKEN for the protected GitHub release environment; no token in source.
 - Link Play Integrity to project famcall, register Play App Signing fingerprints,
   configure testing recipients, and make
   the first upload through the protected workflow. Play automatic protection
