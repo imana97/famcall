@@ -689,6 +689,41 @@ leaving B running: A was recorded as absent with the matching force-stop exit
 record, and B retained its original PID. This verifies diagnostic collection,
 not in-call recovery. An end snapshot is not continuous process monitoring.
 
+STANDALONE ANDROID RECORDER ISOLATION
+A separate local probe used Android AudioRecord directly, without WebRTC,
+Telecom, playout or a network permission. The probe APK contains no native
+libraries. It requested VOICE_COMMUNICATION, mono PCM16 at 8 kHz, a 1024-byte
+recording buffer and 160-byte reads, matching the basic recorder settings
+observed in the calling SDK. It recorded aggregate energy and sample counts,
+not PCM files. It does not reproduce the full calling app's routing or effects
+management and is not a production build.
+
+Two fresh API 36/emulator 37.2.13 attempts injected the same generated 48 kHz
+reference through buffered gRPC delivery, with one injection per incarnation:
+- direct-1794001066830: initial nonzero input followed by 25.34 seconds of
+  exactly zero samples inside the examined injection interval. The examined
+  windows also include 2.02 seconds of nonzero input. The recorder continued
+  producing samples; its original process stayed running and completed normally.
+- direct-1794001203710: nonzero control, with 28.37 seconds of active input and
+  no zero-only windows. This demonstrates that the same probe can receive
+  nonzero samples; aggregate energy does not verify the speech content.
+
+Both runs reported microphone mute false, hardware echo cancellation and noise
+suppression unavailable, and an unsilenced recording session in Android's
+system-audio history. The generated reference was non-silent in every examined
+window. Independent integrity checks verified the native source, installed APK,
+reference, aggregate-event hashes, sample accounting and device/host clock
+alignment. APK SHA-256: 8a4866ea92629b26c4fa2010a83b81a35df04aa8aad96884c12de5847b3b2c8b.
+The probe sources, APK and reports are retained in the private run archives.
+The investigation stopped after these two outcomes, within its three-attempt
+maximum; no reliability estimate or voice-quality score is derived from it.
+
+The silent-input symptom can therefore occur without WebRTC's Java mute path,
+FamCall signaling or call transport. This narrows the investigation to the
+shared emulator/Android input setup for these probe cases. It does not prove
+that every FamCall failure has the same cause or establish a physical-phone
+defect. Production audio settings remain unchanged.
+
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
   lock/background, incoming push after process reclamation, audio routes and
