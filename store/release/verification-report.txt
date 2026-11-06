@@ -453,6 +453,47 @@ removed and both contact screens. Private run: offline-hangup-1793992988164.
 This repeats the caller case on the new APK/backend; callee offline evidence
 above belongs to its earlier, explicitly identified builds.
 
+MUTE BEFORE THE NATIVE CALL EXISTS
+A controlled before-request test on APK 3f5213c2 (identified above) found that the
+UI showed Unmute and the first/current microphone track was disabled, but
+Android's API and cached system microphone-mute flags were both false. This is a
+native/app state mismatch, not evidence that speech was transmitted while muted.
+The call connected, and cleanup returned both phones to contacts. Failed private
+run: pending-action-mute-before-request-1793993475211. Its source, logs and screen
+capture were retained and audited before changing the app.
+
+Calling now keeps the pending outgoing attempt's mute choice when attaching its
+Firestore watcher, even before a CallRecord has arrived. When the native UUID
+becomes available, an existing mute request is applied to that native session.
+Errors from a superseded native session cannot alter a newer call's error state.
+The before-request check holds both request and response boundaries and requires
+a Firestore snapshot with mute still set before releasing the response. This
+exercises the watcher ordering rather than relying on a timing sleep.
+
+The rebuilt APK passed all three mute stages: before-request, after-response,
+and after-native. The first/current microphone track stayed disabled, Android's
+API/system mute flags were true, both phones connected, and both returned to
+contacts with no active-call lease after hangup. The before-request case also
+observed mute still set in the Firestore callback before the delayed response was
+applied. Private runs, with source/build/native-log hashes audited:
+pending-action-mute-before-request-1793993747158
+pending-action-mute-after-response-1793993838883
+pending-action-mute-after-native-1793993929404
+APK SHA-256:
+cc94bd07a64c4ab4e443c0871e9b29b1aa9d70d5586e2158df2767b0c867c0ce
+These are control-state checks; they do not prove received-audio silence, rapid
+native/app toggle ordering, iPhone behavior, or a poor-network audio envelope.
+
+The early-answer case on this APK also passed. The callee accepted while the
+caller still held its ringing response; the caller UI showed Connecting before
+release, and the native-binding diagnostic retained status accepted afterward.
+Both phones connected and ended normally. The caller's first/current track was
+enabled and Android's mute flags were false, checking a new unmuted call after
+the muted cases. Source/build/log hashes and event ordering were audited.
+Private run: pending-action-early-answer-1793994002846.
+This establishes that controlled ordering, not a general call-success rate or
+an explanation for the earlier undiagnosed connection timeout.
+
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
   lock/background, incoming push after process reclamation, audio routes and

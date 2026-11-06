@@ -92,7 +92,8 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       if (initialMuted !== undefined) applyMute(initialMuted);
       return;
     }
-    const muted = initialMuted ?? (current.current.call?.id === id ? current.current.muted : false);
+    const sameCall = current.current.call?.id === id || outgoing.current?.id === id;
+    const muted = initialMuted ?? (sameCall ? current.current.muted : false);
     watchedId.current = id;
     callUnsubscribe.current?.();
     peer.current?.close();
@@ -104,6 +105,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         if (watchedId.current !== id || !snap.exists()) return;
         const call = snap.data() as CallRecord;
         if (hasEndedLocally(call.id) && !isTerminal(call.status)) return;
+        recordTestMetric({ kind: "call-record", callId: call.id, status: call.status, muted: current.current.muted });
         update({ call });
         if (
           call.status === "ringing" &&
@@ -226,9 +228,12 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         if (current.current.call?.id !== id) update({ call });
       },
       ready: (call, systemId) => {
-        recordTestMetric({ kind: "outgoing-bound", callId: id });
+        recordTestMetric({ kind: "outgoing-bound", callId: id, status: current.current.call?.status, muted: current.current.muted });
         nativeId.current = systemId;
         watch(call.id);
+        if (current.current.muted) void Calls.setMuted(systemId, true).catch(error => {
+          if (nativeId.current === systemId) fail(error);
+        });
         if (current.current.call?.status === "accepted") void connect(current.current.call);
         router.replace({ pathname: "/call/[id]", params: { id: call.id } });
       },

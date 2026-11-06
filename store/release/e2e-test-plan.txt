@@ -309,5 +309,15 @@ application delays complement the network matrix; they do not simulate packet
 loss or prove a physical OS lifecycle. Backend tests separately serialize
 concurrent creation/cancellation and check caller isolation and account deletion.
 
+scripts/test-pending-call-actions.mjs takes mute-before-request,
+mute-after-response, mute-after-native or early-answer. Mute cases must keep the
+first/current microphone track disabled and match Android's API/system mute flags.
+The before-request case additionally holds the response until a Firestore call
+snapshot arrives, proving watcher attachment preserves the pending mute choice.
+The early-answer case requires the caller to observe acceptance before applying
+the delayed ringing response, then connect both phones. Retain the exact build,
+source hashes, stage events, native logs and screenshots. These checks establish
+control state, not received-audio silence or physical-device behavior.
+
 Emulator lifecycle investigation (used as a hypothesis, then checked locally):
 https://github.com/kaeawc/auto-mobile/issues/13634

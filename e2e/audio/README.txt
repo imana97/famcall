@@ -193,6 +193,19 @@ to none on completion/interruption and retains private source/native-log evidenc
 An interrupted or failed attempt can leave a call on screen; end it before the
 next run. This is controlled scheduling, not a poor-network audio measurement.
 
+To check actions made before setup finishes:
+node scripts/test-pending-call-actions.mjs mute-before-request
+node scripts/test-pending-call-actions.mjs mute-after-response
+node scripts/test-pending-call-actions.mjs mute-after-native
+node scripts/test-pending-call-actions.mjs early-answer
+Mute-before-request also holds the response until the Firestore watcher attaches.
+The early-answer case accepts on the other phone before releasing the response
+and requires the caller to retain that newer accepted state. Mute cases check the
+first/current track state and Android system mute flags; no speech is injected.
+All cases connect both phones, end the call and return to contacts. Gates and
+call-state diagnostics exist only in the isolated demo build. Retain failed
+attempts and end any leftover call before running another case.
+
 Interrupting the matrix restores the network profile. An interrupted run may
 leave a lab call active; end it before starting another run. All reports and
 recordings remain in .local; do not publish raw diagnostic logs.
