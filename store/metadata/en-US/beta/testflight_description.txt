@@ -4,4 +4,4 @@ This internal test version focuses on phone-number signup, adding contacts, inco
 
 Help us find the moments when a call takes too long to ring, speech becomes hard to follow, or reconnection needs improvement. Send feedback through TestFlight or email info@silvergridtech.com.
 
-This is an early test version from SilverGrid Technologies LLC. Features and performance may change before release.
+This is an early test version from SilverGrid Technology LLC. Features and performance may change before release.

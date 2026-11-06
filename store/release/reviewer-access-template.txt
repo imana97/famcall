@@ -8,7 +8,7 @@ Users verify a phone number, add contacts or enter a number manually, and call.
 There is no password-based login. Both participants require an internet connection.
 
 PUBLISHER CONTACT
-SilverGrid Technologies LLC
+SilverGrid Technology LLC
 Email: info@silvergridtech.com
 Review contact name: PENDING
 Review contact phone: PENDING

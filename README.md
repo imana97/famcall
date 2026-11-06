@@ -68,4 +68,4 @@ Contributions are welcome through pull requests. The project owner, silvergrid, 
 
 ## License
 
-MIT. Copyright 2026 SilverGrid Technologies LLC.
+MIT. Copyright 2026 SilverGrid Technology LLC.

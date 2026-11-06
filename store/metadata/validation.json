@@ -32,7 +32,7 @@
     },
     {
       "field": "apple.description",
-      "length": 1164,
+      "length": 1162,
       "limit": 4000,
       "unit": "characters",
       "pass": true
@@ -53,14 +53,14 @@
     },
     {
       "field": "google-play.full_description",
-      "length": 1164,
+      "length": 1162,
       "limit": 4000,
       "unit": "characters",
       "pass": true
     },
     {
       "field": "beta.testflight_description",
-      "length": 622,
+      "length": 620,
       "limit": 4000,
       "unit": "characters",
       "pass": true

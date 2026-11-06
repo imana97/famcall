@@ -5,7 +5,7 @@ Status: DRAFT. These files are prepared writing assets, not a published listing.
 The mobile app is not implemented. Wireframes require product review. No real
 app screenshots or completed network-test results exist yet.
 
-Publisher: SilverGrid Technologies LLC
+Publisher: SilverGrid Technology LLC
 Support: info@silvergridtech.com
 Brand: FamCall
 Positioning: Simple voice calls designed for weak and unstable internet.

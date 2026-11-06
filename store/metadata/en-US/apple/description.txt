@@ -18,4 +18,4 @@ Both people need FamCall and an internet connection. Call availability and perfo
 
 Questions or feedback? Contact info@silvergridtech.com.
 
-FamCall is developed by SilverGrid Technologies LLC.
+FamCall is developed by SilverGrid Technology LLC.

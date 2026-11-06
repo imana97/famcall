@@ -9,7 +9,7 @@ No mobile release has been uploaded. This checklist tracks remaining submission
 work; it is not evidence of approval.
 
 1. PUBLISHER AND APP RECORDS
-- Use the developer account belonging to SilverGrid Technologies LLC. Confirm
+- Use the developer account belonging to SilverGrid Technology LLC. Confirm
   its legal identity, enrollment, roles, agreements, and required business details.
 - Apple record created: app 6831551843, SKU famcall-ios, version 0.1.0.
   Both platform identifiers are com.silvergridtech.famcall. Apple signing is

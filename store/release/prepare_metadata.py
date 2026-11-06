@@ -26,7 +26,7 @@ Both people need FamCall and an internet connection. Call availability and perfo
 
 Questions or feedback? Contact info@silvergridtech.com.
 
-FamCall is developed by SilverGrid Technologies LLC.'''
+FamCall is developed by SilverGrid Technology LLC.'''
 
 apple = {
     'name': 'FamCall: Simple Voice Calls',
@@ -34,13 +34,13 @@ apple = {
     'promotional_text': 'A little signal. A familiar voice. Simple voice calls designed for weak and unstable internet connections, so you can focus on the people who matter.',
     'keywords': 'family,friends,phone,audio,low bandwidth,unstable internet,stay connected',
     'description': description,
-    'copyright': '2026 SilverGrid Technologies LLC',
+    'copyright': '2026 SilverGrid Technology LLC',
 }
 google = {
     'title': 'FamCall: Simple Voice Calls',
     'short_description': 'Simple voice calls designed for weak and unstable internet connections',
     'full_description': description,
-    'developer_name': 'SilverGrid Technologies LLC',
+    'developer_name': 'SilverGrid Technology LLC',
     'support_email': 'info@silvergridtech.com',
 }
 beta = {
@@ -50,7 +50,7 @@ This internal test version focuses on phone-number signup, adding contacts, inco
 
 Help us find the moments when a call takes too long to ring, speech becomes hard to follow, or reconnection needs improvement. Send feedback through TestFlight or email info@silvergridtech.com.
 
-This is an early test version from SilverGrid Technologies LLC. Features and performance may change before release.''',
+This is an early test version from SilverGrid Technology LLC. Features and performance may change before release.''',
     'testflight_what_to_test': '''Use two test phones with this FamCall build installed.
 
 1. Verify your phone number and reopen the app. Check that you remain signed in.
@@ -83,7 +83,7 @@ metadata = {
     'locale': 'en-US',
     'checked_on': DATE,
     'status': 'DRAFT — native prototypes and development screenshots exist; production call reliability and publisher review pending',
-    'publisher': 'SilverGrid Technologies LLC',
+    'publisher': 'SilverGrid Technology LLC',
     'support_email': 'info@silvergridtech.com',
     'brand': {'name': 'FamCall', 'headline': 'A little signal. A familiar voice.', 'positioning': 'Simple voice calls designed for weak and unstable internet connections.', 'geographic_targeting_in_public_copy': False},
     'apple': apple,
