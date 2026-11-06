@@ -14,6 +14,9 @@ PASS
   Three mute-policy tests cover mute requested before startup and the latest
   mute/unmute intent while microphone capture is pending. Two of these tests
   fail against the previous implementation and pass with the fix.
+  Twelve native-event sequence tests cover restored mute, actions arriving during
+  startup, stale lookup/answer results, hangup while a lookup is pending, missed
+  session-added events, durable local hangup, disposal and storage-read failure.
   Ten Python evidence tests cover profile changes, wrong relay paths, missing
   outage drops, restored speech, silent output, replayed pre-outage audio, and
   timing counter deltas, resets, missing values and stream isolation. An impaired
@@ -319,6 +322,76 @@ cold-start CallKit state or iPhone behavior. No speech was injected during this
 check, and earlier speech matrices used the earlier APKs named in their sections.
 The mute fix is not established as a cause or solution for the intermittent
 silent emulator input observed in the weak-link investigation.
+
+NATIVE CALL RESTORATION AND STALE WORK
+Native call handling now restores the session's mute state, retains mute actions
+received while the durable hangup outbox is loading, and waits for native-session
+binding before starting media. Incoming answer requests must match the native
+session UUID returned by the lookup. If sessions change while a lookup is pending,
+the coordinator reads current native state again; ended calls and disposed account
+listeners cannot be adopted from an old result. Native hangup is handled without
+waiting behind storage restoration or an answer lookup. Its incoming server-call
+ID is also queued when the app has not yet loaded the Firestore call record.
+
+Peer callbacks and startup failures now check that they still belong to the
+current peer/call. Superseded Firestore callbacks and delayed active-call reads
+are ignored. These ownership guards are source-reviewed; the twelve controlled
+sequence tests exercise the native-event coordinator, not a real OS push or every
+React lifecycle interleaving. Physical incoming-call and cold-start gates remain.
+
+On the initial lifecycle APK below, the two-call mute check first failed because
+the call did not connect within the 45-second Maestro deadline. Both peers had
+local UDP relay candidates, but only one observed a remote candidate during the
+captured interval; the caller log did not show an applied answer. No JavaScript
+error was found. The connection failure is undiagnosed, not dismissed as a fixture
+error. Cleanup returned both phones to contacts. A separate retry passed all seven
+mute/control phases across two calls. Both attempts remain in the evidence.
+Private runs: mute-1793989530000 (failed) and mute-1793989709162 (passed).
+
+The extended offline-hangup runner then passed separately for callee and caller:
+disable both selected-phone networks; hang up locally; restart while offline;
+confirm the server remains accepted; restore connectivity; confirm ended status,
+both active-call leases removed, and both contact screens. Source/build hashes
+were audited and snapshots retained. These are two process-restart cases, not
+complete J08/J09, push, speech, or physical-device validation.
+Private runs: offline-hangup-1793989854361 (callee) and
+ offline-hangup-1793989941930 (caller).
+Initial lifecycle APK SHA-256:
+da3e9849a68eae66ab133c539fa7be034b5228b24bb5ea10637532986346232c
+
+STABLE CALL CONTROLS DURING RECONNECTION
+The next callee-offline attempt exposed a moving hangup target. Maestro selected
+End Call at [63,1453][1017,1595], but the longer reconnecting heading and subtitle
+moved it downward before the tap landed. The call stayed active until cleanup
+from the other phone. The failed case and its UI/log/source evidence are retained:
+offline-hangup-1793990283011, APK SHA-256
+64dc26c4755e06e978e3acfe0e36f3672f91c1e145043ff9a86697446d2cadbc.
+
+Call controls now occupy a separate bottom area inside the safe area. Contact,
+status, timer and error text scroll above it, so changing status text does not
+shift End Call. The offline runner compares the control's bounds while connected
+and reconnecting, saves both screens, and still requires local end, offline
+process restart and durable replay. Its first position-inspection attempt timed
+out in Android's uiautomator dump before changing the network; cleanup ended the
+call. That invalid harness attempt is retained as offline-hangup-1793991015706.
+Inspection now uses Maestro's hierarchy command.
+
+The rebuilt app passed separately for callee and caller, on 1080x1920 and
+1080x2400 Android emulator screens. End Call retained identical connected/offline
+bounds on each phone, and the reconnecting message was observed. Local hangup,
+offline process restart, server accepted state before reconnect, ended state
+after reconnect, both lease removals and both contact screens all passed. The
+screen captures were visually inspected and source/build/installed-APK evidence
+audited. These are control/lifecycle checks; no speech was injected.
+Private runs: offline-hangup-1793991269855 (callee) and
+offline-hangup-1793991373132 (caller).
+Stable-controls APK SHA-256:
+881a39e81a2a54daffd39c62d4ecd1f1969f0bcc0aec1a6ed3d5e2ae34bc46b3
+
+The same APK also passed the seven-phase, two-call mute check, including a muted
+first track after answer, unmute/remute, cleared system mute after hangup and an
+unmuted next call. Private run: mute-1793991458329. This checks UI, JavaScript
+track state and Android system flags, not received-audio silence or iPhone mute.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen

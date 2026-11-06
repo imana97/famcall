@@ -1,5 +1,5 @@
 import * as Calls from "expo-callkit-telecom";
-type NativeEvent =
+export type NativeEvent =
   | { kind: "answer"; event: Calls.CallAnsweredEvent }
   | { kind: "end"; event: Calls.CallEndedEvent }
   | { kind: "mute"; event: Calls.SetMutedActionEvent }

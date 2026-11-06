@@ -8,7 +8,11 @@ const root = resolve(import.meta.dirname, '..');
 const sdk = process.env.ANDROID_HOME ?? resolve(homedir(), 'Library/Android/sdk');
 const adb = resolve(sdk, 'platform-tools/adb');
 const app = 'com.silvergridtech.famcall.e2e';
-const serial = 'emulator-5554';
+const role = process.argv[2] ?? 'caller';
+if (!['caller', 'callee'].includes(role) || process.argv.length > 3) throw new Error('Choose caller or callee.');
+const actor = role === 'caller' ? 'a' : 'b';
+const other = actor === 'a' ? 'b' : 'a';
+const serial = actor === 'a' ? 'emulator-5554' : 'emulator-5556';
 const folder = resolve(root, '.local/audio-lab/offline-hangup-' + Date.now());
 const baseline = { transport: 'udp', proxy: true, loss: 0, delayMs: 0, jitterMs: 0, kbps: 0 };
 const command = args => execFileSync(adb, args, { encoding: 'utf8', timeout: 10_000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
@@ -30,7 +34,7 @@ async function flow(peer, name, label = name) {
   let timeout;
   try {
     const status = await new Promise(done => {
-      child = spawn(process.env.MAESTRO_BIN ?? 'maestro', ['--device', peer === 'a' ? serial : 'emulator-5556',
+      child = spawn(process.env.MAESTRO_BIN ?? 'maestro', ['--device', peer === 'a' ? 'emulator-5554' : 'emulator-5556',
         'test', 'e2e/maestro/' + name + '.yaml'], { cwd: root, stdio: ['ignore', log.fd, log.fd] });
       child.once('error', () => done(1));
       child.once('exit', code => done(code ?? 1));
@@ -52,14 +56,27 @@ function defaultNetwork() {
   if (!match) throw new Error('Could not determine the emulator default network.');
   return match[1].trim();
 }
+async function captureCallUi(label) {
+  const raw = execFileSync(process.env.MAESTRO_BIN ?? 'maestro', ['--device', serial, 'hierarchy'],
+    { encoding: 'utf8', timeout: 30_000, maxBuffer: 5 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] });
+  await writeFile(resolve(folder, label + '-ui.json'), raw);
+  const nodes = [];
+  function visit(node) { nodes.push(node.attributes ?? {}); (node.children ?? []).forEach(visit); }
+  visit(JSON.parse(raw));
+  const bounds = nodes.find(node => node['resource-id'] === 'end-call')?.bounds;
+  if (!bounds) throw new Error('End Call control is missing during ' + label);
+  const screenshot = execFileSync(adb, ['-s', serial, 'exec-out', 'screencap', '-p'], { timeout: 10_000 });
+  await writeFile(resolve(folder, label + '.png'), screenshot);
+  return { bounds, reconnecting: nodes.some(node => node.text?.includes('Finding your voice again')), observedAt: Date.now() };
+}
 function restoreNetwork() {
   if (!originalNetwork) return;
   for (const [service, setting] of [['wifi', 'wifi'], ['data', 'data']])
     command(['-s', serial, 'shell', 'svc', service, originalNetwork[setting] === '1' ? 'enable' : 'disable']);
 }
 await mkdir(folder, { recursive: true });
-const report = { startedAt: Date.now(), passed: false,
-  scope: 'Caller offline hangup, process restart and durable replay on two dedicated Android emulators. No speech, background push or physical-device claim.' };
+const report = { startedAt: Date.now(), passed: false, role, offlineSerial: serial,
+  scope: 'Selected participant offline hangup, process restart and durable replay on two dedicated Android emulators. No speech, background push or physical-device claim.' };
 try {
   report.devices = ['emulator-5554', 'emulator-5556'].map((device, i) => {
     if (command(['-s', device, 'emu', 'avd', 'name']).split('\n')[0].trim() !== ['famcall_a', 'famcall_b'][i])
@@ -68,7 +85,10 @@ try {
     if (!apk.startsWith('/data/app/')) throw new Error('Install the isolated FamCall test APK first.');
     return { serial: device, installedApkSha256: command(['-s', device, 'shell', 'sha256sum', apk]).split(/\s/)[0] };
   });
-  const files = ['scripts/test-offline-hangup.mjs', ...['open-people', 'start-call', 'answer-call', 'end-call', 'dismiss-ended'].map(f => 'e2e/maestro/' + f + '.yaml')];
+  const files = ['scripts/test-offline-hangup.mjs', 'apps/mobile/src/state/Calling.tsx', 'apps/mobile/src/services/callOutbox.ts',
+    'apps/mobile/src/services/NativeCallCoordinator.ts', 'apps/mobile/src/services/nativeEvents.ts',
+    'apps/mobile/src/app/call/[id].tsx', 'apps/mobile/src/components/ui.tsx',
+    ...['open-people', 'start-call', 'answer-call', 'end-call', 'dismiss-ended'].map(f => 'e2e/maestro/' + f + '.yaml')];
   report.sourceHashes = Object.fromEntries(await Promise.all(files.map(async f => [f, createHash('sha256').update(await readFile(resolve(root, f))).digest('hex')])));
   const config = await fetch('http://127.0.0.1:8787/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(baseline) });
   if (!config.ok) throw new Error('Lab configuration failed.');
@@ -92,21 +112,31 @@ try {
   originalNetwork = networkBefore;
   report.originalNetwork = originalNetwork;
   report.defaultNetworkBefore = defaultNetwork();
+  report.connectedUi = await captureCallUi('connected');
   command(['-s', serial, 'shell', 'svc', 'wifi', 'disable']);
   command(['-s', serial, 'shell', 'svc', 'data', 'disable']);
   const offlineDeadline = Date.now() + 15_000;
   while (defaultNetwork() !== 'none') {
-    if (Date.now() > offlineDeadline) throw new Error('Caller still has a default network.');
+    if (Date.now() > offlineDeadline) throw new Error('Selected participant still has a default network.');
     await pause(1000);
   }
   report.offlineAt = Date.now();
-  await flow('a', 'end-call');
+  const reconnectingDeadline = Date.now() + 20_000;
+  do {
+    report.offlineUi = await captureCallUi('offline');
+    if (report.offlineUi.reconnecting) break;
+    await pause(1000);
+  } while (Date.now() < reconnectingDeadline);
+  if (!report.offlineUi.reconnecting) throw new Error('Reconnecting message was not observed.');
+  if (report.connectedUi.bounds !== report.offlineUi.bounds)
+    throw new Error('End Call moved when the connection dropped.');
+  await flow(actor, 'end-call');
   report.localHangupObservedAt = Date.now();
   report.serverStatusWhileOffline = (await document('calls/' + callId))?.fields.status.stringValue;
   if (report.serverStatusWhileOffline !== 'accepted') throw new Error('Server already ended the call before replay could be tested.');
   report.processBefore = command(['-s', serial, 'shell', 'pidof', app]);
   command(['-s', serial, 'shell', 'am', 'force-stop', app]);
-  await flow('a', 'open-people', 'restart-offline');
+  await flow(actor, 'open-people', 'restart-offline');
   report.processAfter = command(['-s', serial, 'shell', 'pidof', app]);
   if (report.processBefore === report.processAfter) throw new Error('App process restart was not observed.');
   if (defaultNetwork() !== 'none') throw new Error('Network returned before durable replay could be tested.');
@@ -132,8 +162,8 @@ try {
   if (report.finalStatus !== 'ended') throw new Error('Persisted hangup did not end the call after reconnection.');
   report.activeLeasesCleared = (await Promise.all(participants.map(uid => document('activeCalls/' + uid)))).every(d => d === null);
   if (!report.activeLeasesCleared) throw new Error('An active call lease remained.');
-  await flow('b', 'dismiss-ended');
-  await flow('a', 'open-people', 'still-ended');
+  await flow(other, 'dismiss-ended');
+  await flow(actor, 'open-people', 'still-ended');
   report.passed = true;
 } catch (error) { report.error = error.message; process.exitCode = 1; }
 finally {
@@ -141,7 +171,7 @@ finally {
   catch (error) { report.restoreError = error.message; report.passed = false; process.exitCode = 1; }
   if (!report.passed && callId && !interrupted) {
     try {
-      if ((await document('calls/' + callId))?.fields.status.stringValue === 'accepted') await flow('b', 'end-call', 'cleanup');
+      if ((await document('calls/' + callId))?.fields.status.stringValue === 'accepted') await flow(other, 'end-call', 'cleanup');
     } catch (error) { report.cleanupError = error.message; }
   }
   report.finishedAt = Date.now();

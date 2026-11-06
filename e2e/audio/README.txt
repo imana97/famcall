@@ -165,16 +165,20 @@ restores it after 22 seconds, and checks received packets at both phones. The
 second keeps it blocked and requires the call to end within 90 seconds. Neither
 injects audio or sends SMS. Both restore the baseline lab network afterward.
 
-To check durable caller hangup with both signaling and media unavailable:
-node scripts/test-offline-hangup.mjs
+To check durable hangup with both signaling and media unavailable:
+node scripts/test-offline-hangup.mjs caller
+node scripts/test-offline-hangup.mjs callee
 End any existing call first. This uses only famcall_a/famcall_b and the isolated
-test app. It places a call, disables the caller's emulator Wi-Fi and mobile data,
-checks that no default network remains, hangs up locally, and restarts the app
+test app. It places a call, disables the selected phone's emulator Wi-Fi and mobile data,
+checks that no default network remains and that the reconnecting message leaves
+the End Call button in the same position, hangs up locally, and restarts the app
 while still offline. The server call must remain accepted until connectivity is
-restored; afterward it must end, clear both leases, and disappear at the recipient.
-The caller must remain on the contacts screen. Original network settings are
-restored on completion/interruption. This covers caller hangup/process restart,
-not every offline-call state or physical-device background behavior. The replay
+restored; afterward it must end, clear both leases, and disappear at the other phone.
+The offline phone must remain on the contacts screen. Original network settings are
+restored on completion/interruption. Connected and offline Maestro view hierarchies
+and screenshots are retained privately. Omitting the role selects caller. This
+covers participant hangup/process restart, not every offline-call state or
+physical-device background behavior. The replay
 observation after detecting a default network is not exact reconnection latency.
 
 Interrupting the matrix restores the network profile. An interrupted run may

@@ -277,12 +277,14 @@ they do not relax the speech detector or establish end-to-end latency. Preserve
 the exact input delivery mode when comparing experiments. The experimental
 realtime emulator injection mode has not supplied a valid comparative sample.
 
-scripts/test-offline-hangup.mjs covers one J08 combination on the dedicated
-Android AVDs: disable both caller networks, end locally, restart the app while
-offline, then restore connectivity and verify durable server/recipient cleanup.
-It records the installed APKs, no-default-network observation, changed process
-identity and active-lease removal. Extend coverage to callee hangup, other call
-states, longer outages and physical devices; do not generalize this one result.
+scripts/test-offline-hangup.mjs accepts caller (default) or callee for a J08
+combination on the dedicated Android AVDs: disable both selected-phone networks,
+confirm the reconnecting message without moving the End Call control, end locally,
+restart the app while offline, then restore connectivity and verify durable
+server/recipient cleanup. It records installed APKs, source hashes, connected and
+offline screen bounds/screenshots, no-default-network observation, changed process
+identity and active-lease removal. Extend coverage to other call
+states, longer outages and physical devices; do not generalize these cases.
 
 scripts/test-mute.mjs covers part of J10 on the dedicated Android AVDs: the caller
 mutes while ringing, remains muted after answer, unmutes, remutes, then hangs up.
@@ -291,6 +293,12 @@ check the first/current JavaScript track-enabled state and Android's API/system
 microphone mute state. Unit tests defer microphone capture to check pending mute
 and unmute intent before any track is attached. These controls do not measure
 transmitted silence, callee/system-UI actions, physical audio routes or iOS behavior.
+
+Native event sequence tests use controlled promises for storage/native lookups.
+They check that session mute is adopted before media starts, end actions are not
+blocked behind a lookup, mismatched answer IDs are rejected, and stale results
+cannot revive a finished call. The actual OS push and lifecycle matrix remains
+required: unit scheduling is not a substitute for cold-start tests on phones.
 
 Emulator lifecycle investigation (used as a hypothesis, then checked locally):
 https://github.com/kaeawc/auto-mobile/issues/13634

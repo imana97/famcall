@@ -8,7 +8,7 @@ The app uses React Native with Expo development builds, native WebRTC and Opus, 
 
 ## Development status
 
-This is a working prototype, not a published service. Android and iOS simulator builds compile. Maestro covers signup, persistent sign-in, contacts, and navigation on both platforms, plus call controls and blocking on two Android emulators. The automated suite includes 28 logic, database-rule, backend, connection/mute-policy, and release-guard tests, along with ten audio-evidence validation tests. See the verification record and commit checks for results and limitations.
+This is a working prototype, not a published service. Android and iOS simulator builds compile. Maestro covers signup, persistent sign-in, contacts, and navigation on both platforms, plus call controls and blocking on two Android emulators. The automated suite includes 40 logic, database-rule, backend, connection/mute-policy, native-event, and release-guard tests, along with ten audio-evidence validation tests. See the verification record and commit checks for results and limitations.
 
 Android calls exchange generated speech through the Cloudflare relay. The audio harness now restarts the emulators between profiles and prevents repeated injection into the same emulator process, which previously caused silence or crashes. Pilot measurements and transport recovery checks are recorded in `store/release/verification-report.txt`; they do not establish a supported network envelope. The iOS simulator ends incoming native calls immediately with a system error. Physical-device calling, push delivery, production authentication, and the full poor-network matrix remain release gates.
 

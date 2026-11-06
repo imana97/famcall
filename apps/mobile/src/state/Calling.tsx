@@ -17,6 +17,7 @@ import { doc, onSnapshot } from "@react-native-firebase/firestore";
 import { isTerminal, type CallRecord } from "@famcall/core";
 import { api, database, isE2E } from "../services/firebase";
 import { consumeNativeEvents } from "../services/nativeEvents";
+import { NativeCallCoordinator } from "../services/NativeCallCoordinator";
 import { VoicePeer, type VoiceState } from "../services/VoicePeer";
 import { errorMessage } from "../services/errors";
 import {
@@ -77,18 +78,26 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     setView(current.current);
   };
   const fail = (e: unknown) => update({ error: errorMessage(e) });
+  const applyMute = (muted: boolean) => {
+    peer.current?.mute(muted);
+    update({ muted });
+  };
 
-  function watch(id: string) {
-    if (watchedId.current === id) return;
+  function watch(id: string, initialMuted?: boolean) {
+    if (watchedId.current === id) {
+      if (initialMuted !== undefined) applyMute(initialMuted);
+      return;
+    }
+    const muted = initialMuted ?? (current.current.call?.id === id ? current.current.muted : false);
+    watchedId.current = id;
     callUnsubscribe.current?.();
     peer.current?.close();
     peer.current = null;
-    update({ ...initial });
-    watchedId.current = id;
+    update({ ...initial, muted });
     callUnsubscribe.current = onSnapshot(
       doc(database, "calls", id),
       (snap) => {
-        if (!snap.exists()) return;
+        if (watchedId.current !== id || !snap.exists()) return;
         const call = snap.data() as CallRecord;
         if (hasEndedLocally(call.id) && !isTerminal(call.status)) return;
         update({ call });
@@ -112,7 +121,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
               phoneNumber: call.callerPhone,
               displayName: call.callerPhone,
             },
-          }).catch(fail);
+          }).catch(error => { if (watchedId.current === id) fail(error); });
         }
         if (isTerminal(call.status)) {
           peer.current?.close();
@@ -126,16 +135,17 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
           answerRequest.current = null;
         } else if (call.status === "accepted") void connect(call);
       },
-      fail,
+      error => { if (watchedId.current === id) fail(error); },
     );
   }
   async function connect(call: CallRecord) {
-    if (peer.current || !user || hasEndedLocally(call.id)) return;
+    if (peer.current || !user || !nativeId.current || hasEndedLocally(call.id)) return;
     Calls.setRTCAudioSessionConfiguration(false);
     const connection = new VoicePeer(
       call,
       user.uid,
       (state) => {
+        if (peer.current !== connection || watchedId.current !== call.id) return;
         update({ voice: state });
         if (state === "connected") {
           update({
@@ -143,18 +153,19 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
             error: null,
           });
           if (call.callerId === user.uid && nativeId.current)
-            void Calls.reportOutgoingCallConnected(nativeId.current).catch(
-              fail,
-            );
+            void Calls.reportOutgoingCallConnected(nativeId.current).catch(error => {
+              if (peer.current === connection) fail(error);
+            });
           else if (answerRequest.current) {
             void Calls.fulfillIncomingCallConnected(
               answerRequest.current,
-            ).catch(fail);
+            ).catch(error => { if (peer.current === connection) fail(error); });
             answerRequest.current = null;
           }
         }
       },
       (error) => {
+        if (peer.current !== connection || watchedId.current !== call.id) return;
         fail(error);
         if (["reconnection-exhausted", "call-expired"].includes((error as Error)?.message)) void end();
       },
@@ -164,7 +175,9 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     try {
       await connection.start();
     } catch (e) {
+      const ownsCall = peer.current === connection && watchedId.current === call.id;
       connection.close();
+      if (!ownsCall) return;
       peer.current = null;
       fail(e);
       await end();
@@ -188,6 +201,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         { hasVideo: false, supportsDTMF: false, supportsHolding: false },
       );
       watch(call.id);
+      if (current.current.call?.status === "accepted") void connect(current.current.call);
       router.replace({ pathname: "/call/[id]", params: { id: call.id } });
     } catch (e) {
       if (call)
@@ -238,6 +252,8 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
   const watchEvent = useEffectEvent(watch);
   const endEvent = useEffectEvent(end);
   const failEvent = useEffectEvent(fail);
+  const muteEvent = useEffectEvent(applyMute);
+  const connectEvent = useEffectEvent(connect);
   const uid = user?.uid;
   useEffect(() => {
     if (!uid) return;
@@ -257,53 +273,45 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     const appState = AppState.addEventListener("change", (state) => {
       if (state === "active") flush();
     });
-    const outboxReady = restoreCallOutbox(uid).then(flush).catch(failEvent);
-    const adopt = async (session: Calls.CallSession) => {
-      const id = session.incomingCallEvent?.serverCallId;
-      if (!id) return;
-      await outboxReady;
-      if (!mounted) return;
-      if (hasEndedLocally(id)) {
-        await Calls.reportCallEnded(session.id, "remoteEnded");
-        return;
-      }
-      nativeId.current = session.id;
-      watchEvent(id);
-      if (AppState.currentState === "active")
-        router.push({ pathname: "/call/[id]", params: { id } });
-    };
-    const detachEvents = consumeNativeEvents((event) => {
-      if (event.kind === "session") void adopt(event.event.session);
-      else if (event.kind === "mute") {
-        if (event.event.id !== nativeId.current) return;
-        peer.current?.mute(event.event.isMuted);
-        update({ muted: event.event.isMuted });
-      } else if (event.kind === "end") {
-        if (event.event.id === nativeId.current) void endEvent();
-        else {
-          const id = event.event.session.incomingCallEvent?.serverCallId;
-          if (id) void queueCallEnd(uid, id).then(flush).catch(failEvent);
-        }
-      } else if (event.kind === "answer") {
-        answerRequest.current = event.event.requestId;
-        nativeId.current = event.event.id;
-        void Calls.getActiveCallSession()
-          .then(async (session) => {
-            if (!session) return;
-            const id = session.incomingCallEvent?.serverCallId;
-            if (!id) return;
-            watchEvent(id);
-            await api("updateCall", { callId: id, action: "accept" });
-            router.push({ pathname: "/call/[id]", params: { id } });
-          })
-          .catch(failEvent);
-      }
+    const outboxReady = restoreCallOutbox(uid).then(flush);
+    const coordinator = new NativeCallCoordinator({
+      ready: outboxReady,
+      getActive: Calls.getActiveCallSession,
+      getActiveId: () => nativeId.current,
+      hasEndedLocally,
+      adopt: (session) => {
+        const id = session.incomingCallEvent!.serverCallId;
+        const alreadyWatching = watchedId.current === id && nativeId.current === session.id;
+        nativeId.current = session.id;
+        watchEvent(id, session.isMuted);
+        if (current.current.call?.status === "accepted") void connectEvent(current.current.call);
+        if (!alreadyWatching && AppState.currentState === "active")
+          router.push({ pathname: "/call/[id]", params: { id } });
+      },
+      mute: (event) => muteEvent(event.isMuted),
+      end: (event) => {
+        if (event.id === nativeId.current) void endEvent();
+        // The native session can be known before Firestore supplies CallView.
+        // Persist its server ID even when end() has no loaded call to enqueue.
+        const id = event.session.incomingCallEvent?.serverCallId;
+        if (id) void queueCallEnd(uid, id).then(flush).catch(error => { if (mounted) failEvent(error); });
+      },
+      answer: (session, requestId) => {
+        const id = session.incomingCallEvent!.serverCallId;
+        answerRequest.current = requestId;
+        void api("updateCall", { callId: id, action: "accept" })
+          .then(() => {
+            if (mounted && nativeId.current === session.id && watchedId.current === id && !hasEndedLocally(id))
+              router.replace({ pathname: "/call/[id]", params: { id } });
+          }).catch(error => {
+            if (mounted && nativeId.current === session.id && watchedId.current === id) failEvent(error);
+          });
+      },
+      dismiss: (id) => { void Calls.reportCallEnded(id, "remoteEnded").catch(error => { if (mounted) failEvent(error); }); },
+      error: failEvent,
     });
-    void Calls.getActiveCallSession()
-      .then((session) => {
-        if (session && mounted) void adopt(session);
-      })
-      .catch(failEvent);
+    const detachEvents = consumeNativeEvents(event => coordinator.handle(event));
+    void coordinator.start();
     const register = async (token: Calls.VoIPPushToken | null) => {
       if (!token || !mounted) return;
       let installationId = await AsyncStorage.getItem("famcall-installation");
@@ -325,14 +333,16 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         .then(register)
         .catch(failEvent);
     }
+    let activeRevision = 0;
     const active = onSnapshot(
       doc(database, "activeCalls", uid),
       (snap) => {
+        const revision = ++activeRevision;
         const id = snap.data()?.callId as string | undefined;
         if (id)
           void outboxReady.then(() => {
-            if (mounted && !hasEndedLocally(id)) watchEvent(id);
-          });
+            if (mounted && revision === activeRevision && !hasEndedLocally(id)) watchEvent(id);
+          }).catch(error => { if (mounted) failEvent(error); });
       },
       failEvent,
     );
@@ -343,12 +353,15 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       detachNetwork();
       appState.remove();
       detachEvents();
+      coordinator.dispose();
       tokens.remove();
       active();
       callUnsubscribe.current?.();
       watchedId.current = null;
       peer.current?.close();
       peer.current = null;
+      nativeId.current = null;
+      answerRequest.current = null;
     };
   }, [uid]);
   return (

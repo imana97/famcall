@@ -84,6 +84,8 @@ try {
     return { serial, installedApkSha256: command(['-s', serial, 'shell', 'sha256sum', apk]).split(/\s/)[0] };
   });
   const files = ['scripts/test-mute.mjs', 'scripts/lab-log-capture.mjs', 'apps/mobile/src/state/Calling.tsx', 'apps/mobile/src/services/VoicePeer.ts',
+    'apps/mobile/src/services/NativeCallCoordinator.ts', 'apps/mobile/src/services/nativeEvents.ts',
+    'apps/mobile/src/app/call/[id].tsx', 'apps/mobile/src/components/ui.tsx',
     ...['open-people', 'start-muted-call', 'start-call', 'answer-call', 'mute-connected-call', 'unmute-connected-call', 'end-call', 'dismiss-ended'].map(name => 'e2e/maestro/' + name + '.yaml')];
   report.sourceHashes = Object.fromEntries(await Promise.all(files.map(async file => [file, createHash('sha256').update(await readFile(resolve(root, file))).digest('hex')])));
   const config = await fetch('http://127.0.0.1:8787/config', { method: 'POST', headers: { 'Content-Type': 'application/json' },
