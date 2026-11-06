@@ -3,22 +3,26 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => {
   const sdp = "v=0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=rtpmap:111 opus/48000/2\r\na=ice-ufrag:test\r\n";
   class Peer {
+    attachedTrackEnabled: boolean[] = [];
     connectionState = "new";
     signalingState = "stable";
     createOffer = vi.fn(async () => ({ sdp, type: "offer" }));
     setLocalDescription = vi.fn(async () => undefined);
     setConfiguration = vi.fn();
     addEventListener = vi.fn();
-    addTrack = vi.fn(() => ({ getParameters: () => ({ encodings: [] }) }));
+    addTrack = vi.fn((track: { enabled: boolean }) => {
+      this.attachedTrackEnabled.push(track.enabled);
+      return { getParameters: () => ({ encodings: [] }) };
+    });
     getStats = vi.fn(async () => new Map());
     close = vi.fn();
   }
-  return { Peer, api: vi.fn(), track: { stop: vi.fn() } };
+  return { Peer, api: vi.fn(), getUserMedia: vi.fn(), track: { enabled: true, stop: vi.fn() } };
 });
 vi.mock("react-native-webrtc", () => ({
   RTCPeerConnection: mocks.Peer,
   RTCIceCandidate: class {}, RTCSessionDescription: class {},
-  mediaDevices: { getUserMedia: async () => ({ getTracks: () => [mocks.track], release: vi.fn() }) },
+  mediaDevices: { getUserMedia: mocks.getUserMedia },
 }));
 vi.mock("@react-native-firebase/firestore", () => ({
   addDoc: vi.fn(async () => undefined), collection: vi.fn(), doc: vi.fn(),
@@ -37,6 +41,14 @@ vi.mock("react-native-nitro-keepalive-timer", () => ({
 }));
 
 import { VoicePeer } from "../apps/mobile/src/services/VoicePeer";
+
+const stream = () => ({
+  getTracks: () => [mocks.track], getAudioTracks: () => [mocks.track], release: vi.fn(),
+});
+beforeEach(() => {
+  mocks.track.enabled = true;
+  mocks.getUserMedia.mockReset().mockResolvedValue(stream());
+});
 
 describe("native voice connection retry policy", () => {
   let voice: VoicePeer;
@@ -81,5 +93,40 @@ describe("native voice connection retry policy", () => {
     await vi.advanceTimersByTimeAsync(500_000);
     expect(peer.createOffer).toHaveBeenCalledTimes(1);
     expect(onError).not.toHaveBeenCalled();
+  });
+});
+
+describe("microphone mute during connection setup", () => {
+  let voice: VoicePeer;
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mocks.api.mockImplementation(async (method: string) => method === "heartbeatCall"
+      ? { active: true } : { iceServers: [], refreshAfterMs: 420_000 });
+    voice = new VoicePeer({ id: "call", callerId: "alice", calleeId: "bob" } as ConstructorParameters<typeof VoicePeer>[0],
+      "alice", vi.fn(), vi.fn());
+  });
+  afterEach(() => { voice.close(); vi.useRealTimers(); vi.clearAllMocks(); });
+
+  it("attaches the microphone disabled when mute was requested before startup", async () => {
+    voice.mute(true);
+    await voice.start();
+    const peer = (voice as unknown as { pc: InstanceType<typeof mocks.Peer> }).pc;
+    expect(peer.attachedTrackEnabled).toEqual([false]);
+    voice.mute(false);
+    expect(mocks.track.enabled).toBe(true);
+  });
+
+  it.each([true, false])("keeps the latest mute intent (%s) while microphone permission is pending", async muted => {
+    let provideMicrophone!: (value: ReturnType<typeof stream>) => void;
+    mocks.getUserMedia.mockImplementation(() => new Promise(resolve => { provideMicrophone = resolve; }));
+    const started = voice.start();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(mocks.getUserMedia).toHaveBeenCalledOnce();
+    voice.mute(!muted);
+    voice.mute(muted);
+    provideMicrophone(stream());
+    await started;
+    const peer = (voice as unknown as { pc: InstanceType<typeof mocks.Peer> }).pc;
+    expect(peer.attachedTrackEnabled).toEqual([!muted]);
   });
 });

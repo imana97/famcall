@@ -48,6 +48,7 @@ export type VoiceState = "connecting" | "connected" | "reconnecting" | "ended";
 export class VoicePeer {
   private pc: RTCPeerConnection | null = null;
   private stream: MediaStream | null = null;
+  private muted = false;
   private closed = false;
   private queue: Promise<void> = Promise.resolve();
   private generation = 0;
@@ -115,6 +116,9 @@ export class VoicePeer {
       this.stream.getTracks().forEach((t) => t.stop());
       return;
     }
+    // A mute requested while permission/capture setup was pending must apply
+    // before any microphone track is attached to the connection.
+    this.mute(this.muted);
     const pc = this.pc;
     for (const track of this.stream.getTracks()) {
       const sender = pc.addTrack(track, this.stream);
@@ -388,8 +392,17 @@ export class VoicePeer {
     if (fragment) this.localIceGenerations.set(fragment, this.generation);
   }
   mute(muted: boolean) {
+    this.muted = muted;
     this.stream?.getAudioTracks().forEach((track) => {
       track.enabled = !muted;
+    });
+    recordTestMetric({
+      kind: "microphone-state",
+      callId: this.call.id,
+      uid: this.uid,
+      muted,
+      // JavaScript track state, not proof of recorded/transmitted silence.
+      trackEnabled: this.stream?.getAudioTracks().map((track) => track.enabled) ?? [],
     });
   }
   private async collectStats() {

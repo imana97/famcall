@@ -1,0 +1,7 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- assertVisible: You’re connected.
+- assertVisible: Mute
+- tapOn:
+    id: mute-call
+- assertVisible: Unmute

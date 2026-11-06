@@ -284,5 +284,13 @@ It records the installed APKs, no-default-network observation, changed process
 identity and active-lease removal. Extend coverage to callee hangup, other call
 states, longer outages and physical devices; do not generalize this one result.
 
+scripts/test-mute.mjs covers part of J10 on the dedicated Android AVDs: the caller
+mutes while ringing, remains muted after answer, unmutes, remutes, then hangs up.
+A second call must start unmuted. Maestro checks the controls; private diagnostics
+check the first/current JavaScript track-enabled state and Android's API/system
+microphone mute state. Unit tests defer microphone capture to check pending mute
+and unmute intent before any track is attached. These controls do not measure
+transmitted silence, callee/system-UI actions, physical audio routes or iOS behavior.
+
 Emulator lifecycle investigation (used as a hypothesis, then checked locally):
 https://github.com/kaeawc/auto-mobile/issues/13634

@@ -11,6 +11,9 @@ PASS
   evidence block public submission.
 - Three connection-policy tests cover initial ICE setup stalls, coalesced
   credential-refresh restarts, and cancellation after connection/close.
+  Three mute-policy tests cover mute requested before startup and the latest
+  mute/unmute intent while microphone capture is pending. Two of these tests
+  fail against the previous implementation and pass with the fix.
   Ten Python evidence tests cover profile changes, wrong relay paths, missing
   outage drops, restored speech, silent output, replayed pre-outage audio, and
   timing counter deltas, resets, missing values and stream isolation. An impaired
@@ -290,6 +293,32 @@ to proceed because the AVD name parser retained a carriage return; it changed no
 network setting and placed no call. The parser now trims that response.
 This is one caller/process-restart case, not a pass for all J08/J09 combinations,
 callee hangup, media cleanup on physical hardware, or incoming background calls.
+
+MUTE DURING CONNECTION SETUP — FIXED AND CHECKED
+Previously, mute changed only an existing microphone track. A request made while
+credentials, permission or capture were pending could leave the eventual track
+enabled even while the UI showed Unmute. VoicePeer now keeps the latest mute
+intent and applies it before attaching microphone tracks. Calling passes the
+current mute state into a newly created peer and ignores mute events whose native
+session ID does not match the active call. The late-event guard is source-checked;
+it has not been exercised with a real delayed OS event.
+
+The Android standalone build passed a two-call Maestro check on API 36 emulators:
+mute while ringing; remain muted after answer; unmute; remute; hang up while
+muted; then make a new unmuted call. All seven phases matched Android's API and
+cached system microphone-mute states. The first reported JavaScript microphone
+track was disabled in the muted call and enabled in the following call. Both
+phones returned to contacts and system mute cleared after teardown.
+Private evidence: mute-1793987979442, including source/build/installed-APK hashes,
+private native logs, system-audio snapshots and a successful provenance audit.
+APK SHA-256:
+8e3ed299c6222b95e8591b756bbaea4e62804846f5173310e0842eca700d0e13
+
+This verifies control state, not silence in received audio, physical-device mute,
+cold-start CallKit state or iPhone behavior. No speech was injected during this
+check, and earlier speech matrices used the earlier APKs named in their sections.
+The mute fix is not established as a cause or solution for the intermittent
+silent emulator input observed in the weak-link investigation.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen

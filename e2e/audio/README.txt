@@ -194,3 +194,14 @@ Results and recordings stay in ignored .local. No live conversation, contact
 book, SMS code, push token, API key or relay password belongs in shared evidence.
 Physical-device audio, background ringing, authentication, and listener tests
 remain separate release gates. See store/release/e2e-test-plan.txt.
+
+MUTE CONTROL CHECK (NO SPEECH INJECTION)
+After installing the current standalone e2e APK on both dedicated AVDs, run:
+node scripts/test-mute.mjs
+This checks caller mute while ringing, after answer, unmute/remute, teardown and
+an unmuted second call. It verifies Maestro UI assertions, the first/current
+JavaScript microphone track state and Android system mute flags. The resulting
+private snapshots, app logs, installed-APK/source hashes and result.json stay in
+.local/audio-lab/mute-*. No host microphone or gRPC audio injection is used.
+It is not a transmitted-silence or speech-quality test; real-device and iOS
+mute behavior still require separate validation. End existing lab calls first.

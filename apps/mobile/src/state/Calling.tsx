@@ -160,6 +160,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       },
     );
     peer.current = connection;
+    connection.mute(current.current.muted);
     try {
       await connection.start();
     } catch (e) {
@@ -274,6 +275,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     const detachEvents = consumeNativeEvents((event) => {
       if (event.kind === "session") void adopt(event.event.session);
       else if (event.kind === "mute") {
+        if (event.event.id !== nativeId.current) return;
         peer.current?.mute(event.event.isMuted);
         update({ muted: event.event.isMuted });
       } else if (event.kind === "end") {
