@@ -724,6 +724,26 @@ shared emulator/Android input setup for these probe cases. It does not prove
 that every FamCall failure has the same cause or establish a physical-phone
 defect. Production audio settings remain unchanged.
 
+
+SOUND-CARD CONTENT CONTROL
+A follow-up standalone recorder retained generated PCM in the private emulator
+lab and checked content against the injected reference. With VirtioSndCard
+explicitly enabled, card-virtio-1794001939800 matched all fifteen non-overlapping
+two-second reference windows (30 seconds total). Window correlations ranged
+from .836 to .995. The full capture had about .84% clipped samples. Raw sample
+counts, RMS and zero fractions matched every native aggregate event. Known-offset
+synthetic input passed; silence and reversed-reference controls matched no windows.
+This confirms generated content reached that recorder in one attempt; it is not
+a voice-quality, latency, physical-device or repeatability result.
+
+The Intel HDA attempt, card-hda-1794002095046, reached the injection RPC deadline.
+It has no completed injection or validated content result. Its failure and
+partial recorder output are retained. Both source/build/reference archives and
+sound-card launch flags were checked. The original comparison completion rule
+was not met: further retries were stopped to prioritize newly available physical
+phones. The temporary recorder was removed and the default API 36 emulator
+configuration restored. FamCall production audio settings are unchanged.
+
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
   lock/background, incoming push after process reclamation, audio routes and
