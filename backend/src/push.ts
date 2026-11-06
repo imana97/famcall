@@ -1,6 +1,6 @@
 import { createPrivateKey, randomUUID, sign } from "node:crypto";
 import { connect, type IncomingHttpHeaders } from "node:http2";
-import { getFirestore, type DocumentSnapshot } from "firebase-admin/firestore";
+import { FieldValue, getFirestore, type DocumentSnapshot } from "firebase-admin/firestore";
 import { getMessaging } from "firebase-admin/messaging";
 import { defineSecret } from "firebase-functions/params";
 import type { CallRecord } from "@famcall/core";
@@ -9,6 +9,16 @@ const apnsKey = defineSecret("APNS_PRIVATE_KEY");
 const apnsKeyId = defineSecret("APNS_KEY_ID");
 const apnsTeam = defineSecret("APNS_TEAM_ID");
 export const pushSecrets = [apnsKey, apnsKeyId, apnsTeam];
+
+export async function invalidateRejectedDevice(device: DocumentSnapshot) {
+  await device.ref.firestore.runTransaction(async (transaction) => {
+    const current = await transaction.get(device.ref);
+    if (current.updateTime && device.updateTime?.isEqual(current.updateTime)) {
+      // Keep the sequence until normal expiry so a late upload cannot resurrect it.
+      transaction.update(device.ref, { token: FieldValue.delete(), invalidated: true });
+    }
+  });
+}
 
 export function incomingEvent(call: CallRecord) {
   return {
@@ -97,7 +107,7 @@ async function sendApns(device: DocumentSnapshot, call: CallRecord) {
       result.reason === "BadDeviceToken" ||
       result.reason === "DeviceTokenNotForTopic"
     ) {
-      await device.ref.delete();
+      await invalidateRejectedDevice(device);
       return;
     }
     // Never put push tokens or provider response bodies in logs.
@@ -112,7 +122,8 @@ async function devicesFor(uid: string) {
     .collection("users/" + uid + "/devices")
     .get();
   return devices.docs.filter(
-    (d) => Number(d.data().expiresAt?.toMillis()) > Date.now(),
+    (d) => !d.data().invalidated && typeof d.data().token === "string" &&
+      Number(d.data().expiresAt?.toMillis()) > Date.now(),
   );
 }
 
@@ -139,7 +150,7 @@ async function sendFcm(
             "messaging/invalid-registration-token",
           ].includes(response.error?.code ?? "")
         )
-          await batch[i].ref.delete();
+          await invalidateRejectedDevice(batch[i]);
         else retry = true;
       }),
     );

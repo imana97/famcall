@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { initializeApp, deleteApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
+import { invalidateRejectedDevice } from "../backend/src/push";
 
 // These tests are deliberately confined to the local demo project.
 const enabled = process.env.FAMCALL_FUNCTIONS_TEST === "1";
@@ -100,6 +101,18 @@ describe.skipIf(!enabled)(
       await deleteApp(app);
     }, 30_000);
 
+    it("binds retried push registration to the account that started it", async () => {
+      const [a, b] = await Promise.all([user(), user()]);
+      const installationId = randomUUID();
+      const data = { userId: a.uid, installationId, sequence: 1, type: "FCM", token: "fictional-registration-token-one" };
+      expect((await callApi(a, "registerDevice", data)).result?.ok).toBe(true);
+      expect((await callApi(b, "registerDevice", data)).error?.status).toBe("PERMISSION_DENIED");
+      const db = getFirestore(app!);
+      expect((await db.doc("users/" + b.uid + "/devices/" + installationId).get()).exists).toBe(false);
+      expect((await callApi(a, "registerDevice", { ...data, sequence: 2, token: "fictional-registration-token-two" })).result?.ok).toBe(true);
+      expect((await db.doc("users/" + a.uid + "/devices/" + installationId).get()).data()?.token).toBe("fictional-registration-token-two");
+    }, 30_000);
+
     it("returns the same call for a retried start without creating another ring", async () => {
       const [a, b] = await Promise.all([user(), user()]);
       const id = randomUUID();
@@ -107,6 +120,30 @@ describe.skipIf(!enabled)(
       const retry = await start(a, b, id);
       expect(first.result?.id).toBe(id);
       expect(retry.result?.createdAtMs).toBe(first.result.createdAtMs);
+    }, 30_000);
+    it("retains the latest push token after late uploads and old provider rejections", async () => {
+      const a = await user();
+      const installationId = randomUUID();
+      const data = { userId: a.uid, installationId, sequence: 1, type: "FCM", token: "fictional-registration-token-one" };
+      const ref = getFirestore(app!).doc("users/" + a.uid + "/devices/" + installationId);
+      await callApi(a, "registerDevice", data);
+      const old = await ref.get();
+      const replacement = { ...data, sequence: 2, token: "fictional-registration-token-two" };
+      expect((await callApi(a, "registerDevice", replacement)).result?.ok).toBe(true);
+      await callApi(a, "registerDevice", data);
+      await invalidateRejectedDevice(old);
+      const current = await ref.get();
+      expect(current.data()?.token).toBe(replacement.token);
+      expect(current.data()?.invalidated).toBe(false);
+      expect((await callApi(a, "registerDevice", { ...data, sequence: 2 })).error?.status).toBe("FAILED_PRECONDITION");
+      expect((await callApi(a, "registerDevice", { ...replacement, apnsEnvironment: "sandbox" })).error?.status).toBe("FAILED_PRECONDITION");
+      await invalidateRejectedDevice(current);
+      await callApi(a, "registerDevice", replacement);
+      await callApi(a, "registerDevice", data);
+      expect((await ref.get()).data()).toMatchObject({ sequence: 2, invalidated: true });
+      expect((await ref.get()).data()?.token).toBeUndefined();
+      expect((await callApi(a, "registerDevice", { ...replacement, sequence: 3 })).result?.ok).toBe(true);
+      expect((await ref.get()).data()).toMatchObject({ sequence: 3, token: replacement.token, invalidated: false });
     }, 30_000);
     it("atomically admits only one simultaneous caller to a recipient", async () => {
       const [a, b, c] = await Promise.all([user(), user(), user()]);

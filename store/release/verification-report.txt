@@ -765,7 +765,7 @@ parallel slots; no subscription or paid upgrade was purchased. The trial's
 dashboard showed 94 free minutes remaining after these three completed runs.
 
 A normal-audio demo APK and development-signed demo IPA were built for
-bs-local.com. All 57 app/build source hashes match the inspected snapshots;
+bs-local.com from app source later committed as 360faa2158785457580939d560e493ac1231ac77. All 57 app/build source hashes match the inspected snapshots;
 both signatures and embedded demo project/package settings were verified.
 The final iPhone binary has no camera usage description, preserving microphone
 and contacts descriptions. Neither binary was installed on personal hardware.
@@ -805,6 +805,42 @@ limited provider evidence, not a crash-free reliability estimate. No hosted call
 audio injection, network impairment, background ringing or production attestation
 was tested. The iPhone needs a secure Functions endpoint and verified native
 Firestore route before retrying; Firebase transport protections remain enabled.
+
+INCOMING-CALL REGISTRATION RECOVERY
+A source review after the hosted tests found that a failed registerDevice upload
+had no timer or network/foreground retry. Incoming-call push could therefore
+remain unavailable after a brief outage until another token event or app restart.
+The client now retains the latest native token, serializes uploads, retries at
+5/15/30/60 seconds, and starts a fresh bounded attempt when connectivity returns
+or the app becomes active. It stops queued work when the account changes or the
+provider is disposed. It does not promise background execution while the OS has
+suspended the app.
+
+A persisted installation sequence orders token changes across restarts and
+concurrent preparations. The backend binds each upload to its originating account
+and ignores older sequences, preventing a delayed request from replacing newer
+registration state. APNs/FCM rejection cleanup compares the exact document
+version: an old rejection cannot remove a refreshed token. An invalidated record
+retains its sequence until normal expiry and removes the rejected token, so a
+late duplicate upload cannot resurrect it. This changes the registerDevice
+contract; the matching backend and app must ship together. No public app has
+been released with the earlier contract.
+
+Seven controller tests cover upload failure/recovery, bounded retries, token
+rotation during successful/failed uploads, missing token arrival, storage/native
+failures, account changes and disposal. Two storage tests verify serialized,
+persisted ordering, legacy installation reuse and write-failure recovery. Two
+Auth/Firestore callable integration cases verify account binding, late uploads,
+conflicting sequences, old rejection responses and invalidation/re-registration.
+All passed locally. These synthetic tokens and controlled failures validate the
+registration state machine, not actual APNs/FCM delivery or locked-screen ringing.
+
+The first local full run also discovered four private historical source snapshots,
+adding 28 duplicate core tests to its 98-test total. Vitest now excludes .local/
+while retaining its normal exclusions; discovery confirms 12 current test files.
+The current source has 70 JavaScript/TypeScript tests. The emulator log also retains
+NOT_FOUND errors when account-deletion workers outlive test-record cleanup; those
+are not new push-delivery evidence. The test command itself exited successfully.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen

@@ -94,6 +94,13 @@ J02 Wrong, expired, reused, delayed, and out-of-order codes; resend countdown;
     app restart during verification; interrupted browser verification fallback.
 J03 Restart, reboot, upgrade, token refresh, token revocation, reinstall, and
     number change. Verify sign-in persistence where expected and safe reauth.
+    Interrupt incoming-call registration before/after the server receives it;
+    recover on a bounded timer, network return and foregrounding. Rotate the
+    native push token while its upload is pending and delay the old response.
+    The newest registration must remain stored. A provider rejection for an old
+    registration must not invalidate a refreshed one. After account change,
+    reject delayed work carrying the previous account ID. Repeat with actual
+    APNs/FCM and original store signing; local fake tokens prove only state logic.
 J04 Normalize + and international 00 notation into one canonical phone identity;
     handle spaces, punctuation, pasted numbers, missing country code, invalid
     length, duplicated contacts, and local-number ambiguity without silent guessing.

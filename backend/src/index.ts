@@ -152,17 +152,34 @@ export const registerDevice = onCall(secure, async (request) => {
   const { uid } = await identity(request);
   const data = parse(
     z.object({
+      userId: z.string().min(1).max(128),
       installationId: z.string().uuid(),
+      sequence: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
       token: z.string().min(16).max(4096),
       type: z.enum(["FCM", "APNS_VOIP"]),
       apnsEnvironment: z.enum(["sandbox", "production"]).default("production"),
     }),
     request.data,
   );
-  await db.doc("users/" + uid + "/devices/" + data.installationId).set({
-    ...data,
-    updatedAt: FieldValue.serverTimestamp(),
-    expiresAt: ttl(60),
+  if (data.userId !== uid)
+    throw new HttpsError("permission-denied", "Sign in again before registering this device.");
+  const ref = db.doc("users/" + uid + "/devices/" + data.installationId);
+  await db.runTransaction(async (t) => {
+    const previous = (await t.get(ref)).data();
+    if (Number(previous?.sequence ?? 0) > data.sequence) return;
+    if (previous?.sequence === data.sequence) {
+      // An invalidated registration stays invalid even if its old upload arrives again.
+      if (previous.invalidated) return;
+      if (previous.token !== data.token || previous.type !== data.type ||
+          previous.apnsEnvironment !== data.apnsEnvironment)
+        throw new HttpsError("failed-precondition", "Device registration changed. Please try again.");
+    }
+    t.set(ref, {
+      ...data,
+      invalidated: false,
+      updatedAt: FieldValue.serverTimestamp(),
+      expiresAt: ttl(60),
+    });
   });
   return { ok: true };
 });

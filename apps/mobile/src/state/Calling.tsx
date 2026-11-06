@@ -11,11 +11,12 @@ import { router } from "expo-router";
 import * as Calls from "expo-callkit-telecom";
 import * as Notifications from "expo-notifications";
 import { randomUUID } from "expo-crypto";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import { doc, onSnapshot } from "@react-native-firebase/firestore";
 import { isTerminal, type CallRecord } from "@famcall/core";
-import { api, database, isE2E } from "../services/firebase";
+import { api, auth, database, isE2E } from "../services/firebase";
+import { DeviceRegistration } from "../services/DeviceRegistration";
+import { prepareDeviceRegistration } from "../services/deviceRegistrationStorage";
 import { consumeNativeEvents } from "../services/nativeEvents";
 import { NativeCallCoordinator } from "../services/NativeCallCoordinator";
 import { OutgoingCallAttempt } from "../services/OutgoingCallAttempt";
@@ -301,6 +302,14 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
   useEffect(() => {
     if (!uid) return;
     let mounted = true;
+    const registration = new DeviceRegistration(uid, {
+      current: () => mounted && auth.currentUser?.uid === uid,
+      registerNative: Calls.registerVoIPPush,
+      readToken: Calls.getVoIPPushToken,
+      prepare: prepareDeviceRegistration,
+      send: (data) => api("registerDevice", data),
+      error: failEvent,
+    });
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     const flush = () => {
       if (!mounted) return;
@@ -311,10 +320,16 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     };
     flushPending.current = flush;
     const detachNetwork = NetInfo.addEventListener((state) => {
-      if (state.isConnected) flush();
+      if (state.isConnected) {
+        flush();
+        if (state.isInternetReachable !== false) registration.refresh();
+      }
     });
     const appState = AppState.addEventListener("change", (state) => {
-      if (state === "active") flush();
+      if (state === "active") {
+        flush();
+        registration.refresh();
+      }
     });
     const outboxReady = restoreCallOutbox(uid).then(flush);
     const coordinator = new NativeCallCoordinator({
@@ -356,26 +371,15 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     });
     const detachEvents = consumeNativeEvents(event => coordinator.handle(event));
     void coordinator.start();
-    const register = async (token: Calls.VoIPPushToken | null) => {
-      if (!token || !mounted) return;
-      let installationId = await AsyncStorage.getItem("famcall-installation");
-      if (!installationId) {
-        installationId = randomUUID();
-        await AsyncStorage.setItem("famcall-installation", installationId);
-      }
-      await api("registerDevice", { installationId, ...token });
-    };
     const tokens = Calls.addVoIPPushTokenUpdatedListener((event) => {
-      void register(
+      registration.update(
         event.token ? { token: event.token, type: event.type } : null,
-      ).catch(failEvent);
+      );
     });
     if (!isE2E) {
       void Notifications.requestPermissionsAsync()
-        .then(() => Calls.registerVoIPPush())
-        .then(() => Calls.getVoIPPushToken())
-        .then(register)
-        .catch(failEvent);
+        .then(() => registration.start())
+        .catch(error => { if (mounted) failEvent(error); });
     }
     let activeRevision = 0;
     const active = onSnapshot(
@@ -392,6 +396,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     );
     return () => {
       mounted = false;
+      registration.dispose();
       flushPending.current = () => undefined;
       if (retryTimer) clearTimeout(retryTimer);
       detachNetwork();
