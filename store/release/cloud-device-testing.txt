@@ -1,0 +1,77 @@
+FAMCALL — CLOUD DEVICE TESTING
+Provider qualification, checked 6 November 2026. No cloud tests executed yet.
+
+CONSTRAINT
+Use hosted devices; do not install, launch or test on the owner's personal phones.
+The local personal-phone setup has been discontinued. A cloud UI pass alone does
+not satisfy the two-way speech, network recovery, push or signing release gates.
+
+BROWSERSTACK
+App Automate supports the existing Maestro approach on real Android and iOS
+devices. Start by checking account access, enabled features, available concurrent
+sessions and trial minutes. Do not purchase a subscription without owner approval.
+Two actual app endpoints need overlapping device sessions and a shared backend.
+
+Its Maestro audio injection supports selected Android devices, not iOS, and is
+listed for Device Cloud Pro or higher plans. Session video can include device
+output audio on Android 11+ and iOS 15+. Qualify that capture with a known signal:
+normal media playback support does not by itself prove in-call audio capture.
+Android-to-iPhone received speech can be evaluated only after this qualification;
+the reverse iPhone microphone path remains an explicit gap.
+
+Maestro network settings apply for the whole build. Mid-call network changes need
+Appium's update_network API or a separately verified impairment gateway. Network
+profiles require a paid plan. The documentation does not establish that FamCall's
+selected UDP media path is impaired: measure actual relay traffic, packet loss,
+jitter and RTT before counting any weak-network or outage result.
+
+Uploaded iOS builds may be re-signed by the provider. Preserve a separate plan for
+original signing, App Attest, APNs/VoIP push and actual TestFlight distribution.
+Do not treat a re-signed demo app as production authenticity or delivery evidence.
+
+ALTERNATIVES
+Kobiton documents automated audio injection for iOS/XCUITest and Android/
+UiAutomator2 through Bluetooth audio. It is a candidate for the missing iPhone
+voice path, subject to hosted/private-device availability, plan cost, audio-route
+qualification and network shaping. Do not assume its public device pool includes
+that hardware feature. A Bluetooth route does not prove built-in microphone,
+earpiece, proximity-sensor or acoustic echo behavior.
+
+Sauce Labs' documented audio injection replaces speech-recognition input and
+excludes React Native. It is not evidence of continuous WebRTC microphone support.
+Firebase Test Lab is an option for supplementary installation and UI compatibility
+coverage; no continuous bidirectional microphone/voice harness is established here.
+
+EXECUTION ORDER
+1. Confirm account entitlement and cost before consuming paid device time. Obtain
+   credentials through secure local configuration, never the public repository.
+2. Produce separate demo-famcall test APK/IPA files configured for the provider's
+   supported private-backend tunnel. Validate native Firebase Auth, Firestore
+   streaming and callable functions through that tunnel before call testing.
+   Do not upload a package still pointing to a personal LAN address.
+3. Run signup, persistent sign-in, contacts, history and block/unblock Maestro
+   flows on one cloud Android and one cloud iPhone. Use fictional phone numbers.
+4. Coordinate two live endpoints; test ringing, answer, decline, cancellation,
+   busy state, hangup, mute and background transitions. Keep direction and roles.
+5. Qualify source injection and output capture with known generated audio, silence
+   and wrong-reference controls. Require sustained source activity and advancing
+   content matches. Preserve source/build hashes and both peer identities.
+6. Run the existing network matrix, verifying each actual selected media route
+   and realized impairment. Use dynamic control for the 2/5/15/30-second outages.
+7. Exercise original store-signed candidates via the protected release workflow
+   and a provider installation path that preserves required entitlements. Repeat
+   phone verification, App Check, lock/background push and voice recovery checks.
+8. Retain failed/invalid attempts, session IDs, app hashes, redacted logs, videos
+   with audio and measured recovery bounds. Keep unsupported routes and features
+   open in the release candidate record; never silently waive a gate.
+
+PRIMARY SOURCES
+https://www.browserstack.com/docs/app-automate/maestro/overview
+https://www.browserstack.com/docs/app-automate/maestro/test-specific-scenarios/audio-injection
+https://www.browserstack.com/docs/app-automate/maestro/debug-failed-tests/audio-recording
+https://www.browserstack.com/docs/app-automate/maestro/set-up-test-env/simulate-network-conditions
+https://www.browserstack.com/docs/app-automate/appium/test-real-user-conditions/simulate-network-conditions
+https://docs.kobiton.com/automation-testing/scripting/add-audio-injection-to-appium-script
+https://docs.kobiton.com/manual-testing/inject-audio
+https://docs.saucelabs.com/mobile-apps/features/audio-injection/index.html
+https://firebase.google.com/docs/test-lab/usage-quotas-pricing

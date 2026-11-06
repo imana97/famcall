@@ -57,6 +57,8 @@ const config: ExpoConfig = {
     },
   },
   plugins: [
+    // Info.plist mods run in reverse order; remove the camera entry after SDK plugins.
+    "./plugins/withAudioOnly",
     "expo-router",
     ["expo-localization", { supportedLocales: ["en"], supportsRTL: false }],
     [
@@ -105,7 +107,6 @@ const config: ExpoConfig = {
         androidEventReceiver: "com.silvergridtech.famcall.calls.FamCallEndReceiver",
       },
     ],
-    "./plugins/withAudioOnly",
     "./plugins/withCallEndReceiver",
     ["./plugins/withAudioRecordDiagnostics", { enabled: audioRecordDiagnostics }],
   ],

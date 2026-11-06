@@ -744,6 +744,17 @@ was not met: further retries were stopped to prioritize newly available physical
 phones. The temporary recorder was removed and the default API 36 emulator
 configuration restored. FamCall production audio settings are unchanged.
 
+
+VOICE-ONLY IOS PERMISSION CONFIGURATION
+The WebRTC plugin was reintroducing a camera usage description after the local
+voice-only plugin removed it. The local plugin is now registered first so its
+Info.plist cleanup runs after the SDK mods. Full Expo introspection for both
+production and test configurations confirms the camera description is absent,
+with the microphone and contacts descriptions preserved. Android still removes
+the camera permission. The actual generated iOS test Info.plist was also checked.
+The before/after iOS plist comparison changed only the camera-description entry;
+this is a permission declaration correction, not an audio behavior change.
+
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
   lock/background, incoming push after process reclamation, audio routes and

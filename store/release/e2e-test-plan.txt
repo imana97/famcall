@@ -24,15 +24,17 @@ the first connectivity prototype and user review; do not present them as results
 TEST ENVIRONMENTS
 1. Local/staging service tests with Firebase test numbers and deterministic call
    state fixtures. No real SMS in routine automated suites.
-2. Real-device lab with two phones routed through a controllable network gateway.
+2. Provider-operated real-device lab with two cloud phones and controllable
+   network conditions. The owner's personal phones must not be used.
    Apply impairment independently to uplink and downlink at each endpoint. Measure
    actual traffic and effective impairments; do not rely on a UI network label.
 3. Store-distributed release candidates using production-equivalent signing,
    push notification delivery, authentication, API restrictions, and media paths.
-4. Consenting owner-arranged test pairs across mobile/home-network routes.
-   There is no separate beta-user recruitment program.
-   Record network type, provider, route, device, OS, app build, VPN state, and time.
-   Keep these details in private test evidence, not in location-targeted marketing.
+4. Provider-operated pairs across independently routed connections. No personal
+   phones or beta-user recruitment. Record network type, provider, route, device,
+   OS, app build, VPN state, and time in private evidence. A provider data-center
+   path does not establish performance on consumer mobile/home connections; keep
+   that coverage gap explicit until a suitable hosted device lab can exercise it.
 
 NETWORK MATRIX (TOTAL LINK RATE, INCLUDING PROTOCOL OVERHEAD)
 Rates below are in kbps per direction. Latency is round-trip. Jitter is the
@@ -74,7 +76,7 @@ PATH AND FAILURE MATRIX
   push delivery, and fail a dependency. Check retry behavior and service recovery.
 
 DEVICE MATRIX
-Use physical devices for push, microphone, audio routes, lifecycle, and store
+Use provider-operated physical devices for push, microphone, audio routes, lifecycle, and store
 signing checks. Include a recent iPhone, an older iPhone on the minimum supported
 OS, a recent mainstream Android, and a low-memory Android on the minimum OS.
 Include at least one additional Android manufacturer with restrictive battery
@@ -189,13 +191,13 @@ G5 Speech: ≥90% word understanding on the agreed lab phrase set for N1–N2 in
    one-way audio or feedback. Background-noise cases have separately agreed goals.
 G6 Endurance: no crash, stuck audio, or accumulating resource leak in the 120-minute
    call runs and 100 repeated short-call cycles per representative device.
-G7 Real routes: use owner-operated phones on at least two independent internet
-   connections and repeat all platform pairings in both caller directions.
-   Record the tested devices, routes, attempts and failures. No separate beta
-   audience or recruitment program is required. Field evidence must cover the
-   conditions actually claimed; a small owner-run sample cannot establish a
-   population-wide success rate. Investigate persistent one-way audio and ring
-   failures before public claims.
+G7 Real routes: use provider-operated physical phones on at least two independent
+   internet connections and repeat all platform pairings in both caller directions.
+   Record devices, routes, attempts and failures. Do not use the owner's personal
+   phones or recruit beta users. Evidence must cover the conditions actually
+   claimed; a small cloud-lab sample cannot establish a population-wide success
+   rate. Keep unavailable network-route coverage open rather than treating it as
+   passed. Investigate one-way audio and ring failures before public claims.
 G8 SMS and privacy: demonstrable provider-enforced cap, tested authorization,
    verified permission flows, and tested account/data-deletion behavior. Zero
    known bypass of these release requirements.
@@ -211,17 +213,20 @@ for registration, manual contact entry, locked-screen incoming call, speech both
 ways, mute/speaker, short interruption, and hang-up from each side.
 Nightly: controlled N0–N6 impairment suite, forced media paths, concurrency/races,
 permission/lifecycle cases, resource checks, and synthetic-audio measurements.
-Owner field checks: different internet routes, busy-hour runs, low-end phones,
-long calls, and review of failure clusters. No beta recruitment or recurring
-surveys are part of this plan.
+Hosted real-device checks: different internet routes, low-end phones, long calls,
+and review of failure clusters. Consumer busy-hour coverage requires an appropriate
+provider route; a fixed data-center profile is not equivalent. No personal-phone
+use, beta recruitment or recurring surveys are part of this plan.
 Before public release: full locked matrix, privacy/access/deletion tests, store
 artwork parity, reviewer access, and signed-off provisional gate results.
 
 Maestro drives the native Expo development builds on both platforms. Coordinate
 two-device flows with the isolated relay impairment lab and backend evidence.
 The virtual-microphone harness requires a fresh emulator pair for each direction
-of each measurement. Use a physical acoustic fixture for the full media path. UI automation
-alone cannot validate speech.
+of each measurement. Use a provider acoustic fixture for the full physical media
+path, or distinguish device audio injection from acoustic-microphone coverage.
+UI automation alone cannot validate speech. See cloud-device-testing.txt for
+provider capabilities and outstanding qualification steps.
 
 EVIDENCE AND TRIAGE
 Each run records a reproducible case ID, app build, device/OS pair, network profile,
