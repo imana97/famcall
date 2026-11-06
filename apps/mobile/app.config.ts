@@ -8,7 +8,7 @@ if (!e2e && process.env.EXPO_PUBLIC_EMULATOR_HOST)
 const config: ExpoConfig = {
   name: e2e ? "FamCall Test" : "FamCall",
   slug: "famcall",
-  owner: "imano66",
+  owner: "silvergrid",
   version: "0.1.0",
   scheme: e2e ? "famcall-test" : "famcall",
   orientation: "portrait",
@@ -99,7 +99,7 @@ const config: ExpoConfig = {
     "./plugins/withCallEndReceiver",
   ],
   extra: {
-    ...(e2e ? {} : { eas: { projectId: "c5f7bf33-804b-46c6-abd8-128af08f54fb" } }),
+    ...(e2e ? {} : { eas: { projectId: "76a56f3e-a64d-4917-9da0-d9f9018de627" } }),
     appMode: e2e ? "e2e" : "production",
     emulatorHost: e2e
       ? (process.env.EXPO_PUBLIC_EMULATOR_HOST ?? "10.0.2.2")

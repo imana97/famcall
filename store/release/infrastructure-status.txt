@@ -30,35 +30,44 @@ CONFIGURED
   to FamCall and DeviceCheck enabled. APNS_PRIVATE_KEY / APNS_KEY_ID /
   APNS_TEAM_ID are in Secret Manager with FamCall runtime read access.
   Firebase DeviceCheck confirms the private key is configured; token TTL is
-  one hour. Firebase phone-auth APNs upload and TestFlight delivery remain
-  pending. This key does not cover development sandbox pushes.
+  one hour. Firebase Cloud Messaging confirms the production APNs key is
+  installed. TestFlight delivery remains pending. This key does not cover
+  development sandbox pushes.
 - Google Play app record created: FamCall: Simple Voice Calls,
   com.silvergridtech.famcall. Dedicated famcall-play-publisher service account
   and Android Publisher API configured. FAMCALL_PLAY_API_KEY_JSON is stored
-  in Secret Manager and the protected GitHub release environment. App-only
-  Play permissions are prepared, awaiting the owner's access confirmation.
+  in Secret Manager and the protected GitHub release environment. Owner-approved
+  Play access is active for FamCall only: app information, testing/production
+  releases and Google's included app-quality, policy and deep-link permissions.
+  No account-wide, financial, other-app or user-administration access granted.
 - App Check App Attest and Play Integrity providers registered with one-hour
   tokens. Production callable functions require App Check in source. Firestore
   and Authentication enforcement require successful real-device validation.
 - Play Integrity currently requires Play-recognized app, not Play licensing;
   this supports Play plus off-Play distribution after Play recognizes the same
   signed build. Do not promise an arbitrary unsigned/sideloaded build will pass.
-- Refreshed native Firebase configuration files stored as EAS production secret
-  files. Expo project: https://expo.dev/accounts/imano66/projects/famcall
-  Owner requested a move to silvergrid. The current imano66 CLI login has
-  access only to imano66, so transfer is not yet possible with current access.
-  Project ownership and signing have not been changed.
+- New Expo project created under the requested silvergrid account:
+  https://expo.dev/accounts/silvergrid/projects/famcall
+  Project ID 76a56f3e-a64d-4917-9da0-d9f9018de627 is set in app.config.ts.
+  These separate personal accounts cannot transfer directly with current
+  access. The unreleased imano66 project remains available for recovery.
+  Its iOS signing certificate/profile were downloaded securely and backed up
+  in Secret Manager as FAMCALL_IOS_SIGNING_JSON for reuse. Restore those
+  credentials and the production Firebase configuration files to silvergrid
+  after the restricted Expo workflow token is approved.
 - Restricted GitHub OIDC cloud federation for the owner-approved main-branch
   backend workflow; no long-lived GCP deployment key.
 
 PREPARED / OWNER OR STORE ACTION NEEDED
-- Complete Firebase phone-auth APNs upload and validate DeviceCheck/App Attest
-  and production notification delivery on real devices.
+- Validate Firebase phone-auth APNs, DeviceCheck/App Attest, and production
+  notification delivery on real devices.
 - EXPO_TOKEN for the protected GitHub release environment; no token in source.
 - Link Play Integrity to project famcall, register Play App Signing fingerprints,
-  complete publisher automation permissions and testing recipients, and make
+  configure testing recipients, and make
   the first upload through the protected workflow. Play automatic protection
   is enabled; direct APK installation compatibility has not been validated.
+  The current Play Integrity settings page does not expose the documented
+  Link Cloud project control; no link has been confirmed.
 - Store legal identity/contact, age/audience, encryption, data safety and privacy
   declarations require publisher review. The owner confirmed Apple's account
   identity; public copy now consistently uses SilverGrid Technology LLC.
