@@ -33,13 +33,15 @@ def counter_window(samples):
 
 
 def playout_timing(entries, report):
-    outage = report["outage"]
+    outage = report.get("outage")
     groups = {}
     for entry in entries:
         at = entry.get("receivedAt", 0)
         if entry.get("kind") != "stats" or entry.get("callId") not in report["callIds"] or not report["startedAt"] <= at <= report["finishedAt"]:
             continue
-        phase = "before" if at < outage["blockedAt"] else "after" if at > outage["restoredAt"] else "during"
+        phase = "whole"
+        if outage:
+            phase = "before" if at < outage["blockedAt"] else "after" if at > outage["restoredAt"] else "during"
         for row in entry.get("rows", []):
             if row.get("type") == "inbound-rtp":
                 groups.setdefault((entry["uid"], row["id"], phase), []).append({**row, "at": at})

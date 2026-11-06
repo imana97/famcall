@@ -21,9 +21,10 @@ PASS
   stale completions, uncertain create responses, terminal retries and storage
   failures. Three outbox tests cover in-flight additions, retry and restoration;
   the in-flight addition test fails on the old implementation and passes now.
-  Ten Python evidence tests cover profile changes, wrong relay paths, missing
+  Eleven Python evidence tests cover profile changes, wrong relay paths, missing
   outage drops, restored speech, silent output, replayed pre-outage audio, and
-  timing counter deltas, resets, missing values and stream isolation. An impaired
+  timing counter deltas, resets, missing values and stream/peer isolation in
+  outage and fixed-profile measurements. An impaired
   outage must restore the same weak-link conditions rather than a healthier link.
 - Android native standalone test build compiles, including WebRTC, Firebase,
   native calling integration, native timers, and the background call-end worker.
@@ -493,6 +494,47 @@ the muted cases. Source/build/log hashes and event ordering were audited.
 Private run: pending-action-early-answer-1793994002846.
 This establishes that controlled ordering, not a general call-success rate or
 an explanation for the earlier undiagnosed connection timeout.
+
+CURRENT-BUILD BASELINE AUDIO INVESTIGATION
+Two fresh-pair 30-second baseline measurements on APK cc94bd07 (above), emulator
+37.2.13 and buffered 8 kHz generated input both produced valid received speech.
+The requested/selected path was UDP relay; the shaper applied no loss, delay,
+jitter or bandwidth limit. Full-clip STOI was 0.389 A-to-B and 0.399 B-to-A.
+These low values remain recorded and are not accepted as a quality pass.
+
+The measured packet windows had no loss or concealed samples. Mean native
+receiver-buffer delay on the speech-bearing streams was approximately 66 and
+69 ms. Exploratory alignment of shorter recording windows suggests time-varying
+alignment; some correlations are weak, so this does not diagnose the cause or
+justify replacing the original full-clip scores. App audio, emulator injection
+and capture timing still require separation. The timing-counter analyzer now
+accepts fixed-profile reports, preserving per-peer/per-stream identities and
+excluding observations outside the selected call/measurement interval.
+
+Private run: matrix-2026-11-06T19-52-02.257Z. Source/build/reference/native-log
+hashes and capture lifetimes were verified. Original captures, full-clip reports,
+selected timing counters and exploratory alignment diagnostics are retained.
+Two valid inputs do not establish that the intermittent silent-input problem is
+resolved. Input-rate/toolchain differences prevent direct comparison with the
+earlier eight-sample pilot, and physical-device validation remains required.
+
+A comparison using the original 48 kHz generated-input rate kept the APK,
+emulator version and network profile unchanged, with another fresh pair for
+each direction. A-to-B was valid with full-clip STOI 0.876. B-to-A was invalid:
+both source-energy counters stayed unchanged despite advancing source duration,
+and capture contained only 2.163 seconds for the 30-second measurement. Android
+reported an active, unsilenced recorder and false microphone-mute flags. No gRPC
+error was reported; both peers still had the expected relay path and advancing
+packet counters. Thus the current app/control fixes have not eliminated the
+silent-input measurement failure. One higher score is not proof of a solution.
+
+Private run: matrix-2026-11-06T20-02-39.732Z, including the invalid direction;
+both source/build/reference/native-log provenance and selected peer paths were
+audited. An earlier comparison attempt, matrix-2026-11-06T20-00-54.081Z, failed
+before calling or injection because Maestro lost its ADB connection while
+launching the second app. Its driver log and empty measurement summary are
+retained separately; the cause of that transient disconnect is undiagnosed.
+These four measurements and one setup failure are not a reliability estimate.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen

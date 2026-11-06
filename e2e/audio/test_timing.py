@@ -32,6 +32,22 @@ class PlayoutTimingTests(unittest.TestCase):
         self.assertEqual(groups[0]["deltas"]["totalSamplesReceived"], 100)
         self.assertFalse(groups[1]["available"])
 
+    def test_fixed_profile_keeps_peers_separate_and_excludes_other_intervals(self):
+        report = {"callIds": ["selected"], "startedAt": 100, "finishedAt": 600}
+        def event(peer, at, count, call="selected"):
+            return {"kind": "stats", "callId": call, "uid": peer, "receivedAt": at,
+                    "rows": [{"id": "same-stream-id", "type": "inbound-rtp",
+                              "totalSamplesReceived": count}]}
+        groups = playout_timing([
+            event("a", 99, 0), event("a", 150, 10), event("a", 550, 30),
+            event("a", 601, 100), event("a", 300, 999, "unrelated"),
+            event("b", 200, 100), event("b", 500, 160),
+        ], report)
+        self.assertEqual([(g["peer"], g["phase"], g["deltas"]["totalSamplesReceived"])
+                          for g in groups], [("a", "whole", 20), ("b", "whole", 60)])
+        self.assertEqual(groups[0]["from"], 150)
+        self.assertEqual(groups[0]["to"], 550)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -138,6 +138,9 @@ It separates each peer, stream, and before/during/after interval; missing counte
 remain missing and counter resets invalidate the affected delta. Mean buffer delay
 uses the change in cumulative delay divided by emitted samples. This describes
 receiver buffering, not end-to-end latency, and never grants a speech pass.
+Fixed-profile reports use the same command and produce one whole-measurement
+window per peer/stream. Use these to investigate unexpected baseline scores;
+keep the original recording and score even when a timing issue is suspected.
 
 Reports also retain the emulator's capture timestamps and progress handing
 generated input to gRPC. Handoff time is not microphone consumption time.
