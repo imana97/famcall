@@ -1,5 +1,5 @@
 FAMCALL — CLOUD DEVICE TESTING
-Provider qualification, checked 6 November 2026. No cloud tests executed yet.
+Provider qualification and hosted-device evidence, checked 6 November 2026.
 
 CONSTRAINT
 Use hosted devices; do not install, launch or test on the owner's personal phones.
@@ -10,8 +10,11 @@ FREE / LOW-COST OPTIONS
 Prices and public trial allowances checked 6 November 2026; actual account
 eligibility, remaining minutes and feature entitlements must be checked before use.
 The owner requested evaluation of BrowserStack's free trial. Its account page now
-shows 100 App Automate minutes remaining. No subscription, cloud app upload or
-paid test has been created by this work.
+initially showed 100 unused App Automate minutes. The API reports Free plan and
+five parallel session slots. Separate demo APK/IPA files were uploaded and trial
+tests have now run. No paid subscription or upgrade was purchased. After the three runs, the signed-in
+dashboard shows 94 free minutes remaining. This is an observed account balance;
+build duration alone is not a billing statement. Recheck before further runs.
 
 Firebase Test Lab: the existing Blaze pricing tier includes 30 physical-device
 minutes and 60 virtual-device minutes per day. Additional physical time is $5 per
@@ -42,16 +45,59 @@ attribution and actual voice/network features also need review before adoption.
 No application has been submitted and no vendor has been contacted.
 
 BrowserStack's public trial includes 100 App Automate minutes and a separate 30
-App Live minutes. Its Pro audio/network features and two concurrent device slots
-must not be assumed included in the trial. Evaluate entitlement before uploading
-or consuming minutes; no paid upgrade is authorized by a trial evaluation.
+App Live minutes. This account reports five concurrent slots; its Pro audio and
+network features remain unqualified. Evaluate entitlement before enabling paid
+features; no paid upgrade is authorized by a trial evaluation.
 
 Use existing local emulators for the bulk of repeatable checks, Test Lab for
 limited recurring device coverage, and a qualified trial for the remaining cloud
 checks. No researched free offer yet proves complete two-way speech, background
 push and production-signing coverage on both platforms. Keep those gates open.
 
-BROWSERSTACK
+BROWSERSTACK EXECUTION EVIDENCE
+The Pixel 6 / Android 12 smoke build bdf852cb96bc51ae60bf9a63c2a3022545f987b7
+passed fictional-number verification, manual contact saving and sign-in/contact
+persistence after relaunch. Native Firebase and the runner's emulator-code lookup
+worked through the restricted Local tunnel. Independent demo backend records
+confirm the identity ending 0101 and contact ending 0102. Its provider session,
+command log, Maestro log and native log are retained privately. The provider
+returned 404 for the first run's screenshot endpoint; no screenshot is claimed.
+
+The iPhone 15 / iOS 17.4 build e305212df125898677c318a4596ccab6d6f413df failed
+at contact saving after successful fictional-number verification. Its screenshot
+and native/Maestro logs are retained. Firebase Functions 13.1.1 refused to attach
+authentication to the non-loopback HTTP emulator URL. Native Firestore attempted
+127.0.0.1:8080 and reported connection refused. This observed tunnel setup is not
+qualified for native iPhone backend traffic. A secure Functions endpoint plus a
+verified native database route is required before retrying; retain transport
+protections. This finding does not establish a defect against production Firebase.
+
+The initial flow's env constants also shadowed requested per-run phone numbers,
+so both first runs signed in as 0101. Those defaults were removed. The revised
+flow validates explicit distinct fictional identities before launch. It also
+captures the final contact-list screen. The follow-up Pixel 6 build
+39bca1f5e7958a116668fe098ecd2f09aea468d8 passed with supplied PHONE ending
+0102, CONTACT_PHONE ending 0101 and name Cloud Family. Its native/Maestro logs,
+command trace, final screenshot and independent backend record agree. The saved
+contact remains visible after app relaunch. This verifies parameter handling
+and a second identity in a separate run, not a simultaneous two-endpoint call.
+
+Both binaries contain demo-famcall and bs-local.com, use the separate e2e bundle
+and normal audio settings, and have verified source hashes and signatures. The
+iPhone binary has no camera usage description. The domain-specific iOS HTTP
+exception is restricted to the test bundle; a config plugin removes it when a
+previous test native project is reused for production or a different local host.
+Two regression tests and actual prebuild/introspection checks verify cleanup.
+
+APK SHA-256: 71ef6afd1a123833bc41710c49bac5ed0a18eaac8967c71f2d1ddef9ef4ea65a
+IPA SHA-256: 891480b10d0b50ec5b3c70c51601be1aae52bd30b8fc58ddbad628fbaa942da6
+Initial suite SHA-256: 0d58db0559f06b3f148d3dedea568f7c8e0bbe17d85c4312cd0143582f973c9f
+Revised suite SHA-256: 0be5092180efeea75ac9c700d791771d68e03b0b5bbdedce0dc9bf9515fdcff4
+
+These results verify basic demo flows only. No call was placed in these hosted
+runs; two-way speech, weak-network recovery and background/push remain open.
+
+BROWSERSTACK CAPABILITIES
 App Automate supports the existing Maestro approach on real Android and iOS
 devices. Start by checking account access, enabled features, available concurrent
 sessions and trial minutes. Do not purchase a subscription without owner approval.
@@ -126,3 +172,7 @@ https://aws.amazon.com/device-farm/faqs/
 https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-simulate-network-connections-and-conditions.html
 https://testingbot.com/open-source
 https://www.browserstack.com/support/faq/plans-pricing/plans/what-do-i-get-with-a-free-trial
+
+https://www.browserstack.com/docs/app-automate/maestro/set-up-test-env/configure-tests/set-env-variables
+https://docs.maestro.dev/maestro-flows/flow-control-and-logic/parameters-and-constants
+https://github.com/firebase/firebase-ios-sdk/blob/dc6dfd442b1f3ec215ed62b8beb2623ffab010d6/FirebaseFunctions/Sources/Functions.swift

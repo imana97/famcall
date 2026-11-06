@@ -2,6 +2,9 @@ import type { ExpoConfig } from "expo/config";
 import path from "node:path";
 
 const e2e = process.env.APP_VARIANT === "e2e";
+const emulatorHost = e2e
+  ? (process.env.EXPO_PUBLIC_EMULATOR_HOST ?? "10.0.2.2")
+  : null;
 const audioRecordDiagnostics = process.env.FAMCALL_AUDIO_RECORD_DIAGNOSTICS === "1";
 if (audioRecordDiagnostics && !e2e)
   throw new Error("Audio recording diagnostics require the separate e2e app.");
@@ -59,6 +62,7 @@ const config: ExpoConfig = {
   plugins: [
     // Info.plist mods run in reverse order; remove the camera entry after SDK plugins.
     "./plugins/withAudioOnly",
+    "./plugins/withTestBackend",
     "expo-router",
     ["expo-localization", { supportedLocales: ["en"], supportsRTL: false }],
     [
@@ -113,9 +117,7 @@ const config: ExpoConfig = {
   extra: {
     ...(e2e ? {} : { eas: { projectId: "76a56f3e-a64d-4917-9da0-d9f9018de627" } }),
     appMode: e2e ? "e2e" : "production",
-    emulatorHost: e2e
-      ? (process.env.EXPO_PUBLIC_EMULATOR_HOST ?? "10.0.2.2")
-      : null,
+    emulatorHost,
   },
 };
 export default config;

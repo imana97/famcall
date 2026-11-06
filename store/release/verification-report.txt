@@ -23,6 +23,9 @@ PASS
   the in-flight addition test fails on the old implementation and passes now.
   Two diagnostic-plugin tests reject production enablement, remove generated
   diagnostic code when disabled, and fail on an unrecognized native template.
+  Two hosted-backend plugin tests verify removal of the test HTTP exception when
+  reusing native configuration, require the separate test bundle, preserve
+  unrelated transport settings, and check idempotence.
   Sixteen Python evidence tests cover profile changes, wrong relay paths, missing
   outage drops, restored speech, silent output, replayed pre-outage audio, and
   timing counter deltas, resets, missing values and stream/peer isolation in
@@ -754,6 +757,54 @@ with the microphone and contacts descriptions preserved. Android still removes
 the camera permission. The actual generated iOS test Info.plist was also checked.
 The before/after iOS plist comparison changed only the camera-description entry;
 this is a permission declaration correction, not an audio behavior change.
+
+HOSTED ANDROID/IPHONE SMOKE QUALIFICATION
+The owner requested provider-owned devices only. BrowserStack credentials are
+stored privately outside source control. Its API confirmed Free plan and five
+parallel slots; no subscription or paid upgrade was purchased. The trial's
+dashboard showed 94 free minutes remaining after these three completed runs.
+
+A normal-audio demo APK and development-signed demo IPA were built for
+bs-local.com. All 57 app/build source hashes match the inspected snapshots;
+both signatures and embedded demo project/package settings were verified.
+The final iPhone binary has no camera usage description, preserving microphone
+and contacts descriptions. Neither binary was installed on personal hardware.
+APK SHA-256: 71ef6afd1a123833bc41710c49bac5ed0a18eaac8967c71f2d1ddef9ef4ea65a
+IPA SHA-256: 891480b10d0b50ec5b3c70c51601be1aae52bd30b8fc58ddbad628fbaa942da6
+
+- Pixel 6 / Android 12: build bdf852cb96bc51ae60bf9a63c2a3022545f987b7 passed
+  fictional-number verification, contact saving and persistence after relaunch.
+  Backend records independently confirm identity 0101 and contact 0102. Its
+  command trace and native/Maestro logs are retained. The provider's screenshot
+  endpoint returned 404, so no screenshot is claimed for this first run.
+- iPhone 15 / iOS 17.4: build e305212df125898677c318a4596ccab6d6f413df failed
+  at contact saving after verification. Firebase Functions 13.1.1 refused to
+  attach authentication to a non-loopback HTTP emulator URL. Native Firestore
+  reported connection refused at 127.0.0.1:8080. A screenshot and both logs retain
+  this setup failure; the tunnel route is not qualified for the iPhone backend.
+  Maestro also warned that clearState is unsupported on real iOS devices.
+- The first flow's literal env values overrode the iPhone request's identity,
+  so it actually signed in as 0101. Defaults were removed and explicit distinct
+  fictional identities are now validated before launch. Pixel 6 build
+  39bca1f5e7958a116668fe098ecd2f09aea468d8 passed the revised suite with identity
+  0102, contact 0101 and name Cloud Family. The command/Maestro/native logs,
+  final screenshot and independent backend record agree. This verifies a second
+  identity in a separate Android run, not a concurrent two-endpoint test.
+
+The iPhone test HTTP exception is limited to the separate test bundle. During
+configuration verification, reusing a generated cloud-test plist initially left
+that exception in production configuration. A config plugin now removes the
+owned exception for production and other local hosts, even with --no-clean.
+Two regression tests plus actual prebuild/introspection verified cleanup and
+retention of unrelated transport settings. General insecure loads stay disabled.
+
+Private cloud-testing artifacts retain hashes, app/suite upload IDs, build/session
+responses, successful and failed logs, backend evidence and screenshots. Both
+Android runs and the iPhone run finished with zero reported crash logs. That is
+limited provider evidence, not a crash-free reliability estimate. No hosted call,
+audio injection, network impairment, background ringing or production attestation
+was tested. The iPhone needs a secure Functions endpoint and verified native
+Firestore route before retrying; Firebase transport protections remain enabled.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
