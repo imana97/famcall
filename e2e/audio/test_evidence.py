@@ -1,9 +1,18 @@
 import unittest
 
-from evidence import stable_profile, verified_path
+from evidence import stable_profile, verified_path, planned_outage
 
 
 class ExperimentEvidenceTests(unittest.TestCase):
+    def test_outage_must_have_actual_drops_and_exact_profile_history(self):
+        base = {"transport": "udp", "proxy": True, "loss": 0}
+        changes = [{"at": 1000, "config": {**base, "loss": 1}}, {"at": 6000, "config": base}]
+        outage = {"seconds": 5, "blockedAt": 1001, "restoredAt": 6001, "droppedPackets": 10}
+        self.assertTrue(planned_outage(base, base, changes, outage))
+        self.assertFalse(planned_outage(base, base, changes, {**outage, "droppedPackets": 0}))
+        self.assertFalse(planned_outage(base, base, changes, {**outage, "seconds": 15}))
+        self.assertFalse(planned_outage(base, base, changes + changes, outage))
+
     def test_rejects_a_profile_changed_and_restored_during_capture(self):
         weak = {"transport": "udp", "loss": 0.03, "kbps": 64}
         healthy = {"transport": "udp", "loss": 0, "kbps": 0}

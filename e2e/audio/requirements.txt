@@ -1,6 +1,4 @@
 grpcio==1.85.1
 grpcio-tools==1.85.1
-numpy==2.5.4
 protobuf==7.36.2
-pystoi==0.4.1
-scipy==1.18.1
+-r analysis-requirements.txt

@@ -11,8 +11,8 @@ PASS
   evidence block public submission.
 - Three connection-policy tests cover initial ICE setup stalls, coalesced
   credential-refresh restarts, and cancellation after connection/close.
-  Two Python evidence tests reject changed-and-restored network profiles and
-  a selected relay transport that differs from the requested path.
+  Six Python evidence tests cover profile changes, wrong relay paths, missing
+  outage drops, restored speech, silent output and replayed pre-outage audio.
 - Android native standalone test build compiles, including WebRTC, Firebase,
   native calling integration, native timers, and the background call-end worker.
 - Maestro on two Android API 36 emulators: phone verification using fictional
@@ -118,8 +118,55 @@ Updated test APK SHA-256:
 9b84261cd9c07e252b757c395742d523c380b247d0938a91570e0161ee496561
 
 IN PROGRESS / NOT A PASS
-- Credential refresh, speech recovery, full interruptions, TCP/TLS fallback,
+- Credential refresh, repeatable speech recovery, full interruptions, TCP/TLS fallback,
   offline hangup, repeatability/sample-size targets and physical-device testing.
+
+GENERATED-SPEECH OUTAGE PILOT
+Eight initial attempts used the updated Android test APK identified above.
+Each direction was measured separately, with 12 seconds of generated speech
+before a complete UDP-relay drop and 20 seconds of capture after restoration.
+Outside the outage the lab added no bandwidth cap, delay, jitter or loss.
+
+Outage    A-to-B confirmation bound    B-to-A confirmation bound
+2 s       3.513 s                      Invalid input sample
+5 s       3.521 s                      3.519 s
+15 s      Not confirmed                Invalid input sample
+30 s      15.274 s                     Not confirmed
+
+Confirmation requires a complete two-second received waveform matching new
+reference speech from after restoration, at a fixed correlation threshold of
+0.35. Capture arrival time gives an observation upper bound, not exact recovery
+latency. The four confirmed samples had post-recovery STOI estimates of 0.914,
+0.907, 0.907 and 0.712 respectively, over 10/10/10/7.21 seconds. These are not
+word-understanding scores. There is no simultaneous two-way or N1/N2 outage
+result here, and the sample count cannot establish a reliability rate.
+
+The two invalid samples had silent output and no advancing sender microphone
+energy before the outage, despite a successful injection call. They are retained
+as invalid attempts. The 15-second A-to-B and 30-second B-to-A recordings were
+valid, but no post-outage waveform met the fixed threshold. Audio energy did
+return in the 15-second case; timing distortion versus app recovery remains to
+be diagnosed. These unconfirmed cases are not release passes or a proven lack
+of speech.
+
+The runner now restarts both AVDs before each direction to isolate a possible
+capture-to-injection lifecycle issue. This workaround still requires repeatability
+testing. The original eight attempts remain in the denominator and evidence.
+A fresh-pair repeat of the invalid two-second B-to-A case supplied valid input
+and confirmed new speech within 3.521 seconds, with post-recovery STOI 0.915
+over ten seconds. Across all nine attempts, seven recordings were valid and
+five confirmed recovery under this detector; these mixed cases are not a pooled
+success-rate estimate. The invalid 15-second sample still needs a fresh-pair repeat.
+Offline negative controls on both five-second recordings reject substituted
+silence and replayed pre-outage audio while accepting the original recordings.
+
+Private runs: recovery-2026-11-06T15-40-01.318Z and
+recovery-2026-11-06T15-44-37.720Z. The audit checks reference and source hashes,
+installed APK identity, actual profile changes/drops, selected UDP relay paths
+at both peers before/after the outage, and PCM formats. The first run retains
+a timestamped source-hash amendment made before measurement began.
+The isolated reverse repeat is recovery-2026-11-06T15-56-30.581Z, with matching
+measurement source hashes, unchanged APK, and verified paths before/after the drop.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen

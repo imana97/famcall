@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import signal
 import sys
 import threading
 import time
@@ -19,7 +20,8 @@ import numpy as np
 from scipy.signal import correlate, correlation_lags, resample_poly
 from pystoi import stoi
 from google.protobuf.empty_pb2 import Empty
-from evidence import stable_profile, verified_path
+from evidence import stable_profile, verified_path, planned_outage
+from recovery import speech_recovery
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / ".local/audio-proto"))
@@ -56,15 +58,22 @@ def main():
     parser.add_argument("--seconds", type=float, default=20)
     parser.add_argument("--buffered", action="store_true")
     parser.add_argument("--input-rate", type=int, choices=[8000,16000,48000], default=48000)
+    parser.add_argument("--outage-seconds", type=int, choices=[2, 5, 15, 30])
     args = parser.parse_args()
     if not 3 <= args.seconds <= 3600:
         parser.error("Use a measurement duration between 3 and 3600 seconds.")
     if args.sender == args.receiver:
         parser.error("Speech measurements require two different emulators.")
+    if args.outage_seconds and args.seconds < args.outage_seconds + 32:
+        parser.error("Outage runs need 12 seconds before and 20 seconds after the outage.")
     started_at = int(time.time() * 1000)
+    measurement_sources = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+                           for path in (Path(__file__).resolve(), ROOT / "e2e/audio/recovery.py", ROOT / "e2e/audio/evidence.py")}
     source_hash = hashlib.sha256(args.source.read_bytes()).hexdigest()
     with urllib.request.urlopen("http://127.0.0.1:8787/config", timeout=3) as response:
         network_at_start = json.load(response)
+    if args.outage_seconds and (network_at_start["transport"] != "udp" or not network_at_start["proxy"]):
+        raise RuntimeError("Outages require the isolated UDP proxy")
     with urllib.request.urlopen("http://127.0.0.1:8787/status", timeout=3) as response:
         lab_at_start = json.load(response)
     with wave.open(str(args.source), "rb") as source:
@@ -74,6 +83,8 @@ def main():
         if not original:
             raise RuntimeError("Source audio is empty")
         wanted = int(args.seconds * 48000) * 2
+        if args.outage_seconds and len(original) < wanted:
+            raise RuntimeError("Outage runs require a nonrepeating reference at least as long as the capture")
         pcm = (original * (wanted // len(original) + 1))[:wanted]
     duration = len(pcm) / (48000 * 2)
     input_pcm = pcm if args.input_rate == 48000 else resample_poly(np.frombuffer(pcm, dtype="<i2").astype(float), args.input_rate, 48000).astype("<i2").tobytes()
@@ -97,14 +108,19 @@ def main():
     input_fmt = pb.AudioFormat(samplingRate=args.input_rate, channels=pb.AudioFormat.Mono,
                          format=pb.AudioFormat.AUD_FMT_S16, mode=fmt.mode)
     captured = []
+    capture_chunks = []
+    captured_samples = 0
     formats = set()
     errors = []
     stream = receiver.streamAudio(fmt, metadata=rm, timeout=duration + 6)
 
     def capture():
+        nonlocal captured_samples
         try:
             for packet in stream:
                 captured.append(bytes(packet.audio))
+                captured_samples += len(packet.audio) // 2
+                capture_chunks.append({"at": int(time.time() * 1000), "endSample": captured_samples // 3})
                 formats.add((packet.format.samplingRate, packet.format.channels, packet.format.format))
         except grpc.RpcError as error:
             if error.code() not in (grpc.StatusCode.CANCELLED, grpc.StatusCode.DEADLINE_EXCEEDED):
@@ -114,6 +130,39 @@ def main():
     thread.start()
     time.sleep(1)
     started = time.monotonic()
+    injection_started_at = int(time.time() * 1000)
+    outage = {"seconds": args.outage_seconds, "injectionStartedAt": injection_started_at}
+    cancelled = threading.Event()
+
+    def configure(profile):
+        request = urllib.request.Request("http://127.0.0.1:8787/config", data=json.dumps(profile).encode(),
+                                         headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(request, timeout=5) as response:
+            json.load(response)
+
+    def interrupt_relay():
+        if cancelled.wait(12):
+            return
+        try:
+            with urllib.request.urlopen("http://127.0.0.1:8787/status", timeout=3) as response:
+                drops_before = json.load(response)["traffic"]["dropped"]
+            configure({**network_at_start, "loss": 1})
+            outage["blockedAt"] = int(time.time() * 1000)
+            cancelled.wait(args.outage_seconds)
+        except Exception as error:
+            errors.append("Outage control failed: " + type(error).__name__)
+        finally:
+            try:
+                configure(network_at_start)
+                outage["restoredAt"] = int(time.time() * 1000)
+                with urllib.request.urlopen("http://127.0.0.1:8787/status", timeout=3) as response:
+                    outage["droppedPackets"] = json.load(response)["traffic"]["dropped"] - drops_before
+            except Exception as error:
+                errors.append("Outage restoration failed: " + type(error).__name__)
+
+    outage_thread = threading.Thread(target=interrupt_relay, daemon=True) if args.outage_seconds else None
+    if outage_thread:
+        outage_thread.start()
 
     def packets():
         size = args.input_rate // 50 * 2  # 20 ms of PCM.
@@ -123,16 +172,24 @@ def main():
                 time.sleep(wait)
             yield pb.AudioPacket(format=input_fmt, timestamp=int(time.time() * 1_000_000), audio=input_pcm[offset:offset + size])
 
+    def terminate(_signal, _frame):
+        raise KeyboardInterrupt
+
+    previous_term = signal.signal(signal.SIGTERM, terminate)
     try:
         sender.injectAudio(packets(), metadata=sm, timeout=duration + 8)
         time.sleep(2)
     except grpc.RpcError as error:
         errors.append("Audio injection failed: " + str(error.code()))
     finally:
+        cancelled.set()
+        if outage_thread:
+            outage_thread.join(timeout=15)
         stream.cancel()
         thread.join(timeout=5)
         sc.close()
         rc.close()
+        signal.signal(signal.SIGTERM, previous_term)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     recording = args.output.with_suffix(".wav")
     with wave.open(str(recording), "wb") as destination:
@@ -148,6 +205,9 @@ def main():
               "errors": errors, "stoi": None,
               "captureFormats": sorted(formats), "capturePackets": len(captured), "buffered": args.buffered,
               "inputRate": args.input_rate,
+              "measurementSourceHashes": measurement_sources,
+              "injectionStartedAt": injection_started_at,
+              "captureChunks": capture_chunks,
               "senderProcess": sender_process, "receiverProcess": receiver_process,
               "limitation": "STOI is a laboratory intelligibility estimate, not a MOS score or a physical-device listening test."}
     with urllib.request.urlopen("http://127.0.0.1:8787/config", timeout=3) as response:
@@ -157,6 +217,7 @@ def main():
                    "stableProfile": network_at_start == network_at_end})
     # Verify the actual selected path; a requested relay setting alone is not evidence.
     paths = []
+    path_observations = []
     samples = []
     call_ids = set()
     rtt_ms = []
@@ -176,7 +237,9 @@ def main():
         candidate = rows.get(pair.get("localCandidateId"), {})
         if "currentRoundTripTime" in pair:
             rtt_ms.append(pair["currentRoundTripTime"] * 1000)
-        paths.append({"type": candidate.get("candidateType"), "relayProtocol": candidate.get("relayProtocol")})
+        path = {"type": candidate.get("candidateType"), "relayProtocol": candidate.get("relayProtocol")}
+        paths.append(path)
+        path_observations.append({"peer": entry["uid"], "at": entry["receivedAt"], "path": path})
         for r in rows.values():
             if r["type"] == "inbound-rtp":
                 samples.append({"peer": entry["uid"], "at": entry["receivedAt"], **r})
@@ -193,6 +256,19 @@ def main():
     result["selectedPaths"] = [dict(x) for x in {tuple(sorted(p.items())) for p in paths}]
     result["relayVerified"] = bool(paths) and all(p["type"] == "relay" for p in paths)
     result["requestedPathVerified"] = verified_path(paths, network_at_start["transport"])
+    if args.outage_seconds:
+        result["outage"] = outage
+        result["plannedOutageVerified"] = planned_outage(network_at_start, network_at_end, configuration_changes, outage)
+        # No selected candidate during an outage is expected. Require all known
+        # candidates to match; the pre/post speech and packet checks remain mandatory.
+        result["requestedPathVerified"] = verified_path([p for p in paths if p["type"]], "udp")
+        if result["plannedOutageVerified"]:
+            peers = {p["peer"] for p in path_observations}
+            result["outagePathsVerified"] = len(peers) == 2 and all(
+                verified_path([p["path"] for p in path_observations if p["peer"] == peer and p["path"]["type"]
+                               and (p["at"] < outage["blockedAt"] if phase == "before" else p["at"] > outage["restoredAt"])], "udp")
+                for peer in peers for phase in ("before", "after"))
+            result["speechRecovery"] = speech_recovery(reference, received, capture_chunks, outage)
     result["packetWindows"] = []
     for peer in sorted({r["peer"] for r in samples}):
         rows = sorted((r for r in samples if r["peer"] == peer), key=lambda r: r["at"])
@@ -226,7 +302,13 @@ def main():
         reasons.append("Too little captured audio for the requested interval")
     if result.get("comparedSeconds", 0) < duration * 0.85:
         reasons.append("Too little aligned speech for the requested interval")
-    if not result["stableProfile"]:
+    if args.outage_seconds and not result.get("plannedOutageVerified"):
+        reasons.append("Planned outage was not verified")
+    if args.outage_seconds and not result.get("outagePathsVerified"):
+        reasons.append("Both peers' relay paths were not verified before and after the outage")
+    if args.outage_seconds and not result.get("speechRecovery", {}).get("baselineSpeechVerified"):
+        reasons.append("No matched generated speech before the outage")
+    if not args.outage_seconds and not result["stableProfile"]:
         reasons.append("Network profile changed during measurement")
     if not result["requestedPathVerified"]:
         reasons.append("Requested transport path was not verified")
@@ -236,7 +318,7 @@ def main():
     result["invalidReasons"] = reasons
     args.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result))
-    if not result["measurementValid"]:
+    if not result["measurementValid"] or (args.outage_seconds and not result.get("speechRecovery", {}).get("recoveredSpeech")):
         sys.exit(1)
 
 

@@ -219,8 +219,8 @@ artwork parity, reviewer access, and signed-off provisional gate results.
 
 Maestro drives the native Expo development builds on both platforms. Coordinate
 two-device flows with the isolated relay impairment lab and backend evidence.
-The virtual-microphone harness requires a fresh emulator process for every
-injection. Use a physical acoustic fixture for the full media path. UI automation
+The virtual-microphone harness requires a fresh emulator pair for each direction
+of each measurement. Use a physical acoustic fixture for the full media path. UI automation
 alone cannot validate speech.
 
 EVIDENCE AND TRIAGE
@@ -235,8 +235,8 @@ Only then approve store wording about weak-network behavior.
 CURRENT ANDROID AUDIO LAB
 The macOS emulator gRPC harness permits one audio injection per emulator process.
 A second injection is refused before opening the audio stream; restart the sender
-first. The matrix runner restarts both dedicated FamCall AVDs for each profile,
-then uses one injection in each direction. Buffered mode uses emulator flow
+first. The matrix runner restarts both dedicated FamCall AVDs for each direction
+of each profile, isolating input injection from prior output capture. Buffered mode uses emulator flow
 control rather than real-time packet pacing. It never enables host microphone
 passthrough. The process guard also skips stale emulator discovery files.
 
@@ -248,8 +248,18 @@ WebRTC for end-to-end observations. A valid sample is not a release-quality pass
 scripts/measure-transport-outage.mjs records packet recovery after 5/15/30-second
 outages separately from audio. It samples at the app's three-second statistics
 cadence, so reported recovery time is an observation bound, not precise audio
-latency. Speech recovery still requires generated-audio or physical listening
-validation. Do not substitute the transport result for G4 or G5.
+latency. Do not substitute the transport result for G4 or G5.
+
+The --outages mode of scripts/run-audio-matrix.mjs adds generated-speech cases
+for 2/5/15/30-second UDP-relay drops on a baseline link. It preserves received
+PCM, capture arrival times, exact profile history, packet drops, and source/APK
+hashes. It requires matched speech before the outage and new reference speech
+after restoration. The first complete two-second waveform match gives a
+conservative observation bound. A missing match is not automatically proof of
+missing speech: inspect resumed audio, timing drift, and input validity first.
+STOI, waveform matching, and returning packets do not replace listener scores,
+simultaneous two-way speech, N1/N2 outage tests, or physical-device G4/G5 evidence.
+Keep invalid attempts and unconfirmed recovery cases in the evidence record.
 
 Emulator lifecycle investigation (used as a hypothesis, then checked locally):
 https://github.com/kaeawc/auto-mobile/issues/13634

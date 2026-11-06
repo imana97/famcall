@@ -6,11 +6,18 @@ import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const maestro = process.env.MAESTRO_BIN ?? 'maestro';
-const folder = resolve(root, '.local/audio-lab/matrix-' + new Date().toISOString().replaceAll(':', '-'));
+const outageMode = process.argv[2] === '--outages';
+const requestedOutages = process.argv.slice(3).map(Number);
+const requestedDirection = process.env.FAMCALL_AUDIO_DIRECTION;
+if (requestedDirection && !['a-to-b', 'b-to-a'].includes(requestedDirection)) throw new Error('FAMCALL_AUDIO_DIRECTION must be a-to-b or b-to-a.');
+const directions = [['a-to-b', 8554, 8556], ['b-to-a', 8556, 8554]].filter(([direction]) => !requestedDirection || direction === requestedDirection);
+if (outageMode && requestedOutages.some(n => ![2, 5, 15, 30].includes(n))) throw new Error('Outages must be 2, 5, 15, or 30 seconds.');
+if (process.argv[2] && !outageMode) throw new Error('Use no arguments for fixed profiles, or --outages [2 5 15 30].');
+const folder = resolve(root, '.local/audio-lab/' + (outageMode ? 'recovery-' : 'matrix-') + new Date().toISOString().replaceAll(':', '-'));
 await mkdir(folder, { recursive: true });
 const reference = resolve(folder, 'reference.wav');
-await copyFile(resolve(root, '.local/audio-source.wav'), reference);
-const files = ['e2e/audio/measure.py', 'e2e/audio/evidence.py', 'scripts/run-audio-matrix.mjs', 'scripts/restart-lab-emulators.mjs', 'scripts/audio-lab.mjs'];
+await copyFile(resolve(root, outageMode ? '.local/recovery-source.wav' : '.local/audio-source.wav'), reference);
+const files = ['e2e/audio/measure.py', 'e2e/audio/evidence.py', 'e2e/audio/recovery.py', 'scripts/run-audio-matrix.mjs', 'scripts/restart-lab-emulators.mjs', 'scripts/audio-lab.mjs'];
 const hashes = {};
 for (const file of files) hashes[file] = createHash('sha256').update(await readFile(resolve(root, file))).digest('hex');
 const referenceSha256 = createHash('sha256').update(await readFile(reference)).digest('hex');
@@ -26,7 +33,9 @@ await writeFile(resolve(folder, 'provenance.json'), JSON.stringify({
 }, null, 2) + '\n');
 // Each endpoint's relay leg is impaired independently, in each direction.
 // These are not end-to-end RTT or loss percentages; inspect measured counters.
-const profiles = [
+const profiles = outageMode ? (requestedOutages.length ? requestedOutages : [2, 5, 15, 30]).map(seconds => ({
+  name: 'outage-' + seconds, outageSeconds: seconds, loss: 0, delayMs: 0, jitterMs: 0, kbps: 0,
+})) : [
   { name: 'baseline', loss: 0, delayMs: 0, jitterMs: 0, kbps: 0 },
   { name: 'modest', loss: 0.005, delayMs: 35, jitterMs: 10, kbps: 128 },
   { name: 'weak', loss: 0.0151, delayMs: 75, jitterMs: 25, kbps: 64 },
@@ -64,10 +73,12 @@ async function flow(peer, name, prefix) {
 let failed = 0;
 const results = [];
 try {
-  for (const { name, ...config } of profiles) {
-    console.log('Starting fresh emulator pair for ' + name);
+  for (const { name, outageSeconds, ...config } of profiles) {
+   for (const [direction, sender, receiver] of directions) {
+    const caseName = name + '-' + direction;
+    console.log('Starting fresh emulator pair for ' + caseName);
     await configure(baseline);
-    if (await run(process.execPath, [resolve(root, 'scripts/restart-lab-emulators.mjs')], name + '-boot'))
+    if (await run(process.execPath, [resolve(root, 'scripts/restart-lab-emulators.mjs')], caseName + '-boot'))
       throw new Error('Emulator restart failed; inspect ' + folder);
     const devices = ['emulator-5554', 'emulator-5556'].map(serial => {
       const apk = command(adb, ['-s', serial, 'shell', 'pm', 'path', 'com.silvergridtech.famcall.e2e']).split('\n')[0].replace('package:', '').trim();
@@ -75,31 +86,33 @@ try {
         systemBuild: command(adb, ['-s', serial, 'shell', 'getprop', 'ro.build.fingerprint']),
         installedApkSha256: command(adb, ['-s', serial, 'shell', 'sha256sum', apk]).split(/\s/)[0] };
     });
-    await writeFile(resolve(folder, name + '-devices.json'), JSON.stringify(devices, null, 2) + '\n');
-    for (const peer of ['a', 'b']) await flow(peer, 'open-people', name);
+    await writeFile(resolve(folder, caseName + '-devices.json'), JSON.stringify(devices, null, 2) + '\n');
+    for (const peer of ['a', 'b']) await flow(peer, 'open-people', caseName);
     await configure({ ...baseline, ...config });
-    await flow('a', 'start-call', name);
-    await flow('b', 'answer-call', name);
+    await flow('a', 'start-call', caseName);
+    await flow('b', 'answer-call', caseName);
     try {
       await new Promise(r => setTimeout(r, 5000));
-      for (const [direction, sender, receiver] of [['a-to-b', 8554, 8556], ['b-to-a', 8556, 8554]]) {
         console.log('Measuring ' + name + '/' + direction);
         const output = resolve(folder, name + '-' + direction + '.json');
         const status = await run(resolve(root, '.local/audio-venv/bin/python'), [resolve(root, 'e2e/audio/measure.py'),
-          '--buffered', '--source', reference, '--sender', String(sender), '--receiver', String(receiver), '--seconds', '30', '--output', output], name + '-' + direction);
+          '--buffered', '--source', reference, '--sender', String(sender), '--receiver', String(receiver),
+          '--seconds', String(outageSeconds ? outageSeconds + 32 : 30), '--output', output,
+          ...(outageSeconds ? ['--outage-seconds', String(outageSeconds)] : [])], name + '-' + direction);
         if (status !== 0) failed++;
         let report;
         try { report = JSON.parse(await readFile(output, 'utf8')); } catch { /* Failed before report creation. */ }
         results.push({ profile: name, direction, config, status, measurementValid: report?.measurementValid ?? false,
-          stoi: report?.stoi ?? null, invalidReasons: report?.invalidReasons ?? ['No measurement report'] });
-      }
+          stoi: report?.stoi ?? null, speechRecovery: report?.speechRecovery ?? null,
+          invalidReasons: report?.invalidReasons ?? ['No measurement report'] });
     } finally {
       await configure(baseline);
       if (!interrupted) {
-        await flow('a', 'end-call', name);
-        await flow('b', 'dismiss-ended', name);
+        await flow('a', 'end-call', caseName);
+        await flow('b', 'dismiss-ended', caseName);
       }
     }
+   }
   }
 } finally {
   await configure(baseline);

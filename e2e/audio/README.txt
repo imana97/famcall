@@ -51,8 +51,8 @@ RUN
    Forks must use their own relay/project; never put permanent keys in the repo.
 2. End any existing lab call. Set JAVA_HOME for Maestro and MAESTRO_BIN if needed.
 3. Run node scripts/run-audio-matrix.mjs.
-   Each profile restarts the dedicated AVDs, places/answers a native call through
-   Maestro, and measures both directions with one injection per emulator process.
+   Each direction of each profile restarts the dedicated AVDs, places/answers a
+   native call through Maestro, and uses one injection per emulator process.
    Speech measurements use buffered delivery and emulator flow control.
    The run keeps a private copy of the synthetic reference, source hashes,
    emulator version, and each profile's actual installed APK hashes. A workspace
@@ -72,6 +72,31 @@ With a connected call on the isolated UDP proxy, run:
 node scripts/measure-transport-outage.mjs 5
 Repeat with 15 or 30. This reports packet recovery only, at approximately
 three-second observation intervals. It cannot prove speech recovery.
+
+Generated speech recovery is a separate experiment:
+say -v Samantha -f e2e/audio/recovery-phrases.txt -o .local/recovery-source.aiff
+afconvert -f WAVE -d LEI16@48000 -c 1 .local/recovery-source.aiff .local/recovery-source.wav
+node scripts/run-audio-matrix.mjs --outages 2 5 15 30
+
+The runner restarts both dedicated AVDs for each direction of each outage. Set
+FAMCALL_AUDIO_DIRECTION=b-to-a (or a-to-b) to run only one direction. It injects
+continuous, nonrepeating synthetic speech,
+blocks only the UDP relay after 12 seconds, restores it after the requested
+interval, and captures another 20 seconds. It verifies the exact profile-change
+history, actual packet drops, the selected path, and speech before the outage.
+It requires a two-second received waveform matching new reference speech from
+after restoration. Silence and replayed pre-outage audio fail the recovery check.
+The first full matching window's arrival time is a conservative observation
+upper bound, not exact speech latency. Delayed capture delivery makes that bound
+later. The reported post-recovery STOI is an estimate for up to ten seconds;
+it is not a word-understanding score, a simultaneous two-way test, or a G4/G5 pass.
+These baseline-link outage cases do not cover outages on N1/N2 impaired links.
+
+The detector uses a fixed correlation threshold of 0.35 and two-second windows,
+sampled every 250 ms. Preserve these settings and the reference with the evidence.
+Unit checks cover restored audio, silent packet streams, replayed old audio,
+profile changes and missing packet drops. Run them with the audio virtualenv:
+.local/audio-venv/bin/python -m unittest discover -s e2e/audio -p 'test_*.py'
 
 To observe an already-connected call's selected path and packet continuity:
 node scripts/measure-transport-session.mjs udp 30
@@ -100,7 +125,11 @@ recordings remain in .local; do not publish raw diagnostic logs.
 The emulator may become silent or crash if injectAudio is reopened in the same
 process. measure.py refuses repeated injections. Restart the emulator first;
 do not delete its guard marker to force another injection. Discovery skips dead
-processes. These workarounds need revalidation when upgrading the emulator.
+processes. Two recovery samples also had no input signal when injection followed
+output capture in the same process. The runner now restarts both emulators for
+every direction to isolate that transition. This is a workaround under test,
+not a diagnosed emulator defect. These workarounds need revalidation when
+upgrading the emulator.
 
 Results and recordings stay in ignored .local. No live conversation, contact
 book, SMS code, push token, API key or relay password belongs in shared evidence.
