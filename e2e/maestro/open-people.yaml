@@ -1,0 +1,9 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- launchApp:
+    clearState: false
+    permissions:
+      all: allow
+- extendedWaitUntil:
+    visible: Your people.
+    timeout: 20000

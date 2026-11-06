@@ -1,0 +1,98 @@
+FAMCALL — RELEASE PREPARATION
+Planning document • Checked 6 November 2026
+
+CURRENT STATE
+The brand and written store assets are drafts. The app is not built, the UI is
+under review, and no mobile release has been uploaded. This checklist is the
+route to submission, not evidence that submission requirements are complete.
+
+1. PUBLISHER AND APP RECORDS
+- Use the developer account belonging to SilverGrid Technologies LLC. Confirm
+  its legal identity, enrollment, roles, agreements, and required business details.
+- Confirm the final Apple bundle ID, Android application ID, Apple SKU, and
+  availability of the desired store name. Prepared copy does not reserve a name.
+- Set the supported OS versions and devices. iPad availability is undecided.
+- Confirm pricing, audience, countries of distribution, ads, content rating, and
+  any current declarations from the real product. Do not infer an age rating
+  or children-directed audience from the word "Fam" or family photography.
+
+2. PHONE AUTHENTICATION AND SERVICE READINESS
+- Enable the chosen Firebase phone-verification configuration and appropriate
+  region policy, with a verified provider-side maximum of 50 SMS sent per day
+  across the project, including retries. Confirm the actual quota name, scope,
+  reset timezone, and enforcement behavior. A client counter or budget alert is
+  not a hard SMS cap. Do not launch real signup if the cap cannot be enforced.
+- Register the actual production and testing app identities and signing
+  fingerprints. For Google Play installs, distinguish the Play App Signing key
+  from the upload key. Validate authentication from the internal test build.
+- Configure native phone-auth app verification, App Check where supported, and
+  API restrictions against the chosen Firebase product tier. Test legitimate
+  installs and documented fallback paths before enforcement. App authenticity
+  and user authentication are separate controls.
+- Use release-scoped backend permissions, short-lived calling credentials, and
+  safe logs. Confirm no debug auth bypass, permanent relay secrets, or admin
+  credentials are shipped in the application.
+
+3. BETA DISTRIBUTION — REQUESTED CHANNELS
+Android: Google Play internal testing. Upload a signed Android App Bundle to the
+internal track, configure the intended tester list, and verify the real opt-in
+link on a tester's Google account. Internal testing supports up to 100 testers.
+Do not use an unlisted APK download as the primary requested testing channel.
+
+iPhone: TestFlight. Upload the signed build to App Store Connect, complete the
+beta description, feedback email, What to Test, export information, and any
+required beta review access. Internal testers must hold appropriate App Store
+Connect roles. External testers may need Beta App Review approval before testing.
+Do not promise an external invitation works before the build is approved.
+
+Conditional Google gate: qualifying personal developer accounts created after
+13 November 2023 must complete a closed test with at least 12 testers opted in
+continuously for 14 days before applying for production access. Confirm account
+type; do not assume internal testing satisfies that separate requirement.
+
+4. LISTING AND ARTWORK
+- Copy the reviewed en-US fields; retain the checked character limits.
+- Confirm that the release candidate actually supports each described feature.
+- Supply the 512 x 512 Google Play icon and 1024 x 500 feature graphic, respecting
+  the current format and content requirements. Launcher icons are separate.
+- Integrate the Apple app icon into the app asset catalog/build, then verify the
+  icon App Store Connect extracts. Test system masks and any themed variants.
+- Replace screenshot concepts with actual captures. Keep captions accurate and
+  UI prominent. No fabricated usage, ratings, awards, or availability badges.
+- If supported, supply the additional device-specific screenshot sets. Do not
+  stretch phone screenshots into tablet screenshots.
+- Set a live support page containing a working contact route, and confirm the
+  marketing URL. The intended Firebase subdomain is not a verified URL yet.
+
+5. PRIVACY, DELETION, AND DISCLOSURES
+- Inventory data processed by the app, servers, Firebase, the call provider,
+  notifications, crash diagnostics, and other SDKs. Determine storage, purpose,
+  sharing, association with identity, retention, and deletion for each item.
+- Prepare the app-specific privacy policy from that inventory. Cover actual
+  collection and handling; a website-only privacy notice is insufficient.
+- Complete Apple's App Privacy responses and Google Play's Data safety form
+  accurately, including relevant third-party behavior. Internal-only Google Play
+  apps are exempt from that form, but complete it before a track that requires it.
+- Implement a discoverable in-app account-deletion flow. Provide an accessible
+  external web route to request account/data deletion for Google Play. Explain
+  any legitimate retained data and retention periods accurately. Deactivation
+  alone is not deletion. Verify ownership without creating an unnecessary barrier.
+- Review microphone and contacts usage explanations, permission timing, and
+  notification behavior. Manual contact entry must work after permission denial.
+- Complete the actual encryption export questionnaire, permission declarations,
+  age/content ratings, required SDK privacy manifests, and any relevant current
+  platform declarations. Do not guess exemption answers.
+
+6. RELEASE EVIDENCE AND SUBMISSION
+- Meet the agreed gates in e2e-test-plan.txt and archive the run evidence.
+- Provide working reviewer access and two-endpoint calling instructions.
+- Check all supplied URLs from a signed-out browser and a mobile connection.
+- Inspect the store listing preview for truncation, crops, and mismatched assets.
+- Confirm legal contact details, screenshots, metadata, and build refer to the
+  same version. Use manual public release initially so both platforms can be
+  coordinated after review. Do not display live download badges before links work.
+- Submit each store release, resolve the actual review feedback, and verify the
+  public listing and installation after approval. No approval is guaranteed by
+  satisfying this preparation checklist.
+
+Sources and field specifications: requirements-and-sources.json.

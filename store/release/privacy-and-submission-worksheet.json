@@ -1,0 +1,60 @@
+{
+  "status": "UNANSWERED — inspect the implemented app and service providers before submission",
+  "prepared_on": "2026-11-06",
+  "publisher": "SilverGrid Technologies LLC",
+  "contact_email": "info@silvergridtech.com",
+  "warning": "This worksheet is not a privacy policy, a completed store disclosure, or a claim that data is not collected.",
+  "website_privacy_is_app_privacy": false,
+  "candidate_data_inventory": [
+    {"data": "Verified phone number and account identifier", "planned_purpose": "Account creation, authentication, and contact identity", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
+    {"data": "Device address-book entries or discovery inputs", "planned_purpose": "Optional contact discovery", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
+    {"data": "Manually entered contacts", "planned_purpose": "Saving people to call", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
+    {"data": "Live microphone audio", "planned_purpose": "Delivering the voice call", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
+    {"data": "Call signaling, participants, timing and call state", "planned_purpose": "Call setup, ringing and recovery", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
+    {"data": "Notification tokens and device/app integrity signals", "planned_purpose": "Incoming calls and abuse prevention", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
+    {"data": "IP addresses, network telemetry and service logs", "planned_purpose": "Connectivity and operation diagnostics", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
+    {"data": "Crash reports or analytics, if selected", "planned_purpose": null, "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null},
+    {"data": "Support correspondence and voluntary test feedback", "planned_purpose": "Customer support and beta testing", "actual_processing": null, "providers": null, "stored_where": null, "retention": null, "deletion": null, "store_classification": null}
+  ],
+  "questions_for_each_data_item": [
+    "Does it leave the device, and can a provider access it beyond servicing the request in real time?",
+    "Is it required or optional? What permission or consent is used?",
+    "Is it linked to a person, account, device, or another identifier?",
+    "Is it collected, shared, or subject to a store-defined exception? Use each store's definitions separately.",
+    "Is it used for tracking or advertising? Do any SDK defaults introduce those purposes?",
+    "What is protected in transit and at rest, and what is the actual media encryption model?",
+    "Who receives it, where is it stored, how long is it kept, and what happens on deletion?"
+  ],
+  "must_resolve": {
+    "app_specific_privacy_policy_url": null,
+    "terms_or_license_choice": null,
+    "in_app_deletion_path": null,
+    "external_account_deletion_url": null,
+    "deletion_verification_process": null,
+    "deletion_completion_window": null,
+    "retained_data_and_reason": null,
+    "retention_periods": null,
+    "app_privacy_answers": null,
+    "data_safety_answers": null,
+    "encryption_export_answers": null,
+    "age_and_target_audience_answers": null,
+    "ads_declaration": null,
+    "required_sdk_privacy_manifests": null,
+    "reviewer_accounts_and_access": null,
+    "legal_contact_details_required_by_distribution_markets": null
+  },
+  "deletion_acceptance_checks": [
+    "A signed-in user can find and initiate account deletion in the app.",
+    "A person without the app installed can find and initiate a deletion request on the external web resource.",
+    "The process verifies identity without relying on an inaccessible account or excessive steps.",
+    "Deletion affects the defined account and associated data; it is not only deactivation.",
+    "Any retained data, legitimate reason, and time limit match the policy and actual implementation.",
+    "Active sessions, call permissions, notifications and contact discovery stop behaving as if the deleted account remains active."
+  ],
+  "source_urls": [
+    "https://developer.apple.com/app-store/app-privacy-details/",
+    "https://developer.apple.com/support/offering-account-deletion-in-your-app/",
+    "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en",
+    "https://support.google.com/googleplay/android-developer/answer/10144311?hl=en"
+  ]
+}

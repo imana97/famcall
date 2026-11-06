@@ -1,0 +1,16 @@
+FamCall campaign photograph
+Created: 2026-11-06
+Method: Built-in image generation.
+Status: Original campaign imagery; not an app screenshot or a customer testimonial.
+File: familiar-voices.png
+
+Prompt:
+Use case: photorealistic-natural.
+Asset type: original lifestyle campaign photograph for FamCall, a simple voice calling app for weak and unstable internet connections.
+Primary request: a warm, premium editorial diptych showing an adult daughter and her older father enjoying an ordinary voice call from two different homes, divided softly by the architecture of their rooms, each holding a plain unbranded smartphone naturally to one ear. No visible app screens.
+Composition: wide landscape 3:2, two equally sized photographic panels with a clean straight vertical split in the middle; the daughter in the left half, the father in the right half, both faces and hands comfortably within their panel. Medium-close portraits, realistic candid expressions, slight smiles from listening rather than laughing at the camera. They look slightly inward toward the center of the composition. This should feel like real life rather than corporate stock.
+Scene: daughter early 30s, textured dark hair and a simple cream knit top in a softly lit contemporary apartment; father early 60s, salt-and-pepper hair and an olive linen shirt at a warm kitchen table. Their family resemblance is subtle. Inclusive and culturally neutral everyday styling, no identifiable location.
+Lighting: soft late afternoon window light, lifelike skin texture, subtle film grain, gentle natural shadows.
+Palette: warm ivory, muted sage green, deep forest green accents, natural wood.
+Constraints: photorealistic human anatomy, exactly two people total, normal hands with five fingers, one phone per person, no text, no lettering, no logos, no flags, no maps, no borders, no watermarks, no headset, no visible phone brand.
+Requested output: high-resolution 1536 x 1024 landscape photograph.

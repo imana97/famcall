@@ -1,0 +1,12 @@
+Please test with another FamCall beta user.
+
+1. Verify your phone number and reopen the app. Check that you remain signed in.
+2. Add someone from contacts, then try adding a number manually with its country code. Try again with contact access declined.
+3. Call in both directions. Check that both people can hear and understand each other.
+4. Try an incoming call with the receiving phone locked and the app in the background.
+5. During a call, switch between Wi-Fi and mobile data. Briefly lose the connection, then restore it. Note whether speech returns and how long it takes.
+6. Try speakerphone, headphones, mute, declining a call, and hanging up from either end.
+
+Include the app build, phone model, OS version, approximate time and timezone, connection type at each end, whether a VPN was used, and the steps that caused the problem. If a diagnostic reference is shown, include it.
+
+Do not include verification codes, passwords, other people's phone numbers, contact lists, or recordings of private conversations. Use the feedback address info@silvergridtech.com.

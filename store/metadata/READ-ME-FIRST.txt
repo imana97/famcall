@@ -1,0 +1,40 @@
+FAMCALL — STORE COPY PACK
+Prepared 6 November 2026
+
+Status: DRAFT. These files are prepared writing assets, not a published listing.
+The mobile app is not implemented. Wireframes require product review. No real
+app screenshots or completed network-test results exist yet.
+
+Publisher: SilverGrid Technologies LLC
+Support: info@silvergridtech.com
+Brand: FamCall
+Positioning: Simple voice calls designed for weak and unstable internet.
+Campaign line: A little signal. A familiar voice.
+
+USE
+metadata.json holds the structured source, known publisher information, and null
+values for unresolved submission fields. en-US/ contains individual plain-text
+fields for pasting into App Store Connect, Google Play Console, and TestFlight.
+Do not paste this status notice into the final store listing.
+
+Every feature described in the public copy is a release requirement, not a claim
+that a finished app has already been built. Check the final app against the
+claims_requiring_release_evidence array before upload. The beta descriptions and
+release notes also require a matching working build before use.
+
+The desired website is https://famcall.web.app. Hosting availability and the
+deployed pages must be verified before using this URL in store forms. A public
+website privacy notice does not replace the future app's privacy policy.
+
+No location-specific marketing is included. All public text uses the FamCall
+name and the weak-connection positioning. There are no claims about guaranteed
+connections, offline calling, price, unlimited use, or an unverified security
+architecture.
+
+VALIDATION
+validation.json records checked character limits. Apple keywords were also
+checked in UTF-8 bytes. Text fits the documented field limits as of the date
+above. This is not a store-approval result. Recheck requirements before submission.
+
+The release/ folder contains the screenshot storyboard, submission checklist,
+reviewer-access template, privacy worksheet, source links, and proposed E2E plan.

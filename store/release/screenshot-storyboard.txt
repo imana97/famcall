@@ -1,0 +1,86 @@
+FAMCALL — SCREENSHOT STORYBOARD
+Design draft • 6 November 2026 • Five portrait panels per platform
+
+IMPORTANT
+These panels describe future captures from the working app. Wireframes and
+marketing mockups are not final app screenshots and must not be submitted as if
+they show an implemented app. After UI approval and implementation, capture the
+shipping build on each platform and replace the concept content. Keep actual
+controls, wording, and available features faithful to that build.
+
+VISUAL DIRECTION
+Warm ivory, deep green, generous spacing, large readable headings, and one clear
+benefit per panel. Keep the real app interface prominent. Use fictional contacts
+and demo avatars. Do not expose real numbers, verification codes, personal
+notifications, or call content. Do not add fabricated testimonials, rankings,
+download counts, store badges, network test scores, or unsupported guarantees.
+For Google Play exports, keep taglines within 20% of the composition and devote
+most of the image to real UI. Do not reduce the interface to a tiny phone mockup.
+
+01 — THE PEOPLE YOU CALL
+Headline: Your people. One tap away.
+Supporting line: A simple contact list for everyday conversations.
+Capture: Actual contacts screen with a small set of fictional saved contacts and
+the control that starts a voice call. Capture both platforms separately.
+Proof required: Tapping the displayed contact starts the actual outgoing flow.
+
+02 — A FAMILIAR VOICE
+Headline: A little signal. A familiar voice.
+Supporting line: Voice calling designed for imperfect connections.
+Capture: Actual active call screen with the connected person's name, live call
+duration, and implemented call controls. No simulated quality indicator.
+Proof required: Two-way intelligible speech and measured weak-network behavior.
+
+03 — RECOVERY
+Headline: A pause. Then back to talking.
+Supporting line: FamCall tries to reconnect when the connection drops.
+Capture: Actual reconnecting state triggered by a controlled interruption, then
+an optional inset of the actual recovered call. Use only if the final interface
+has this behavior and the recovery tests pass.
+Proof required: Recovery is automatic under the supported test conditions. Avoid
+implying recovery during complete or indefinite loss of internet access.
+Fallback if not implemented: Omit this panel. Do not illustrate a future feature
+as though it exists in the current version.
+
+04 — AN INCOMING CALL
+Headline: Pick up a familiar voice.
+Supporting line: Answer a call from someone who matters.
+Capture: Actual incoming call UI from the app or native calling integration on
+the specific platform. Keep native platform UI intact and plausible. No invented
+lock-screen layout or cross-platform mix of controls.
+Proof required: Ringing, answer, and decline work in the documented app states.
+
+05 — ADD SOMEONE
+Headline: Add a number. Start a conversation.
+Supporting line: Use your contacts or enter a number with its country code.
+Capture: Actual add-contact screen. Show generic fictional information or a
+masked test number. Do not show an unowned working phone number.
+Proof required: Permission-declined and manual-entry paths both work.
+
+EXPORT TARGETS
+Apple iPhone: 1320 x 2868 pixels portrait, opaque PNG, sRGB. This is one of the
+accepted 6.9-inch screenshot dimensions checked on 6 November 2026. Five images
+fit Apple's 1–10 screenshot range. If iPad support is enabled, add genuine iPad
+captures at a currently accepted 13-inch dimension; do not stretch iPhone art.
+
+Google Play phone: 1080 x 1920 pixels portrait, opaque 24-bit PNG or JPEG. Five
+images fit the 2–8 phone screenshot range. Keep exported images within the
+documented 320–3840 pixel bounds and the 2:1 maximum dimension relationship.
+
+CHECKS BEFORE UPLOAD
+Inspect at full resolution and at store thumbnail size. Read every line. Check
+cropping, contrast, actual UI consistency, fictional data, and asset order.
+Compare captures against the release candidate's build number. Record the device,
+OS, build, locale, and capture date in the release evidence. No alpha for Apple
+screenshots. No cross-platform store logos or unsupported availability badges.
+
+OPTIONAL VIDEO
+An app preview is not required for the initial listing. If produced later, use
+real app footage and the current platform specifications. A suggested sequence
+is contacts → tap to call → incoming call → conversation → hang up. Do not use
+generated UI footage as evidence of the working product.
+
+Sources:
+https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/
+https://developer.apple.com/app-store/review/guidelines/ (2.3.3)
+https://support.google.com/googleplay/android-developer/answer/9866151?hl=en

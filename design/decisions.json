@@ -1,0 +1,75 @@
+{
+  "updated": "2026-11-06",
+  "product": "FamCall",
+  "positioning": "Simple voice calls designed for weak and unstable internet connections",
+  "public_branding": "Location-neutral; no country-specific targeting in app, website, artwork, or store copy",
+  "publisher": "SilverGrid Technologies LLC",
+  "support_email": "info@silvergridtech.com",
+  "platforms": [
+    "Android",
+    "iPhone"
+  ],
+  "testing_channels": {
+    "Android": "Google Play internal testing",
+    "iPhone": "TestFlight"
+  },
+  "release_channels": [
+    "Google Play",
+    "Apple App Store"
+  ],
+  "sign_in": "One-time phone verification, persistent sign-in afterward",
+  "phone_format": "E.164 with + prefix; accept leading 00 and normalize",
+  "sms_limit_requirement": "GCP provider verification-request quota override effective at 50/day; real-provider boundary test pending",
+  "website_requested": "https://famcall.web.app",
+  "website_status": "Built and visually checked; famcall.web.app reserved; owner-approved workflow deployment pending",
+  "design_status": "Approved: Simple list",
+  "design_options": [
+    "Simple list",
+    "Large tiles"
+  ],
+  "screens": [
+    "Contacts",
+    "Sign up",
+    "Verify number",
+    "Add contact",
+    "Incoming call",
+    "Outgoing call",
+    "During a call",
+    "Reconnecting",
+    "Call ended",
+    "Settings",
+    "Call history",
+    "Blocked callers",
+    "Account deletion"
+  ],
+  "preview_verification": [
+    "Phone number normalization from 00 to +",
+    "Demo verification flow",
+    "Manual contact addition",
+    "Contact-to-call navigation",
+    "Incoming call answer",
+    "Mute toggle",
+    "Reconnecting layout",
+    "Large-tile layout at 320px viewport"
+  ],
+  "preview_limitations": "Sample contacts and simulated states only; no real SMS, microphone, contact access, or calling. System incoming-call presentation will differ between Android and iOS.",
+  "remaining_work": [
+    "Complete native lifecycle and recovery validation on both platforms",
+    "Production phone authentication, App Check and store signing verification",
+    "Real-device push/audio checks",
+    "Actual store screenshots and final privacy declarations",
+    "Owner review and protected workflow deployment"
+  ],
+  "localization": {
+    "initial": [
+      "en"
+    ],
+    "direction": "LTR for every locale"
+  },
+  "monthly_users": 50,
+  "monthly_budget_usd_target": 10,
+  "repository": "silvergrid/famcall",
+  "development_identity": "imana97",
+  "sole_approver": "silvergrid",
+  "license": "MIT"
+}

@@ -1,0 +1,14 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- tapOn: Recents
+- tapOn:
+    id: history-.*
+    index: 0
+- tapOn: Block number
+- assertVisible: Block this number?
+- tapOn: Block number
+- tapOn: Settings
+- tapOn: Blocked numbers
+- assertVisible: Unblock
+- back
+- tapOn: People

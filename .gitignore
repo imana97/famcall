@@ -16,7 +16,8 @@ node_modules/
 coverage/
 dist/
 .firebase/
-android/
-ios/
+/apps/mobile/android/
+/apps/mobile/ios/
+/backend/lib/
 service-account*.json
 *credentials*.json

@@ -1,0 +1,50 @@
+FAMCALL — VERIFICATION RECORD
+6 November 2026. Development evidence, not release approval.
+
+PASS
+- 21 automated local tests: 7 shared-logic tests, 6 Firestore isolation tests,
+  8 callable-backend integration tests. Includes call idempotency, concurrent
+  callers, outsider rejection, answer/hangup races, late answers, blocking,
+  lease renewal/expiry, and durable account deletion with stale-token denial.
+- Android native standalone test build compiles, including WebRTC, Firebase,
+  native calling integration, native timers, and the background call-end worker.
+- Maestro on two Android API 36 emulators: phone verification using fictional
+  numbers, 00/+ normalization, persistent sign-in, manual contacts, outgoing
+  call, answer, hangup, decline, history blocking, blocked-call rejection,
+  unblocking, and another answered call.
+- TypeScript checks and ESLint.
+- Original Apple/Play icons and Play feature graphic exported at required sizes.
+- Website checked at desktop and phone widths; privacy/deletion links work in
+  the local preview. The public site is not deployed yet.
+- GCP provider quota effectiveLimit and override both read back as 50/day for
+  send_verification_code, including after phone authentication was initialized.
+- Public source scanned for secret patterns and exact dedicated TURN secrets;
+  no matches. Private configurations, logs, recordings, and signing material
+  are excluded from source control.
+
+IN PROGRESS / NOT A PASS
+- iOS native build and simulator validation.
+- Repeated generated-speech measurements under packet loss, delay, jitter,
+  and limited bandwidth. Earlier calls carried speech in both directions, but
+  subsequent emulator audio runs produced silence. Investigating the audio
+  input/output harness before assigning a supported network envelope.
+- Credential refresh, full interruptions, TCP/TLS fallback, and offline hangup.
+
+RELEASE GATES
+- Physical Android and iPhone calls, including cross-platform audio, screen
+  lock/background, incoming push after process reclamation, audio routes and
+  microphone permissions. Force-stop/force-quit behavior must be documented.
+- Production App Check, signing fingerprints, phone verification fallback,
+  Apple push credentials, and Google Play/TestFlight distribution.
+- Real-provider quota boundary/concurrency validation; routine tests sent no SMS.
+- Genuine store screenshots matching the tested release candidate and final
+  store privacy, age, content, encryption, and contact declarations.
+- Owner PR review, deployment approval, and store release approval.
+
+MEASUREMENT RULES
+The audio lab injects generated speech into the emulator microphone and captures
+the receiving emulator output. It never uses the computer's microphone. STOI is
+an intelligibility estimate, not a MOS score, human listening result, or proof of
+physical-device performance. Tests check the actual selected ICE candidate path.
+Per-leg impairment settings must not be reported as end-to-end loss/latency.
+Only completed, reproducible cases with valid source/capture signals count.

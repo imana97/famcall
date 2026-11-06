@@ -1,0 +1,5 @@
+Initial FamCall internal test build.
+
+Includes phone-number verification, manual and device-contact entry, outgoing and incoming one-to-one voice calls, call controls, and reconnection after supported network interruptions.
+
+This version is intended for testing before public release.
