@@ -21,6 +21,7 @@ from scipy.signal import correlate, correlation_lags, resample_poly
 from pystoi import stoi
 from google.protobuf.empty_pb2 import Empty
 from evidence import stable_profile, verified_path, planned_outage
+from source_evidence import call_participants, source_activity
 from recovery import speech_recovery
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -55,6 +56,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--sender", type=int, default=8554)
     parser.add_argument("--receiver", type=int, default=8556)
+    parser.add_argument("--caller", type=int, required=True, help="gRPC port of the phone that placed this call")
+    parser.add_argument("--call-started-after", type=int, required=True, help="Host Unix milliseconds before dialing")
     parser.add_argument("--source", type=Path, default=ROOT / ".local/audio-source.wav")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--seconds", type=float, default=20)
@@ -67,11 +70,17 @@ def main():
         parser.error("Use a measurement duration between 3 and 3600 seconds.")
     if args.sender == args.receiver:
         parser.error("Speech measurements require two different emulators.")
+    if args.caller not in (args.sender, args.receiver):
+        parser.error("The caller must be one of the two measured emulators.")
     if args.outage_seconds and args.seconds < args.outage_seconds + 32:
         parser.error("Outage runs need 12 seconds before and 20 seconds after the outage.")
     started_at = int(time.time() * 1000)
     measurement_sources = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
-                           for path in (Path(__file__).resolve(), ROOT / "e2e/audio/recovery.py", ROOT / "e2e/audio/evidence.py")}
+                           for path in (Path(__file__).resolve(), ROOT / "e2e/audio/recovery.py", ROOT / "e2e/audio/evidence.py",
+                                        ROOT / "e2e/audio/source_evidence.py")}
+    metrics_path = ROOT / ".local/audio-lab/metrics.jsonl"
+    before = [json.loads(line) for line in metrics_path.read_text().splitlines() if line.strip()]
+    participants = call_participants(before, args.call_started_after, started_at, args.sender == args.caller)
     source_hash = hashlib.sha256(args.source.read_bytes()).hexdigest()
     with urllib.request.urlopen("http://127.0.0.1:8787/config", timeout=3) as response:
         network_at_start = json.load(response)
@@ -213,6 +222,7 @@ def main():
               "errors": errors, "stoi": None,
               "captureFormats": sorted(formats), "capturePackets": len(captured), "buffered": args.buffered,
               "inputRate": args.input_rate, "captureRate": args.capture_rate,
+              "participants": participants, "caller": args.caller, "callStartedAfter": args.call_started_after,
               "measurementSourceHashes": measurement_sources,
               "protoDescriptorSha256": hashlib.sha256(pb.DESCRIPTOR.serialized_pb).hexdigest(),
               "grpcVersion": grpc.__version__,
@@ -236,9 +246,9 @@ def main():
     rtt_ms = []
     jitter_ms = []
     configuration_changes = []
-    metrics_path = ROOT / ".local/audio-lab/metrics.jsonl"
-    for line in metrics_path.read_text().splitlines() if metrics_path.exists() else []:
-        entry = json.loads(line)
+    entries = [json.loads(line) for line in metrics_path.read_text().splitlines() if line.strip()]
+    result["sourceActivity"] = source_activity(entries, participants, injection_started_at, reference)
+    for entry in entries:
         if entry.get("kind") == "configuration" and started_at <= entry.get("at", 0) <= result["finishedAt"]:
             configuration_changes.append({"at": entry["at"], "config": entry["config"]})
         if entry.get("kind") != "stats" or not started_at <= entry.get("receivedAt", 0) <= result["finishedAt"]:
@@ -311,6 +321,10 @@ def main():
         result["stoi"] = None
     if len(call_ids) != 1 or None in call_ids:
         reasons.append("Measurement did not identify exactly one active call")
+    if call_ids != {participants["callId"]}:
+        reasons.append("Measured call differs from the identified experiment")
+    if not result["sourceActivity"]["verified"]:
+        reasons.append("Generated-input microphone activity was not sustained or could not be verified")
     if result["receivedSeconds"] < duration * 0.85:
         reasons.append("Too little captured audio for the requested interval")
     if result.get("comparedSeconds", 0) < duration * 0.85:

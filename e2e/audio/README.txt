@@ -47,6 +47,21 @@ capture sample positions and analysis resampling follow that requested rate;
 unexpected response formats invalidate the measurement. This is a recording
 diagnostic, not an app codec setting. Preserve both rates when comparing results.
 
+The runner also identifies the new call and sending participant before injecting
+audio. Direct measure.py use must supply --caller (the caller's emulator gRPC
+port) and --call-started-after (host Unix milliseconds saved before dialing).
+Missing or ambiguous call/peer evidence stops the experiment before injection.
+Reports require sustained microphone activity on that sender's single source
+stream. Energy and sample-duration deltas must cover at least 75% of the generated
+interval, excluding one second at each edge, with gaps no longer than five
+seconds. When the reference RMS exceeds 0.001, source RMS must reach 0.0001.
+Intentional reference pauses are exempt. Counter resets, missing values and
+stream changes invalidate this check; another peer cannot supply its evidence.
+RMS follows the WebRTC Stats definition:
+https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats-totalaudioenergy
+This checks microphone activity, not matching speech content or voice quality.
+Keep failed runs: an input failure may originate in the app or the fixture.
+
 SYNTHETIC REFERENCE
 Generate only between runs; never replace the reference during a matrix:
 say -v Samantha -f e2e/audio/phrases.txt -o .local/audio-source.aiff

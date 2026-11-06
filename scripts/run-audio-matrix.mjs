@@ -36,7 +36,7 @@ const folder = resolve(root, '.local/audio-lab/' + (outageMode ? 'recovery-' : '
 await mkdir(folder, { recursive: true });
 const reference = resolve(folder, 'reference.wav');
 await copyFile(resolve(root, outageMode ? '.local/recovery-source.wav' : '.local/audio-source.wav'), reference);
-const files = ['e2e/audio/measure.py', 'e2e/audio/evidence.py', 'e2e/audio/recovery.py', 'scripts/run-audio-matrix.mjs', 'scripts/restart-lab-emulators.mjs', 'scripts/audio-lab.mjs', 'scripts/lab-log-capture.mjs'];
+const files = ['e2e/audio/measure.py', 'e2e/audio/evidence.py', 'e2e/audio/source_evidence.py', 'e2e/audio/recovery.py', 'scripts/run-audio-matrix.mjs', 'scripts/restart-lab-emulators.mjs', 'scripts/audio-lab.mjs', 'scripts/lab-log-capture.mjs'];
 const hashes = {};
 for (const file of files) hashes[file] = createHash('sha256').update(await readFile(resolve(root, file))).digest('hex');
 const referenceSha256 = createHash('sha256').update(await readFile(reference)).digest('hex');
@@ -110,6 +110,7 @@ try {
     let stopNativeLogs;
     try {
       stopNativeLogs = await captureNativeLogs(adb, folder, caseName);
+      const callStartedAfter = Date.now();
       await flow('a', 'start-call', caseName);
       await flow('b', 'answer-call', caseName);
       await captureAudioState(adb, folder, caseName, 'connected');
@@ -118,6 +119,7 @@ try {
         const output = resolve(folder, name + '-' + direction + '.json');
         const status = await run(resolve(root, '.local/audio-venv/bin/python'), [resolve(root, 'e2e/audio/measure.py'),
           ...(delivery === 'buffered' ? ['--buffered'] : []), '--source', reference, '--sender', String(sender), '--receiver', String(receiver),
+          '--caller', '8554', '--call-started-after', String(callStartedAfter),
           '--input-rate', String(inputRate), '--capture-rate', String(captureRate),
           '--seconds', String(outageSeconds ? outageSeconds + 32 : 30), '--output', output,
           ...(outageSeconds ? ['--outage-seconds', String(outageSeconds)] : [])], name + '-' + direction);

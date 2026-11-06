@@ -21,10 +21,11 @@ PASS
   stale completions, uncertain create responses, terminal retries and storage
   failures. Three outbox tests cover in-flight additions, retry and restoration;
   the in-flight addition test fails on the old implementation and passes now.
-  Eleven Python evidence tests cover profile changes, wrong relay paths, missing
+  Sixteen Python evidence tests cover profile changes, wrong relay paths, missing
   outage drops, restored speech, silent output, replayed pre-outage audio, and
   timing counter deltas, resets, missing values and stream/peer isolation in
-  outage and fixed-profile measurements. An impaired
+  outage and fixed-profile measurements, sustained sender activity, reference
+  pauses and unambiguous call/participant identity. An impaired
   outage must restore the same weak-link conditions rather than a healthier link.
 - Android native standalone test build compiles, including WebRTC, Firebase,
   native calling integration, native timers, and the background call-end worker.
@@ -578,6 +579,42 @@ it does not establish a reliable fixture or justify changing app audio settings.
 Private folder: matrix-2026-11-06T20-34-34.408Z. Both actual UDP relay paths,
 installed APKs, source/reference hashes and native-log lifetimes were audited.
 Keep the differing capture rates explicit when comparing this with earlier runs.
+
+SUSTAINED MICROPHONE ACTIVITY
+Inspecting the complete timeline of that 8 kHz capture showed sound only near
+its beginning. B's source-energy counter stopped increasing by about five
+seconds after injection began, and A's received-energy counter then stayed flat.
+The generated reference contained sound throughout those intervals. An examined
+two-second early window matched locally, but most of the recording was silence.
+The retained full-clip score remains 0.069; local alignment is not a replacement
+score. This narrows that failure to missing sustained source activity and does
+not establish whether the cause is in FamCall, Android or emulator injection.
+
+The recorder now binds the explicit caller port and pre-dial timestamp to one
+new call and its two participant IDs before injection. A source-activity check
+requires the intended sender's energy/duration counters over the observed part
+of the generated interval, without combining peers, calls or source streams. Gaps, resets and
+missing counters fail closed. Intentional pauses in the reference are allowed.
+Energy presence alone cannot prove speech content or intelligibility, so the
+existing transport, capture, alignment and recovery checks remain necessary.
+
+Reanalysis preserved the five original reports and saved separate source-activity
+diagnostics with source/reference/report hashes and selected metrics. It rejects
+the 0.069 early-burst-then-silence sample and the already-invalid silent B-to-A
+48 kHz sample. The 0.876 A-to-B sample and both 0.389/0.399 samples retain sustained
+source activity. Passing this new check therefore does not turn low scores into
+quality passes. Five new unit cases cover stopped input, unrelated peers/calls,
+stream changes, missing/reset counters, observation gaps, deliberate reference
+pauses and caller/callee identity; the Python evidence suite now has 16 tests.
+
+A fresh live B-to-A baseline run verified the new participant binding and source
+check end to end with the unchanged APK. It used the same 48 kHz input and 8 kHz
+output-capture settings as the earlier stopped-input sample, observed sustained
+source activity across 27.004 seconds and recorded 32.629 seconds, with STOI
+0.861. Private folder: matrix-2026-11-06T20-49-06.357Z. The installed APK, complete
+measurement source set, reference, both UDP relay paths and native-log lifetimes
+were audited. This is one successful sample alongside retained failures; it
+does not establish repeatability or explain why the previous source stopped.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
