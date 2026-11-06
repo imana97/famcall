@@ -1,0 +1,108 @@
+FAMCALL — MACOS ANDROID AUDIO LAB
+
+The lab uses two dedicated Android AVDs, an isolated Firebase demo project,
+Maestro, generated speech, and the emulator's authenticated audio API. It does
+not record the host microphone. Native WebRTC carries the injected speech through
+the real Cloudflare relay. The local UDP proxy impairs only this experiment.
+
+PREREQUISITES
+Node from .nvmrc, Python 3.12 or newer (3.14 used for this pilot), Java 17 for
+Maestro, Java 21 for Firebase emulators,
+Android SDK/emulator and an ARM64 API 36 system image on Apple Silicon, Maestro,
+ffmpeg, and macOS say (or another offline source of synthetic speech).
+
+Create named AVDs famcall_a and famcall_b under this repository's .local/avd.
+Set ANDROID_AVD_HOME to that absolute directory when using avdmanager. Use
+separate data directories and enable virtual audio input/output. Do not use
+personal-device AVDs. The restart helper refuses an unrelated AVD at its ports.
+
+Install the separate com.silvergridtech.famcall.e2e app on both emulators, then
+sign in with the Auth emulator's fictional +12025550101 and +12025550102 users.
+Use scripts/e2e-sign-in.mjs, setting DEVICE and PHONE for each. Save the second
+number as a contact on the first phone. Never use real SMS for this lab.
+
+PYTHON SETUP (from repository root)
+python3 -m venv .local/audio-venv
+.local/audio-venv/bin/pip install -r e2e/audio/requirements.txt
+mkdir -p .local/audio-proto
+.local/audio-venv/bin/python -m grpc_tools.protoc \
+  -I "$ANDROID_HOME/emulator/lib" \
+  --python_out=.local/audio-proto --grpc_python_out=.local/audio-proto \
+  "$ANDROID_HOME/emulator/lib/emulator_controller.proto"
+
+Use the proto shipped with the exact emulator binary. Confirm the generated
+files import successfully before running. ANDROID_HOME must name the SDK.
+
+SYNTHETIC REFERENCE
+Generate only between runs; never replace the reference during a matrix:
+say -v Samantha -f e2e/audio/phrases.txt -o .local/audio-source.aiff
+ffmpeg -y -i .local/audio-source.aiff -ac 1 -ar 48000 \
+  -c:a pcm_s16le .local/audio-source.wav
+
+Another synthetic clip is acceptable if it is mono signed 16-bit PCM at 48 kHz.
+Keep the exact reference with the private run evidence. A different clip changes
+the experiment and must not be silently compared as an identical repeat.
+
+RUN
+1. Start Firebase demo emulators and the lab server in separate terminals:
+   node scripts/start-emulators.mjs --live-turn
+   node scripts/audio-lab.mjs
+   The maintainer command reads relay secrets into memory from Secret Manager.
+   Forks must use their own relay/project; never put permanent keys in the repo.
+2. End any existing lab call. Set JAVA_HOME for Maestro and MAESTRO_BIN if needed.
+3. Run node scripts/run-audio-matrix.mjs.
+   Each profile restarts the dedicated AVDs, places/answers a native call through
+   Maestro, and measures both directions with one injection per emulator process.
+   Speech measurements use buffered delivery and emulator flow control.
+   The run keeps a private copy of the synthetic reference, source hashes,
+   emulator version, and each profile's actual installed APK hashes. A workspace
+   commit alone does not prove which app binary was installed.
+4. Inspect the timestamped .local/audio-lab/matrix-* directory. A process exit
+   code of zero means measurements were valid, not that voice quality passed a
+   release threshold. Listen to the synthetic captures and review packet data.
+
+The baseline/modest/weak/stress labels describe experimental configurations,
+not an advertised support envelope. Delay/loss/jitter are applied independently
+on both endpoint relay legs. Report measured RTT and RTP loss. Bandwidth includes
+an estimated 28-byte IPv4/UDP header per packet; link-layer and VPN overhead are
+not included. The measured network model is recorded in each report.
+
+OUTAGES AND SAFETY
+With a connected call on the isolated UDP proxy, run:
+node scripts/measure-transport-outage.mjs 5
+Repeat with 15 or 30. This reports packet recovery only, at approximately
+three-second observation intervals. It cannot prove speech recovery.
+
+To observe an already-connected call's selected path and packet continuity:
+node scripts/measure-transport-session.mjs udp 30
+The first argument is udp, tcp, tls, or direct; the second is 15–7200 seconds.
+For TCP/TLS, set the lab /config transport and proxy=false BEFORE placing a new
+call. For direct, the selected candidate must actually be host/srflx/prflx.
+Forcing a relay protocol proves that path is usable, not that automatic fallback
+works when UDP is blocked. The UDP shaper does not impair TCP/TLS traffic.
+A longer observation also records signaling generation changes, without storing
+SDP or relay passwords. Renegotiation alone is not proof of credential expiry
+handling or audible continuity. Physical-device endurance remains required.
+
+With the current test APK installed and both fictional users signed in, exercise
+initial setup failure separately (end any existing call first):
+node scripts/test-initial-connection.mjs recover
+node scripts/test-initial-connection.mjs timeout
+The first blocks the relay during initial setup, verifies a signaling retry,
+restores it after 22 seconds, and checks received packets at both phones. The
+second keeps it blocked and requires the call to end within 90 seconds. Neither
+injects audio or sends SMS. Both restore the baseline lab network afterward.
+
+Interrupting the matrix restores the network profile. An interrupted run may
+leave a lab call active; end it before starting another run. All reports and
+recordings remain in .local; do not publish raw diagnostic logs.
+
+The emulator may become silent or crash if injectAudio is reopened in the same
+process. measure.py refuses repeated injections. Restart the emulator first;
+do not delete its guard marker to force another injection. Discovery skips dead
+processes. These workarounds need revalidation when upgrading the emulator.
+
+Results and recordings stay in ignored .local. No live conversation, contact
+book, SMS code, push token, API key or relay password belongs in shared evidence.
+Physical-device audio, background ringing, authentication, and listener tests
+remain separate release gates. See store/release/e2e-test-plan.txt.

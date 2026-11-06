@@ -189,9 +189,13 @@ G5 Speech: ≥90% word understanding on the agreed lab phrase set for N1–N2 in
    one-way audio or feedback. Background-noise cases have separately agreed goals.
 G6 Endurance: no crash, stuck audio, or accumulating resource leak in the 120-minute
    call runs and 100 repeated short-call cycles per representative device.
-G7 Real routes: at least 200 completed beta calls across at least 20 consenting
-   pairs, multiple providers, and all platform pairings before public claims.
-   Investigate every persistent one-way-audio report and cluster of ring failures.
+G7 Real routes: use owner-operated phones on at least two independent internet
+   connections and repeat all platform pairings in both caller directions.
+   Record the tested devices, routes, attempts and failures. No separate beta
+   audience or recruitment program is required. Field evidence must cover the
+   conditions actually claimed; a small owner-run sample cannot establish a
+   population-wide success rate. Investigate persistent one-way audio and ring
+   failures before public claims.
 G8 SMS and privacy: demonstrable provider-enforced cap, tested authorization,
    verified permission flows, and tested account/data-deletion behavior. Zero
    known bypass of these release requirements.
@@ -207,14 +211,17 @@ for registration, manual contact entry, locked-screen incoming call, speech both
 ways, mute/speaker, short interruption, and hang-up from each side.
 Nightly: controlled N0–N6 impairment suite, forced media paths, concurrency/races,
 permission/lifecycle cases, resource checks, and synthetic-audio measurements.
-Weekly beta: real international routes, busy-hour runs, low-end phones, long calls,
-and review of failure clusters. Do not send recurring surveys automatically.
+Owner field checks: different internet routes, busy-hour runs, low-end phones,
+long calls, and review of failure clusters. No beta recruitment or recurring
+surveys are part of this plan.
 Before public release: full locked matrix, privacy/access/deletion tests, store
 artwork parity, reviewer access, and signed-off provisional gate results.
 
-Choose the mobile UI automation framework after the React Native/native-module
-stack is selected. Use coordinated two-device drivers plus a controllable gateway
-and backend observability. UI automation alone cannot validate full media flow.
+Maestro drives the native Expo development builds on both platforms. Coordinate
+two-device flows with the isolated relay impairment lab and backend evidence.
+The virtual-microphone harness requires a fresh emulator process for every
+injection. Use a physical acoustic fixture for the full media path. UI automation
+alone cannot validate speech.
 
 EVIDENCE AND TRIAGE
 Each run records a reproducible case ID, app build, device/OS pair, network profile,
@@ -224,3 +231,25 @@ media establishment failure, one-way audio, and poor intelligibility. Include
 failed attempts in denominators and retain the prescribed privacy-safe evidence.
 Publish an internal summary of measured supported conditions and known limits.
 Only then approve store wording about weak-network behavior.
+
+CURRENT ANDROID AUDIO LAB
+The macOS emulator gRPC harness permits one audio injection per emulator process.
+A second injection is refused before opening the audio stream; restart the sender
+first. The matrix runner restarts both dedicated FamCall AVDs for each profile,
+then uses one injection in each direction. Buffered mode uses emulator flow
+control rather than real-time packet pacing. It never enables host microphone
+passthrough. The process guard also skips stale emulator discovery files.
+
+The UDP shaper accounts for payload plus 28 bytes of IPv4/UDP headers. Ethernet,
+radio and VPN overhead remain outside this estimate. Delay/loss/jitter are per
+endpoint relay leg; use measured RTT, interarrival jitter and packet loss from
+WebRTC for end-to-end observations. A valid sample is not a release-quality pass.
+
+scripts/measure-transport-outage.mjs records packet recovery after 5/15/30-second
+outages separately from audio. It samples at the app's three-second statistics
+cadence, so reported recovery time is an observation bound, not precise audio
+latency. Speech recovery still requires generated-audio or physical listening
+validation. Do not substitute the transport result for G4 or G5.
+
+Emulator lifecycle investigation (used as a hypothesis, then checked locally):
+https://github.com/kaeawc/auto-mobile/issues/13634

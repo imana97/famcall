@@ -60,6 +60,7 @@ export class VoicePeer {
   private heartbeatTimer?: ReturnType<typeof setInterval>;
   private heartbeatPending = false;
   private pendingRestart = false;
+  private pendingForcedRestart = false;
   private restartAttempts = 0;
   private previousCounters?: AudioCounters;
   private lastRestartAt = 0;
@@ -209,6 +210,11 @@ export class VoicePeer {
     this.statsTimer = setInterval(() => {
       void this.collectStats();
     }, 3000);
+    // With no usable candidate, native ICE can remain "new" and never emit a
+    // disconnected/failed event. Start the bounded retry policy in that case.
+    this.later(() => {
+      if (this.state === "connecting") return this.requestRestart();
+    }, 15_000);
   }
   private async heartbeat() {
     if (this.closed || this.heartbeatPending) return;
@@ -279,7 +285,19 @@ export class VoicePeer {
       (!force && this.pc.connectionState === "connected")
     )
       return;
-    if (Date.now() - this.lastRestartAt < 2000) return;
+    const cooldown = 2000 - (Date.now() - this.lastRestartAt);
+    if (cooldown > 0) {
+      // A credential refresh must eventually restart ICE with its new servers,
+      // even if the other peer requested a restart moments earlier.
+      if (force && !this.pendingForcedRestart) {
+        this.pendingForcedRestart = true;
+        this.later(() => {
+          this.pendingForcedRestart = false;
+          return this.requestRestart(true);
+        }, cooldown);
+      }
+      return;
+    }
     this.lastRestartAt = Date.now();
     if (this.caller) {
       await this.serial(() => this.offer(true));

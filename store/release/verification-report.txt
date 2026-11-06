@@ -9,6 +9,10 @@ PASS
 - An additional release-workflow test verifies that a tested source commit may
   receive evidence updates, while subsequent app changes or missing network
   evidence block public submission.
+- Three connection-policy tests cover initial ICE setup stalls, coalesced
+  credential-refresh restarts, and cancellation after connection/close.
+  Two Python evidence tests reject changed-and-restored network profiles and
+  a selected relay transport that differs from the requested path.
 - Android native standalone test build compiles, including WebRTC, Firebase,
   native calling integration, native timers, and the background call-end worker.
 - Maestro on two Android API 36 emulators: phone verification using fictional
@@ -36,15 +40,86 @@ PASS
   no matches. Private configurations, logs, recordings, and signing material
   are excluded from source control.
 
+ANDROID AUDIO PILOT — VALID MEASUREMENTS, NOT RELEASE APPROVAL
+Eight 30-second generated-speech samples completed: one in each direction for
+four profiles, with a fresh pair of emulator processes for each profile.
+Android API 36 ARM64; emulator 36.1.9.0; the same installed test APK on both peers.
+Opus starts at 16 kbps, mono, 40 ms packet time. Every sample selected Cloudflare
+UDP relay media and retained received audio plus statistics from both peers.
+
+Profile   Cap/leg   Delay/leg   Jitter/leg   Loss/leg   STOI A→B / B→A
+Baseline  uncapped  0 ms        0 ms        0%         0.898 / 0.836
+Modest    128 kbps  35 ms       10 ms       0.5%       0.862 / 0.841
+Weak      64 kbps   75 ms       25 ms       1.51%      0.730 / 0.760
+Stress    48 kbps   150 ms      50 ms       3%         0.469 / 0.333
+
+Settings apply independently in both directions on each endpoint relay leg.
+Measured median RTT across the two samples was 14.5–15 ms, 182.5–185 ms,
+377.5–396 ms, and 705.5–751 ms respectively. Observed per-peer packet-loss
+windows ranged from 0%, 0.76–1.09%, 2.76–3.37%, and 4.08–13.19% respectively.
+The small windows include silent-direction DTX traffic. These are realized
+measurements, not guaranteed values of the configured random process.
+
+The stress scores show substantial degradation. STOI is not a percentage of
+words understood, and no human intelligibility or supported-network claim is
+made. These pilot profiles do not substitute for the N0–N6 release matrix.
+The v2 shaper includes 28-byte IPv4/UDP headers in its bandwidth accounting;
+link-layer and VPN overhead remain excluded.
+
+Private evidence: matrix-2026-11-06T10-43-48.689Z, including all eight reports,
+synthetic captures/reference, source and installed-APK hashes, and an audit of
+unchanged profiles and selected paths. A prior matrix attempt stopped before
+the first call because Android System UI was unresponsive after boot. Staggered
+boots, two emulator CPU cores, and a short settling interval allowed this run.
+
+The earlier silence/crashes came from a virtual-microphone lifecycle limitation.
+The harness now uses buffered flow control and refuses a second injection into
+the same emulator process. The refusal was checked without crashing either
+emulator. Revalidate this workaround when changing emulator versions.
+
+TRANSPORT OUTAGE PILOT — PACKETS ONLY
+One native Android call recovered received packets at both peers after each
+5-, 15-, and 30-second 100% relay-drop interval. First observed recovery after
+restoration: 3.020/3.092 s, 2.144/2.216 s, and 5.639/5.713 s respectively.
+The lab counted 158, 637, and 830 dropped packets. The 30-second case included
+a disconnected/failed transition and reconnection. Statistics arrive about
+every three seconds; these are observation bounds, not precise recovery latency.
+These preliminary outage runs used the earlier v1 shaper with no bandwidth cap.
+They did not measure speech recovery and do not clear G4/G5.
+
+FORCED RELAY PATHS
+Separate 30-second observations selected TCP and TLS relay paths respectively,
+with current statistics and advancing received packets at both peers. These
+tests forced each protocol before placing a call; they did not simulate UDP
+blocking or prove automatic fallback. The UDP shaper did not impair these paths.
+
+The delayed UDP call below was then observed for eight minutes after it connected.
+Both peers continued receiving packets across the scheduled seven-minute
+renegotiation (offer/answer generation 1 → 2) and beyond the original ten-minute
+credential lifetime. The observed packet windows were approximately 477 seconds,
+with 2,573/2,570 received packets and no stagnant counter interval at the roughly
+three-second statistics cadence. This used the APK before the retry-policy fix;
+it is one transport-only observation, not a speech or endurance release pass.
+
+INITIAL SETUP FINDING
+A subsequent UDP-proxy call remained on Connecting beyond the 45-second test
+deadline and first connected about 160 seconds after answer. One peer lacked a
+local relay candidate during the delay. The underlying allocation delay is not
+diagnosed. It exposed an application retry gap: native ICE can remain new without
+emitting disconnected/failed. Source now starts bounded initial retries after
+15 seconds, and coalesces forced restart requests arriving during the two-second
+cooldown. Unit tests and the following native Android checks pass.
+The updated Android APK then passed both native cases: with the relay blocked
+during setup, both signaling generations reached 5 by 22 seconds; restoring
+access connected the peers after 398/407 ms and received packets advanced on
+both sides. Keeping it blocked ended the call after 72,653 ms. Both phones
+returned to the contact list, and the lab restored its baseline configuration.
+Updated test APK SHA-256:
+9b84261cd9c07e252b757c395742d523c380b247d0938a91570e0161ee496561
+
 IN PROGRESS / NOT A PASS
-- Repeated generated-speech measurements under packet loss, delay, jitter,
-  and limited bandwidth. Earlier calls carried speech in both directions, but
-  subsequent emulator audio runs produced silence. A separate Android AudioRecord
-  probe also captured silence from generated input, on emulator versions 36.1.9
-  and 37.2.13. A later injection attempt crashed emulator 37.2.13. The
-  virtual-microphone test path is unresolved. No supported
-  network envelope or weak-network pass is claimed.
-- Credential refresh, full interruptions, TCP/TLS fallback, and offline hangup.
+- Credential refresh, speech recovery, full interruptions, TCP/TLS fallback,
+  offline hangup, repeatability/sample-size targets and physical-device testing.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen

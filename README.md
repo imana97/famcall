@@ -8,9 +8,9 @@ The app uses React Native with Expo development builds, native WebRTC and Opus, 
 
 ## Development status
 
-This is a working prototype, not a published service. Android and iOS simulator builds compile. Maestro covers signup, persistent sign-in, contacts, and navigation on both platforms, plus call controls and blocking on two Android emulators. The 21 local logic, database-rule, and backend tests pass.
+This is a working prototype, not a published service. Android and iOS simulator builds compile. Maestro covers signup, persistent sign-in, contacts, and navigation on both platforms, plus call controls and blocking on two Android emulators. All 25 local logic, database-rule, backend, retry-policy, and release-guard tests pass, along with two audio-evidence validation tests.
 
-Earlier Android calls exchanged generated speech, but repeated measurements are currently blocked by the emulator's virtual microphone. The iOS simulator also ends incoming native calls immediately with a system error. Neither is a passing call-quality result. Physical-device calling, push delivery, production authentication, and a reproducible poor-network audio test remain release gates.
+Android calls exchange generated speech through the Cloudflare relay. The audio harness now restarts the emulators between profiles and prevents repeated injection into the same emulator process, which previously caused silence or crashes. Pilot measurements and transport recovery checks are recorded in `store/release/verification-report.txt`; they do not establish a supported network envelope. The iOS simulator ends incoming native calls immediately with a system error. Physical-device calling, push delivery, production authentication, and the full poor-network matrix remain release gates.
 
 The production backend and website require an owner-approved deployment. Production mobile releases go through Google Play internal testing and TestFlight first. Nothing in this repository bypasses that approval.
 
@@ -52,7 +52,7 @@ Routine tests use fictional numbers and the Firebase Auth emulator. They send no
 
 See `store/release/e2e-test-plan.txt` for the full release matrix. Maestro drives the actual native app. The audio lab injects generated PCM through the Android emulator's authenticated gRPC interface, captures the other emulator's output, and records WebRTC packet counters plus a laboratory STOI estimate. It never opens the host microphone.
 
-`scripts/audio-lab.mjs` impairs only the test relay's UDP traffic. Delay and loss apply to each endpoint's relay leg; do not confuse a per-leg setting with end-to-end loss or round-trip latency. `e2e/audio/measure.py` checks the selected candidate path as well as speech output. TCP/TLS fallback, outages, screen lock, credential renewal, and real-device listening are separate cases. A connected screen alone is not a passing audio test.
+`scripts/audio-lab.mjs` impairs only the test relay's UDP traffic. Delay and loss apply to each endpoint's relay leg; do not confuse a per-leg setting with end-to-end loss or round-trip latency. `e2e/audio/measure.py` checks the selected candidate path, received speech, and packet evidence from both peers. See `e2e/audio/README.txt` for reproducible setup and emulator limitations. TCP/TLS fallback, speech recovery, screen lock, credential renewal, and real-device listening are separate cases. A connected screen alone is not a passing audio test.
 
 ## Deployment and secrets
 

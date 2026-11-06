@@ -22,7 +22,8 @@ try {
 await writeFile(configuration, JSON.stringify(config, null, 2));
 let sequence = 0;
 const metrics = resolve(local, "metrics.jsonl");
-const traffic = { sent: 0, dropped: 0, bytes: 0 };
+const traffic = { sent: 0, dropped: 0, bytes: 0, estimatedIpBytes: 0 };
+const shaper = { version: 2, ipVersion: 4, udpIpHeaderBytes: 28, excludes: 'link-layer and VPN overhead' };
 const allowed = new Set(["127.0.0.1:8787", "10.0.2.2:8787", "localhost:8787"]);
 const server = http.createServer(async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
@@ -31,7 +32,7 @@ const server = http.createServer(async (req, res) => {
   if (req.url === "/config" && req.method === "GET")
     return res.end(JSON.stringify(config));
   if (req.url === "/status" && req.method === "GET")
-    return res.end(JSON.stringify({ config, traffic, samples: sequence }));
+    return res.end(JSON.stringify({ config, traffic, shaper, samples: sequence }));
   if (
     req.method !== "POST" ||
     !["/config", "/metrics", "/mark"].includes(req.url)
@@ -95,11 +96,13 @@ function forward(message, endpoint, send) {
     return;
   }
   const now = Date.now();
-  const serializationMs = config.kbps ? (message.length * 8) / config.kbps : 0;
+  // UDP sockets expose payload only. Include the IPv4 + UDP headers in the cap.
+  const ipBytes = message.length + shaper.udpIpHeaderBytes;
+  const serializationMs = config.kbps ? (ipBytes * 8) / config.kbps : 0;
   const start = Math.max(now, endpoint.nextAt ?? 0);
   const delay = Math.max(
     0,
-    start - now + config.delayMs + (random() * 2 - 1) * config.jitterMs,
+    start - now + serializationMs + config.delayMs + (random() * 2 - 1) * config.jitterMs,
   );
   // A bounded queue represents congestion rather than accumulating stale audio forever.
   if (delay > 3000) {
@@ -110,6 +113,7 @@ function forward(message, endpoint, send) {
   setTimeout(() => {
     traffic.sent++;
     traffic.bytes += message.length;
+    traffic.estimatedIpBytes += ipBytes;
     send();
   }, delay);
 }
