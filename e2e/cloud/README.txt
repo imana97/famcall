@@ -43,14 +43,46 @@ These are retained setup failures, not a cross-platform pass.
 
 The revised flow subsequently passed on Pixel 6 with supplied PHONE ending 0102
 and CONTACT_PHONE ending 0101. The Maestro trace, final screenshot and independent
-backend record agree. Both identities have therefore passed in separate Android
-runs; concurrent endpoints and call behavior have not been tested in this setup.
+backend record agree. At this stage both identities had passed in separate
+Android runs; the paired-call qualification below was performed afterward.
 
 An iPhone retry needs a qualified secure backend and native database route.
 Do not disable Firebase transport protections or add a production auth bypass.
 Provider re-signing also means these demo tests cannot validate production App
 Attest, APNs, TestFlight, real SMS or the final store candidate. No call audio,
 network-recovery or background-ringing claim follows from this smoke test.
+
+PAIRED ANDROID CALL
+Package the two endpoint flows with:
+  node scripts/package-cloud-smoke.mjs --paired-call
+
+This produces a separate famcall-cloud-call.zip with twelve allowlisted files.
+Before testing, build the backend, start demo-famcall with live TURN access,
+and run node scripts/cloud-call-lab.mjs <fresh-run-UUID>. The call lab listens on
+loopback port 8787; include only this port and 9099/8080/5001 in the authenticated
+provider tunnel. Never expose these demo services publicly. The lab selects UDP
+relay traffic without impairment and records the existing e2e metrics.
+
+Start two simultaneous Android builds with the same RUN_ID. Execute only
+e2e/cloud/call-callee.yaml for the phone ending 0102 and only
+e2e/cloud/call-caller.yaml for the phone ending 0101. Each endpoint needs the four
+signup parameters above, with the other phone as CONTACT_PHONE. Each build must
+have its own device session. The caller waits for callee readiness, both assert
+connected state, and the caller waits at least fifteen seconds after the callee's
+connected marker before hanging up. Both flows verify return to the people list.
+The synchronization helper polls for at most ninety seconds; it does not retry
+failed call actions. Limit overall provider run duration separately and stop the
+other endpoint if startup fails. Stop the tunnel, collector and emulators after
+retaining results.
+
+Both Pixel 6 / Android 12 flows passed on 6 November 2026. The backend recorded
+20.782 seconds from acceptance to hangup and no remaining active leases. Six
+WebRTC samples per endpoint over fifteen seconds confirmed each selected pair
+used UDP relay candidates, with inbound/outbound RTP and increasing source and
+received audio energy. Screenshots and logs are retained. No known speech was
+injected and no network impairment was applied. This is foreground call/media
+transport evidence; it does not establish intelligibility, push or poor-network
+recovery. See the release verification record for the precise artifact scope.
 
 Keep app/ZIP hashes, provider build/session IDs, backend evidence and full
 pass/failure artifacts. See store/release/cloud-device-testing.txt for updated

@@ -12,8 +12,9 @@ eligibility, remaining minutes and feature entitlements must be checked before u
 The owner requested evaluation of BrowserStack's free trial. Its account page now
 initially showed 100 unused App Automate minutes. The API reports Free plan and
 five parallel session slots. Separate demo APK/IPA files were uploaded and trial
-tests have now run. No paid subscription or upgrade was purchased. After the three runs, the signed-in
-dashboard shows 94 free minutes remaining. This is an observed account balance;
+tests have now run. No paid subscription or upgrade was purchased. After the first
+three smoke runs, the dashboard showed 94 free minutes. After two further paired
+Android call runs, a refreshed dashboard showed 89 free minutes. This is an observed account balance;
 build duration alone is not a billing statement. Recheck before further runs.
 
 Firebase Test Lab: the existing Blaze pricing tier includes 30 physical-device
@@ -94,8 +95,32 @@ IPA SHA-256: 891480b10d0b50ec5b3c70c51601be1aae52bd30b8fc58ddbad628fbaa942da6
 Initial suite SHA-256: 0d58db0559f06b3f148d3dedea568f7c8e0bbe17d85c4312cd0143582f973c9f
 Revised suite SHA-256: 0be5092180efeea75ac9c700d791771d68e03b0b5bbdedce0dc9bf9515fdcff4
 
-These results verify basic demo flows only. No call was placed in these hosted
-runs; two-way speech, weak-network recovery and background/push remain open.
+Those first three runs verify basic demo flows only; they placed no calls.
+
+PAIRED ANDROID CALL — 6 NOVEMBER 2026
+Caller build 4799bbd5e21e4df6c24e6f40b46cf0e52d0fab85 and callee build
+627bba37e96ec0bb12ab12128a8bb6248f11b7ab both passed on separate hosted Pixel 6
+Android 12 sessions. The new twelve-file paired suite coordinates readiness,
+answer, connected-state assertions and caller hangup. The backend recorded a
+20.782-second accepted call and released both active-call leases. Each peer's
+six WebRTC samples span fifteen seconds. Following selectedCandidatePairId to
+the actual candidate records confirms UDP relay on both endpoints; received
+RTP and source/received audio energy increased in both directions.
+
+The APK is the earlier verified 360faa2 test artifact, not a store candidate or
+the latest registration build. Private records retain runtime backend hashes;
+its compiled registration handler predates the final APNs sequence-conflict
+check in 4065490, so this run does not validate that fix. Push is disabled in
+the demo app. Both command/native/Maestro logs and connected/ended screenshots
+were saved. Video/audio capture was requested; both API video links returned
+404. The dashboard showed a recording player, but its download did not complete.
+No recorded-output audio has therefore been qualified.
+
+No microphone reference was injected, and the network was not impaired. Nonzero
+energy alone cannot establish intelligible speech or rule out background noise
+and echo. Known-speech qualification, weak-network recovery, iPhone calling and
+background/push remain open. The provider remained on Free with zero running
+and queued sessions after completion; local test services were stopped.
 
 BROWSERSTACK CAPABILITIES
 App Automate supports the existing Maestro approach on real Android and iOS

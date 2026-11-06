@@ -1,0 +1,24 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- runFlow: signup-and-contacts.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: caller, STAGE: ready }
+- runScript:
+    file: call-event.js
+    env: { ACTION: wait, ROLE: callee, STAGE: ready }
+- tapOn: Call ${CONTACT_NAME}
+- runFlow: ../maestro/wait-connected.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: caller, STAGE: connected }
+- takeScreenshot: caller-connected
+- runScript:
+    file: call-event.js
+    env: { ACTION: wait, ROLE: callee, STAGE: connected, MIN_AGE_MS: 15000 }
+- assertVisible: You’re connected.
+- runFlow: ../maestro/end-call.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: caller, STAGE: finished }
+- takeScreenshot: caller-ended

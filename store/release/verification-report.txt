@@ -842,6 +842,41 @@ The current source has 70 JavaScript/TypeScript tests. The emulator log also ret
 NOT_FOUND errors when account-deletion workers outlive test-record cleanup; those
 are not new push-delivery evidence. The test command itself exited successfully.
 
+HOSTED ANDROID PAIRED CALL
+Two concurrent BrowserStack Pixel 6 / Android 12 sessions passed the new caller
+and callee Maestro flows. Caller build: 4799bbd5e21e4df6c24e6f40b46cf0e52d0fab85.
+Callee build: 627bba37e96ec0bb12ab12128a8bb6248f11b7ab. Both used fictional demo
+accounts, the authenticated Local tunnel for signaling and live Cloudflare TURN.
+The backend recorded acceptance then caller hangup after 20.782 seconds, with
+zero remaining active leases. Both phones returned to the people list.
+
+Six WebRTC samples per peer span fifteen seconds. Each selected transport's
+selectedCandidatePairId resolves to a succeeded, nominated pair whose local and
+remote candidates are relay/UDP; local relayProtocol is UDP. Final inbound RTP
+counts were 425 and 390, with outbound counts 394 and 421 respectively. Source
+and received totalAudioEnergy increased on both peers. This proves bidirectional
+media transport in this short foreground call. It does not prove speech
+intelligibility: no known microphone reference, silence control, echo check,
+network impairment or output-audio qualification was used.
+
+The APK is the previously verified artifact from source 360faa2158785457580939d560e493ac1231ac77.
+The backend's runtime hashes are retained separately: its compiled registration
+handler lacks the last APNs environment conflict check added in 4065490. This
+run therefore does not validate current push-registration changes; demo mode
+disables push registration. Rebuild the backend before future exact-source tests.
+The call-suite SHA-256 is 0a44323d02a5c0a553554366d3c6a85b8b7640633c66ee4b173d7740da8b496e.
+Private run: e81990ab-12db-4fb3-85b0-261b2da01dd2. Both command/native/Maestro
+logs and screenshots were saved and connected screenshots inspected. Provider
+crash-log counts were zero. Video/audio recording was requested; API downloads
+returned 404, and the dashboard download did not complete. No captured-output
+audio claim follows. History UI, background/push and iPhone calling were not
+tested in this run. The initial empty users/{uid}/history probe was the wrong
+collection: app history queries participant records in calls instead.
+
+The refreshed dashboard showed 89 free minutes remaining, with no paid upgrade.
+The provider reported zero running/queued sessions. The temporary tunnel,
+collector and emulators were stopped; ports 9099/8080/5001/8787 were closed.
+
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
   lock/background, incoming push after process reclamation, audio routes and
