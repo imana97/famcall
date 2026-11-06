@@ -6,6 +6,51 @@ Use hosted devices; do not install, launch or test on the owner's personal phone
 The local personal-phone setup has been discontinued. A cloud UI pass alone does
 not satisfy the two-way speech, network recovery, push or signing release gates.
 
+FREE / LOW-COST OPTIONS
+Prices and public trial allowances checked 6 November 2026; actual account
+eligibility, remaining minutes and feature entitlements must be checked before use.
+The owner requested evaluation of BrowserStack's free trial. Its account page now
+shows 100 App Automate minutes remaining. No subscription, cloud app upload or
+paid test has been created by this work.
+
+Firebase Test Lab: the existing Blaze pricing tier includes 30 physical-device
+minutes and 60 virtual-device minutes per day. Additional physical time is $5 per
+device-hour; virtual time is $1 per device-hour. Android Device Streaming has a
+separate allowance of 30 minutes per month, then $0.15/minute; do not confuse that
+interactive product with the daily Test Lab allowance. Test Lab is a practical
+candidate for repeatable install/UI checks. Its documented native test frameworks
+require adaptation from Maestro; no two-way voice fixture is established here.
+
+AWS Device Farm: the public offer currently advertises a one-time 1,000 device-
+minute trial (a limited-time increase from 250), then $0.17/device-minute. A ten-
+minute two-device session uses at least 20 device-minutes, or $3.40 after the trial,
+before billed preparation/cleanup. AWS documents real Android/iOS devices and
+network shaping for bandwidth, delay, jitter and loss in both directions, with
+changes during a run. This makes it a candidate for weak-network testing, subject
+to verifying actual media impairment, microphone injection/output capture, paired
+device concurrency and iOS signing limitations. Wi-Fi shaping is not carrier
+coverage. Do not purchase unmetered/private-device subscriptions for this pilot.
+AWS's standard iOS re-signing removes push-notification entitlements, so that
+route cannot validate production incoming-call push. Media-file upload support
+does not establish microphone injection or in-call audio recording support.
+
+TestingBot's open-source program advertises free unlimited automated testing,
+real Android/iOS devices and two concurrent tests for qualifying active public,
+non-commercial projects with an OSI-approved license. FamCall's public MIT license
+alone does not establish non-commercial eligibility or approval. Its requested
+attribution and actual voice/network features also need review before adoption.
+No application has been submitted and no vendor has been contacted.
+
+BrowserStack's public trial includes 100 App Automate minutes and a separate 30
+App Live minutes. Its Pro audio/network features and two concurrent device slots
+must not be assumed included in the trial. Evaluate entitlement before uploading
+or consuming minutes; no paid upgrade is authorized by a trial evaluation.
+
+Use existing local emulators for the bulk of repeatable checks, Test Lab for
+limited recurring device coverage, and a qualified trial for the remaining cloud
+checks. No researched free offer yet proves complete two-way speech, background
+push and production-signing coverage on both platforms. Keep those gates open.
+
 BROWSERSTACK
 App Automate supports the existing Maestro approach on real Android and iOS
 devices. Start by checking account access, enabled features, available concurrent
@@ -75,3 +120,9 @@ https://docs.kobiton.com/automation-testing/scripting/add-audio-injection-to-app
 https://docs.kobiton.com/manual-testing/inject-audio
 https://docs.saucelabs.com/mobile-apps/features/audio-injection/index.html
 https://firebase.google.com/docs/test-lab/usage-quotas-pricing
+https://firebase.google.com/docs/test-lab
+https://aws.amazon.com/device-farm/pricing/
+https://aws.amazon.com/device-farm/faqs/
+https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-simulate-network-connections-and-conditions.html
+https://testingbot.com/open-source
+https://www.browserstack.com/support/faq/plans-pricing/plans/what-do-i-get-with-a-free-trial
