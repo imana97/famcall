@@ -1,6 +1,6 @@
 {
-  "status": "IMPLEMENTATION INVENTORY — proposed classifications require publisher review before submission",
-  "prepared_on": "2026-11-06",
+  "status": "EVIDENCE-BASED DRAFT — store-signed archives and live retention settings inspected; publisher form review and remaining provider questions are still required",
+  "prepared_on": "2026-11-07",
   "publisher": "SilverGrid Technology LLC",
   "contact_email": "info@silvergridtech.com",
   "warning": "This worksheet is not a privacy policy, a completed store disclosure, or a claim that data is not collected.",
@@ -12,7 +12,7 @@
       "actual_processing": "Verified phone number and Firebase UID; app stores normalized E.164 number and account timestamps.",
       "providers": "Google Firebase Authentication; Google Cloud Firestore",
       "stored_where": "Firebase Authentication and private Firestore user record",
-      "retention": "Until account deletion; Google may keep abuse-prevention records under its policy.",
+      "retention": "App account until deletion; Firebase documents logged IP retention of a few weeks and removal of deleted authentication data from live/backup systems within 180 days. This is a provider policy, not a FamCall deletion-time measurement.",
       "deletion": "Durable server deletion disables the Auth user, removes account data, then removes Auth user.",
       "store_classification": "Proposed: phone number, user ID; linked to user; app functionality/security."
     },
@@ -72,19 +72,19 @@
       "actual_processing": "Providers receive ordinary network information. Production app sends no lab RTC diagnostics. Per-user abuse counters protect calls/contacts/relay issuance.",
       "providers": "Google Cloud/Firebase; Cloudflare; Apple for push",
       "stored_where": "Cloud service logs and private rate-limit counters",
-      "retention": "Counters 2 days; operational logs target 30 days; provider-required security/audit records may differ.",
-      "deletion": "Counters/logs expire by configured retention; verify deployed settings.",
+      "retention": "Abuse counters become eligible for TTL cleanup after 2 days. Live global _Default log bucket: 30 days. Mandatory _Required administrative/system audit log bucket: 400 days. Provider-internal records follow provider policy.",
+      "deletion": "TTL policies are ACTIVE. Periodic cleanup is not instantaneous. Configured retention is verified; actual aged-record deletion is not yet observed.",
       "store_classification": "Review diagnostics and IP-derived location classification with each provider’s current policy."
     },
     {
-      "data": "Crash reports or analytics, if selected",
-      "planned_purpose": null,
-      "actual_processing": "No Firebase Analytics, Crashlytics or advertising SDK selected. No app analytics endpoint in production.",
-      "providers": "None selected",
-      "stored_where": "Not applicable",
-      "retention": "Not applicable",
-      "deletion": "Not applicable",
-      "store_classification": "Proposed: no advertising tracking; recheck final binary and SDK manifests."
+      "data": "SDK diagnostic metadata and optional app analytics",
+      "planned_purpose": "Firebase service operation and improvement",
+      "actual_processing": "No app Analytics or Crashlytics feature is selected. The shipped iOS Auth, Firestore and Installations manifests declare Other Diagnostic Data for Analytics, not linked or tracking. Firebase default collection is not explicitly disabled in the archived Info.plist. Android includes Firebase messaging, installations and data transport components. Manifest presence describes SDK declarations, not a runtime trace.",
+      "providers": "Google Firebase; relevant platform integrity providers",
+      "stored_where": "Provider systems; FamCall does not receive a user-agent analytics dataset",
+      "retention": "Provider policy; no uniform FamCall-controlled retention claim",
+      "deletion": "Provider processing and retention must be accounted for separately from app account deletion",
+      "store_classification": "Apple proposal: Other Diagnostic Data, Analytics, not linked or used for tracking for Firebase user-agent data. Review Android diagnostics and device identifiers under its separate SDK disclosures. No-data-collected is incorrect."
     },
     {
       "data": "Support correspondence and voluntary test feedback",
@@ -107,22 +107,23 @@
     "Who receives it, where is it stored, how long is it kept, and what happens on deletion?"
   ],
   "must_resolve": {
-    "app_specific_privacy_policy_url": "https://famcall.web.app/privacy (prepared; not deployed)",
+    "app_specific_privacy_policy_url": "https://famcall.web.app/privacy (live; proposed clarifications in this PR need protected website deployment after review)",
     "terms_or_license_choice": "MIT source license; service terms draft at /terms",
     "in_app_deletion_path": "Settings → Delete account → recent phone verification → confirm",
-    "external_account_deletion_url": "https://famcall.web.app/delete-account (prepared; not deployed)",
+    "external_account_deletion_url": "https://famcall.web.app/delete-account (live)",
     "deletion_verification_process": "Recent Firebase phone auth in app; ownership verification by support for external requests",
     "deletion_completion_window": "Asynchronous server retries; external support response time requires publisher policy",
     "retained_data_and_reason": "Completion marker 30 days for retry safety; provider security/legal records per provider policy",
-    "retention_periods": "See implemented inventory and production retention verification gate",
-    "app_privacy_answers": null,
-    "data_safety_answers": null,
-    "encryption_export_answers": null,
+    "retention_periods": "Live TTL, logging and scheduled cleanup configuration inspected; see retention-configuration-evidence.json. Expiration eligibility is not instantaneous deletion.",
+    "app_privacy_answers": "Proposed per-category answers in privacy-review-notes.txt; not entered or submitted",
+    "data_safety_answers": "Proposed per-category answers and unresolved sharing/audio questions in privacy-review-notes.txt; not entered or submitted",
+    "encryption_export_answers": "Owner approved standard encryption with no France distribution for current TestFlight build 2; saved in App Store Connect. Reassess before France distribution or changed encryption.",
     "age_and_target_audience_answers": null,
     "ads_declaration": "No ads implemented; publisher to confirm final submission",
-    "required_sdk_privacy_manifests": "Inspect final archived build; simulator build alone is insufficient",
+    "required_sdk_privacy_manifests": "40 privacy-manifest files inspected in store IPA 0.1.0 (2), including nested duplicate declarations. Four required-reason API categories. Repeat on the final approved candidate; manifests do not certify completeness.",
     "reviewer_accounts_and_access": null,
-    "legal_contact_details_required_by_distribution_markets": null
+    "legal_contact_details_required_by_distribution_markets": null,
+    "android_permission_minimization": "Shipped code 3 includes unused WRITE_CONTACTS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE and SYSTEM_ALERT_WINDOW from dependencies. A focused app fix and rebuilt manifest verification are pending."
   },
   "deletion_acceptance_checks": [
     "A signed-in user can find and initiate account deletion in the app.",
@@ -136,6 +137,16 @@
     "https://developer.apple.com/app-store/app-privacy-details/",
     "https://developer.apple.com/support/offering-account-deletion-in-your-app/",
     "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en",
-    "https://support.google.com/googleplay/android-developer/answer/10144311?hl=en"
+    "https://support.google.com/googleplay/android-developer/answer/10144311?hl=en",
+    "https://firebase.google.com/docs/ios/app-store-data-collection",
+    "https://firebase.google.com/docs/android/play-data-disclosure",
+    "https://firebase.google.com/support/privacy",
+    "https://firebase.google.com/docs/firestore/ttl"
+  ],
+  "evidence_files": [
+    "ios-build-2-privacy.json",
+    "android-build-3-privacy.json",
+    "retention-configuration-evidence.json",
+    "privacy-review-notes.txt"
   ]
 }

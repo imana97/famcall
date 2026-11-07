@@ -1,0 +1,115 @@
+FAMCALL — STORE PRIVACY REVIEW
+7 November 2026 UTC. Proposed answers, not submitted declarations or release approval.
+
+EVIDENCE
+The inspected store artifacts are iOS 0.1.0 (2), source 60d0406, and Android
+0.1.0 (3), source 0c92b91. SHA-256 identities and selected declarations are in
+ios-build-2-privacy.json and android-build-3-privacy.json. These are the delivered
+testing builds, not the final public candidate. Re-run after app/SDK changes.
+
+Reproduce from your private downloaded store artifacts:
+  python3 scripts/inspect-ios-privacy.py <store.ipa> --output <report.json>
+  python3 scripts/inspect-android-privacy.py <store.aab> \
+    --bundletool <official-bundletool-all.jar> --output <report.json>
+The Android audit used official bundletool 1.18.3, with its published digest
+verified. Neither script installs an app or reads Firebase configuration values.
+
+WHAT THE BUILD AUDIT ESTABLISHES
+- The IPA contains 40 privacy-manifest files, including duplicate nested SDK
+  declarations. No inspected manifest declares tracking or a tracking domain.
+  This is not proof that every SDK behavior is covered or that no traffic occurs.
+- Firebase Auth declares linked User ID for App Functionality. Auth, Firestore
+  and Installations declare unlinked Other Diagnostic Data for Analytics.
+  No explicit FirebaseDataCollectionDefaultEnabled override is in Info.plist.
+  An absent override does not disable default SDK collection.
+- The combined manifests declare required reasons for User Defaults, File
+  Timestamp, System Boot Time and Disk Space. Reason codes and their original
+  declarations are retained in the report; no reason was invented by this audit.
+- Android declares messaging, installations, transport and integrity components.
+  A Firebase measurement connector is not proof that an Analytics feature runs.
+  The debug App Check registrar is packaged by the dependency; production source
+  selects Play Integrity. Availability is not proof of debug-provider activation.
+- Android code 3 has unnecessary write-contact, shared-storage and overlay
+  permissions. Reduce them before the public candidate and inspect the new AAB.
+
+PROPOSED APP STORE ANSWERS
+Data collected: Yes. No advertising, advertising measurement or data-broker
+tracking is implemented. The following mapping is an app-specific interpretation
+of the source and archive; the publisher must review it before submission.
+
+Data type               Linked?   Purpose               Evidence
+Phone Number            Yes       App Functionality     Firebase phone auth; user/call records
+User ID                 Yes       App Functionality     Firebase UID; account ownership
+Contacts                Yes       App Functionality     Explicitly selected/saved names and numbers; blocking
+Device ID               Yes       App Functionality     Installation ID and push token stored under UID
+Other Usage Data        Yes       App Functionality     Call participants, times and outcomes
+Other Diagnostic Data   No*       Analytics             Firebase SDK user-agent declarations
+Other Data Types        Yes       App Functionality     IP-bearing SDP/ICE tied to participants
+
+* This unlinked answer covers the Firebase user-agent data described by its SDK
+  manifests. Do not apply it automatically to app/server diagnostics that carry
+  a user, device or call identifier. Inspect any added telemetry before release.
+
+Live call audio is transmitted in real time and is not archived by FamCall.
+Apple's collection definition excludes access limited to servicing a real-time
+request. Proposed treatment: not collected for the label if that remains true
+for all intermediaries. This is not a claim that the microphone is unused.
+Support correspondence can contain email, a name and support content. Review
+the email service and process; do not assume an optional-disclosure exception.
+No location API, photos/video, purchases, advertising or health feature exists
+in the inspected app source. Provider IP handling still needs separate review.
+
+PROPOSED GOOGLE PLAY ANSWERS
+Data collected: Yes. Phone-number authentication creates an account. Account
+deletion is available in Settings and at https://famcall.web.app/delete-account.
+Production Firebase requests use HTTPS and live media uses WebRTC encryption.
+The AAB has usesCleartextTraffic=false; this alone does not prove every data path.
+
+Data type                       Required/optional        Proposed purposes
+Personal info / Phone number    Required                 Account management; functionality; fraud/security
+Personal info / User IDs        Required                 Account management; functionality; fraud/security
+Contacts                        Optional                 App functionality
+Device or other IDs             Required for ringing     App functionality; fraud/security
+App activity / App interactions Required when calling     App functionality (call history)
+App info/performance / Other
+  app performance data          SDK default behavior      Analytics; functionality (confirm SDK mapping)
+Audio files / Voice recordings  Required for speaking     App functionality; proposed ephemeral processing
+
+The audio row is a conservative proposal for live voice, not a recording claim.
+Google treats ephemeral processing separately from Apple's definition. If using
+Google's end-to-end-encryption exclusion instead, first verify its exact key-
+access requirements for every intermediary. Do not infer that exception merely
+from encrypted transport or TURN use. No end-to-end-encryption marketing claim.
+
+Do not yet submit a blanket "no data shared" response. Most backend processing
+may fit the service-provider exception, and a user-initiated call intentionally
+transfers identity/audio to the recipient. Review Google's cross-service phone
+abuse-prevention use, integrity providers, Cloudflare and support-mail handling
+against the actual agreements and Play definitions before finalizing sharing.
+
+RETENTION CONFIGURATION VERIFIED
+retention-configuration-evidence.json records live read-only responses:
+- TTL enabled on devices, limits, accountDeletions and cancelledStarts.
+- Ordinary _Default log bucket: 30 days; mandatory _Required audit bucket: 400.
+- History-pruning scheduler enabled daily; call-expiry scheduler enabled minutely.
+Source assigns 60-day device expiry, two-day counter expiry, 30-day completed
+deletion-marker expiry and 90-day call-history expiry. TTL cleanup is asynchronous.
+This proves configured expiration/retention, not observation of aged-data deletion.
+Firebase documents authentication backup deletion separately; do not promise
+all provider copies disappear when the app's account-deletion worker completes.
+
+REMAINING DECISIONS / EVIDENCE
+Publisher review of form categories and provider sharing; support retention and
+external ownership-verification procedure; provider IP/derived-location handling;
+actual production auth/App Check/push tests; final-candidate archives, privacy
+reports and screenshots. The proposed website clarifications must go through the
+protected website workflow after owner review. candidate.json remains not-ready.
+
+PRIMARY SOURCES (checked 7 November 2026 UTC)
+Apple definitions: https://developer.apple.com/app-store/app-privacy-details/
+Firebase Apple SDK disclosures: https://firebase.google.com/docs/ios/app-store-data-collection
+Google Play definitions: https://support.google.com/googleplay/android-developer/answer/10787469?hl=en
+Firebase Android SDK disclosures: https://firebase.google.com/docs/android/play-data-disclosure
+Provider retention: https://firebase.google.com/support/privacy
+TTL behavior: https://firebase.google.com/docs/firestore/ttl
+Official bundletool: https://developer.android.com/tools/bundletool

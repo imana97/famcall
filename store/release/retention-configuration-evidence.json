@@ -1,0 +1,62 @@
+{
+  "checkedAt": "2026-11-07T02:22:53.501231+00:00",
+  "scope": "Read-only production configuration evidence; does not prove runtime cleanup completion or provider-internal retention.",
+  "firestoreTtl": [
+    {
+      "collectionGroup": "accountDeletions",
+      "field": "expiresAt",
+      "state": "ACTIVE"
+    },
+    {
+      "collectionGroup": "cancelledStarts",
+      "field": "expiresAt",
+      "state": "ACTIVE"
+    },
+    {
+      "collectionGroup": "devices",
+      "field": "expiresAt",
+      "state": "ACTIVE"
+    },
+    {
+      "collectionGroup": "limits",
+      "field": "expiresAt",
+      "state": "ACTIVE"
+    }
+  ],
+  "logBuckets": [
+    {
+      "name": "projects/famcall/locations/global/buckets/_Default",
+      "retentionDays": 30,
+      "state": "ACTIVE"
+    },
+    {
+      "name": "projects/famcall/locations/global/buckets/_Required",
+      "retentionDays": 400,
+      "state": "ACTIVE"
+    }
+  ],
+  "logSinks": [
+    {
+      "name": "_Required",
+      "destination": "logging.googleapis.com/projects/famcall/locations/global/buckets/_Required",
+      "filter": "LOG_ID(\"cloudaudit.googleapis.com/activity\") OR LOG_ID(\"externalaudit.googleapis.com/activity\") OR LOG_ID(\"cloudaudit.googleapis.com/system_event\") OR LOG_ID(\"externalaudit.googleapis.com/system_event\") OR LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") OR LOG_ID(\"externalaudit.googleapis.com/access_transparency\")"
+    },
+    {
+      "name": "_Default",
+      "destination": "logging.googleapis.com/projects/famcall/locations/global/buckets/_Default",
+      "filter": "NOT LOG_ID(\"cloudaudit.googleapis.com/activity\") AND NOT LOG_ID(\"externalaudit.googleapis.com/activity\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"externalaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") AND NOT LOG_ID(\"externalaudit.googleapis.com/access_transparency\")"
+    }
+  ],
+  "schedulers": [
+    {
+      "name": "firebase-schedule-pruneHistory-us-east1",
+      "schedule": "every 24 hours",
+      "state": "ENABLED"
+    },
+    {
+      "name": "firebase-schedule-expireCalls-us-east1",
+      "schedule": "every 1 minutes",
+      "state": "ENABLED"
+    }
+  ]
+}
