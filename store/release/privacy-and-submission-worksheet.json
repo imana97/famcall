@@ -107,7 +107,7 @@
     "Who receives it, where is it stored, how long is it kept, and what happens on deletion?"
   ],
   "must_resolve": {
-    "app_specific_privacy_policy_url": "https://famcall.web.app/privacy (live from source 336c6be; proposed privacy/deletion clarifications in PR #5 need protected website deployment after review)",
+    "app_specific_privacy_policy_url": "https://famcall.web.app/privacy (revised notice live from source 5ace4bb; protected website-only workflow 42339257054 succeeded and page bytes verified on 7 November 2026 at 04:39 UTC)",
     "terms_or_license_choice": "MIT source license; service terms draft at /terms",
     "in_app_deletion_path": "Settings → Delete account → recent phone verification → confirm",
     "external_account_deletion_url": "https://famcall.web.app/delete-account (live)",
@@ -148,6 +148,7 @@
     "android-build-3-privacy.json",
     "retention-configuration-evidence.json",
     "privacy-review-notes.txt",
-    "testing-delivery-2026-11-07.json"
+    "testing-delivery-2026-11-07.json",
+    "website-delivery-2026-11-07.json"
   ]
 }

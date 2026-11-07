@@ -39,7 +39,7 @@
     "support_url": "https://famcall.web.app",
     "privacy_policy_url": "https://famcall.web.app/privacy",
     "external_account_deletion_url": "https://famcall.web.app/delete-account",
-    "url_status": "Protected backend workflow 42322194542 deployed source 336c6be. Homepage, privacy, terms and deletion pages returned HTTP 200 and matched that source on 7 November 2026 UTC. Revised privacy and deletion notices in PR #5 are not deployed and require a protected website update after review. The homepage provides the support email link.",
+    "url_status": "Protected website-only workflow 42339257054 deployed source 5ace4bb, including the revised privacy and deletion notices. All four pages returned HTTP 200 and byte-matched that source on 7 November 2026 at 04:39 UTC; see website-delivery-2026-11-07.json. The homepage provides the support email link.",
     "apple_bundle_id": "com.silvergridtech.famcall",
     "android_application_id": "com.silvergridtech.famcall",
     "apple_sku": "famcall-ios",

@@ -13,6 +13,13 @@ CURRENT VERIFIED TESTING DELIVERY — 7 NOVEMBER 2026 04:27 UTC
   by store status. Preserve the older privacy reports as historical evidence;
   inspect the final candidate archives before completing store disclosures.
 
+VERIFIED WEBSITE DELIVERY — 7 NOVEMBER 2026 04:39 UTC
+- Protected website-only workflow 42339257054 succeeded at source 5ace4bb.
+  Homepage, privacy, terms and deletion URLs returned HTTP 200 and byte-matched
+  that source. The revised privacy/deletion notices are live. Exact URLs and
+  SHA-256 hashes are recorded in website-delivery-2026-11-07.json. This is
+  hosting evidence, not a public-store release or a production-calling test.
+
 EARLIER TESTING DELIVERY AND DEPLOYMENT EVIDENCE
 - PR #4 exact source b873d7a passed 70 JS/TS tests and 16 Python tests, typecheck,
   lint, backend build and dependency audit (zero vulnerabilities). The owner
@@ -36,10 +43,10 @@ EARLIER TESTING DELIVERY AND DEPLOYMENT EVIDENCE
   no France distribution for now. Reassess before France distribution or
   encryption changes. English TestFlight description,
   feedback address and test instructions were saved and read-back verified.
-- https://famcall.web.app and privacy/terms/delete-account return HTTP 200 with
-  bytes matching deployed source 336c6be from workflow 42322194542. The revised
-  privacy/deletion notices in PR #5 await a protected website deployment after
-  review; the live landing page was viewed.
+- Earlier workflow 42322194542 deployed website source 336c6be. At that check,
+  homepage/privacy/terms/delete-account returned HTTP 200 and matched those
+  source bytes; the live landing page was viewed. The later website-only
+  deployment above supersedes this page-content snapshot.
 
 PASS
 - 25 automated local tests: 7 shared-logic tests, 7 Firestore isolation tests,
