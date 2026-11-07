@@ -16,6 +16,9 @@ export const en = {
   countryCodeHint: "Include the country code. Both + and 00 work.",
   save: "Save person",
   chooseContacts: "Choose from contacts",
+  choosePhone: "Choose a number.",
+  errorContactNumber:
+    "This contact has no phone number. Choose another person or enter their number below.",
   contactPrivacy:
     "Only the person you choose is added. Your address book stays on your phone.",
   emptyPeople: "Keep your people close.",
@@ -47,8 +50,9 @@ export const en = {
   errorNumber: "Enter a valid phone number with its country code.",
   errorCountry: "Add the country code, starting with + or 00.",
   errorCode: "That code didn’t work. Check it and try again.",
-  errorQuota: "Verification is busy today. Please try again later.",
-  errorUnavailable: "This person is not available on FamCall right now.",
+  errorQuota: "Verification is busy. Please try again later.",
+  errorRateLimit: "Too many attempts. Please wait before trying again.",
+  errorUnavailable: "Couldn’t connect right now. Please try again shortly.",
   errorBusy: "Another call is in progress.",
   errorPermission:
     "Please allow microphone access in your phone’s settings to make a call.",

@@ -1,0 +1,26 @@
+# Precondition: signed in to the separate demo app, with a fictional contact
+# named CONTACT_NAME already in the emulator's native address book.
+appId: com.silvergridtech.famcall.e2e
+---
+- launchApp
+- extendedWaitUntil:
+    visible: Your people.
+    timeout: 30000
+- tapOn:
+    id: add-person
+- tapOn: Choose from contacts
+- extendedWaitUntil:
+    visible: ${CONTACT_NAME}
+    timeout: 15000
+- tapOn: ${CONTACT_NAME}
+- assertVisible:
+    id: contact-name
+    text: ${CONTACT_NAME}
+- assertVisible:
+    id: contact-number
+- tapOn:
+    id: save-contact
+- extendedWaitUntil:
+    visible: Your people.
+    timeout: 15000
+- assertVisible: Call ${CONTACT_NAME}
