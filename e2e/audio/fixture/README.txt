@@ -29,6 +29,10 @@ list before enabling emulator input and plays generated PCM into the input sink.
 The server uses a private Unix socket, never a network listener. No host hardware
 microphone is used by either method. FAMCALL_FIXTURE_INPUT selects grpc or pulse;
 the workflow currently evaluates pulse after the grpc control failed qualification.
+The pulse-pipe variant feeds a private FIFO into module-pipe-source. It exposes
+an ordinary virtual input source, with no hardware devices, and supplies generated
+PCM at real-time speed. Pulse input/output stream snapshots identify the emulator's
+route before and during playback. The workflow currently runs this diagnostic.
 Virtual host input is enabled and verified before Android opens AudioRecord.
 The pulse route explicitly sets QEMU_PA_SERVER/SOURCE/SINK and uses the emulator's
 -allow-host-audio flag, which otherwise zeroes host input even when the microphone

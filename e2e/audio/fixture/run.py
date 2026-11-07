@@ -8,6 +8,8 @@ import re
 import shutil
 import subprocess
 import sys
+import stat
+import threading
 import time
 import wave
 
@@ -32,6 +34,8 @@ PACKAGE = "com.silvergridtech.famcall.audiofixture"
 SERIAL = "emulator-5554"
 INPUT_METHOD = os.environ.get("FAMCALL_FIXTURE_INPUT", "grpc")
 ATTEMPTS = int(os.environ.get("FAMCALL_FIXTURE_ATTEMPTS", "3"))
+USE_PULSE = INPUT_METHOD in ("pulse", "pulse-pipe")
+PULSE_INPUT = "famcall_input" if INPUT_METHOD == "pulse-pipe" else "famcall_input.monitor"
 
 
 def command(*args, check=True, binary=False, timeout=30, **kwargs):
@@ -50,15 +54,37 @@ def sha(path):
 def verify_virtual_audio(env):
     sources = json.loads(command("pactl", "-f", "json", "list", "sources", env=env).stdout)
     modules = json.loads(command("pactl", "-f", "json", "list", "modules", env=env).stdout)
-    if {s["name"] for s in sources} != {"famcall_input.monitor", "famcall_output.monitor"}:
+    expected_sources = {PULSE_INPUT: "module-pipe-source.c" if INPUT_METHOD == "pulse-pipe" else "module-null-sink.c",
+                        "famcall_output.monitor": "module-null-sink.c"}
+    if {s["name"] for s in sources} != set(expected_sources):
         raise RuntimeError("Refusing audio input from an unexpected host source")
-    if any(s.get("driver") != "module-null-sink.c" for s in sources):
-        raise RuntimeError("Host sources must be generated virtual monitors only")
-    if sorted(m["name"] for m in modules) != ["module-native-protocol-unix", "module-null-sink", "module-null-sink"]:
+    if any(s.get("driver") != expected_sources[s["name"]] for s in sources):
+        raise RuntimeError("Host sources must be generated virtual devices only")
+    expected_modules = ["module-native-protocol-unix", "module-null-sink",
+                        "module-pipe-source" if INPUT_METHOD == "pulse-pipe" else "module-null-sink"]
+    if sorted(m["name"] for m in modules) != sorted(expected_modules):
         raise RuntimeError("Unexpected audio server modules")
-    if command("pactl", "get-default-source", env=env).stdout.strip() != "famcall_input.monitor":
+    if command("pactl", "get-default-source", env=env).stdout.strip() != PULSE_INPUT:
         raise RuntimeError("Generated source is not the default microphone")
-    return {"sources": [s["name"] for s in sources], "modules": [m["name"] for m in modules]}
+    if INPUT_METHOD == "pulse-pipe":
+        mode = (WORK / "runtime/input.pcm").stat().st_mode
+        if not stat.S_ISFIFO(mode) or mode & 0o077:
+            raise RuntimeError("Synthetic input must use a private FIFO")
+    return {"sources": [s["name"] for s in sources], "modules": [m["name"] for m in modules],
+            "sourceIds": {s["name"]: s["index"] for s in sources}}
+
+
+def pulse_routes(env):
+    result = {"at": int(time.time() * 1000)}
+    fields = ("index", "source", "sink", "client", "corked", "mute", "sample_specification",
+              "buffer_latency_usec", "source_latency_usec", "sink_latency_usec")
+    for kind in ("source-outputs", "sink-inputs"):
+        streams = json.loads(command("pactl", "-f", "json", "list", kind, env=env, timeout=5).stdout)
+        result[kind] = [{**{k: s[k] for k in fields if k in s},
+                         "application": {k: s.get("properties", {}).get(k) for k in
+                                         ("application.name", "application.process.id", "media.name")}}
+                        for s in streams]
+    return result
 
 
 def read_json(name):
@@ -104,11 +130,12 @@ def one_run(index, pcm, reference, env, build):
     log_path = WORK / (run_id + "-emulator.log")
     child = None
     channel = None
+    route_timer = None
     try:
         args = [EMULATOR, "-avd", "famcall_fixture", "-port", "5554", "-grpc", "8554",
                 "-grpc-use-token", "-no-window", "-no-snapshot", "-wipe-data",
                 "-gpu", "swiftshader", "-memory", "2048", "-cores", "2"]
-        if INPUT_METHOD == "pulse":
+        if USE_PULSE:
             record["virtualAudio"] = verify_virtual_audio(env)
             # The emulator otherwise zeroes host input even when its microphone
             # RPC reports enabled. Only our verified virtual monitors are exposed.
@@ -118,6 +145,7 @@ def one_run(index, pcm, reference, env, build):
             args.append("-no-audio")
         with log_path.open("w") as log:
             child = subprocess.Popen([str(x) for x in args], env=env, stdout=log, stderr=log)
+        record["emulatorPid"] = child.pid
         deadline = time.monotonic() + 180
         while time.monotonic() < deadline:
             if child.poll() is not None:
@@ -153,7 +181,7 @@ def one_run(index, pcm, reference, env, build):
         channel, stub, metadata, version = grpc_client(log_path)
         record["emulatorVersion"] = version
         record["protoDescriptorSha256"] = hashlib.sha256(pb.DESCRIPTOR.serialized_pb).hexdigest()
-        if INPUT_METHOD == "pulse":
+        if USE_PULSE:
             # Make the verified synthetic device available before Android opens
             # AudioRecord, rather than enabling its input after the recorder opens.
             record["virtualAudio"] = verify_virtual_audio(env)
@@ -179,7 +207,7 @@ def one_run(index, pcm, reference, env, build):
         if started.get("rate") != 8000 or started.get("source") != 7:
             raise RuntimeError("Unexpected Android recording format")
         record["stage"] = "inject"
-        if INPUT_METHOD == "pulse":
+        if USE_PULSE:
             record["virtualAudio"] = verify_virtual_audio(env)
         fmt = pb.AudioFormat(samplingRate=48000, channels=pb.AudioFormat.Mono,
                              format=pb.AudioFormat.AUD_FMT_S16, mode=pb.AudioFormat.MODE_UNSPECIFIED)
@@ -190,8 +218,24 @@ def one_run(index, pcm, reference, env, build):
                                      audio=pcm[offset:offset + 1920])
 
         record["injectionStartedAt"] = int(time.time() * 1000)
+        if USE_PULSE:
+            record["pulseRoutes"] = {"before": pulse_routes(env)}
+
+            def observe_route():
+                try:
+                    record["pulseRoutes"]["during"] = pulse_routes(env)
+                except Exception as error:
+                    record["pulseRoutes"]["error"] = type(error).__name__
+
+            route_timer = threading.Timer(5, observe_route)
+            route_timer.daemon = True
+            route_timer.start()
         # One injection only per fresh process; failed samples remain failures.
-        if INPUT_METHOD == "pulse":
+        if INPUT_METHOD == "pulse-pipe":
+            command("ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-y", "-re",
+                    "-i", WORK / "reference.wav", "-t", "30", "-ar", "48000", "-ac", "1",
+                    "-f", "s16le", WORK / "runtime/input.pcm", env=env, timeout=38)
+        elif INPUT_METHOD == "pulse":
             command("paplay", "--device=famcall_input", "--raw", "--format=s16le", "--rate=48000",
                     "--channels=1", "--latency-msec=20", input=pcm, binary=True, env=env, timeout=38)
         else:
@@ -244,6 +288,9 @@ def one_run(index, pcm, reference, env, build):
         except Exception:
             record["partialCaptureUnavailable"] = True
     finally:
+        if route_timer:
+            route_timer.cancel()
+            route_timer.join(timeout=15)
         if "deviceFingerprint" in record:
             try:
                 # This disposable Android image has no signed-in user or backend.
@@ -277,8 +324,8 @@ def main():
     if RESULTS.exists():
         raise RuntimeError("Refusing to overwrite existing experiment evidence")
     RESULTS.mkdir(parents=True)
-    if INPUT_METHOD not in ("grpc", "pulse"):
-        raise ValueError("Use grpc or pulse for fixture input")
+    if INPUT_METHOD not in ("grpc", "pulse", "pulse-pipe"):
+        raise ValueError("Use grpc, pulse or pulse-pipe for fixture input")
     if ATTEMPTS not in (1, 3):
         raise ValueError("Use one diagnostic attempt or three qualification attempts")
     if "emulator-" in command(ADB, "devices").stdout:
@@ -287,21 +334,28 @@ def main():
     for name in ("avd", "runtime"):
         (WORK / name).mkdir(mode=0o700)
     os.environ["XDG_RUNTIME_DIR"] = env["XDG_RUNTIME_DIR"]
-    if INPUT_METHOD == "pulse":
+    if USE_PULSE:
         # This private Unix socket is inside a mode-0700 directory on the
         # disposable runner. No network listener or physical audio module loads.
         socket = WORK / "runtime/pulse-native"
         pulse_config = WORK / "pulse.pa"
+        input_module = (
+            f"load-module module-pipe-source source_name=famcall_input file={WORK / 'runtime/input.pcm'} format=s16le rate=48000 channels=1\n"
+            if INPUT_METHOD == "pulse-pipe" else
+            "load-module module-null-sink sink_name=famcall_input rate=48000 channels=1\n"
+        )
         pulse_config.write_text(
             f"load-module module-native-protocol-unix socket={socket} auth-anonymous=1\n"
-            "load-module module-null-sink sink_name=famcall_input rate=48000 channels=1\n"
+            + input_module +
             "load-module module-null-sink sink_name=famcall_output rate=48000 channels=1\n"
-            "set-default-source famcall_input.monitor\nset-default-sink famcall_output\n")
-        env.update(PULSE_SERVER="unix:" + str(socket), PULSE_SOURCE="famcall_input.monitor",
+            f"set-default-source {PULSE_INPUT}\nset-default-sink famcall_output\n")
+        env.update(PULSE_SERVER="unix:" + str(socket), PULSE_SOURCE=PULSE_INPUT,
                    PULSE_SINK="famcall_output", QEMU_PA_SERVER="unix:" + str(socket),
-                   QEMU_PA_SOURCE="famcall_input.monitor", QEMU_PA_SINK="famcall_output")
+                   QEMU_PA_SOURCE=PULSE_INPUT, QEMU_PA_SINK="famcall_output")
         command("pulseaudio", "-n", "--daemonize=yes", "--exit-idle-time=-1",
                 "--file=" + str(pulse_config), "--log-target=file:" + str(WORK / "pulse.log"), env=env)
+        if INPUT_METHOD == "pulse-pipe":
+            (WORK / "runtime/input.pcm").chmod(0o600)
         verify_virtual_audio(env)
     command(SDK / "cmdline-tools/latest/bin/avdmanager", "create", "avd", "-n", "famcall_fixture",
             "-k", "system-images;android-36;google_apis;x86_64", "--device", "pixel_6",
@@ -332,7 +386,7 @@ def main():
     try:
         records = [one_run(index, pcm, reference, env, build) for index in range(1, ATTEMPTS + 1)]
     finally:
-        if INPUT_METHOD == "pulse":
+        if USE_PULSE:
             command("pulseaudio", "--kill", env=env, check=False)
     passed = all(r["passed"] for r in records)
     summary = {"passed": passed, "attempts": ATTEMPTS, "passes": sum(r["passed"] for r in records),
