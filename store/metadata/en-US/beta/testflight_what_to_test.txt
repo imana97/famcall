@@ -1,15 +1,13 @@
-Updated in this build: the Signal bridge icon in FamCall's familiar colors, microphone setup before calling, clearer forms and search, and improved keyboard and large-text navigation.
+FamCall 0.2.0
 
-Use two phones with this test build installed.
+This update brings a simpler interface, direct dialing, English and Persian, and incoming-call fixes.
 
-1. Verify your number and complete Calling setup. Try denying microphone access: contacts and history should remain available, and a call attempt should return to setup without a surprise permission prompt. Allow the microphone from setup and retry. Android call alerts and lock-screen access are optional for outgoing calls.
-2. Reopen FamCall and check that you remain signed in. Add someone from contacts or manually with a country code. Try a 00 prefix and declined contact access. Check search, missed calls, blocking and unblocking.
-3. Check the new icon, light and dark appearance, and larger system text. Make sure navigation labels, buttons and form fields remain usable. Try dismissing the phone-number and verification-code keyboards.
-4. Call in both directions. Answer, speak both ways, use mute, speakerphone and headphones, and hang up from either end.
-5. Repeat incoming calls with the receiving phone locked, with FamCall in the background, and after swiping it away. Record each state separately, including whether it rings, how you answer and whether both people can hear.
-6. Cancel before answer, decline, let a call time out and briefly disconnect the receiver. Check for stale ringing screens.
-7. Switch between Wi-Fi and mobile data during a call. Briefly interrupt and restore the connection. Note whether speech returns and how long it takes.
+Please check:
+• People: search, add, swipe to edit/remove, and update a saved phone number.
+• Dial pad: the centered button opens a bottom sheet. Enter a number with + or 00 and its country code to call another FamCall user.
+• Calls: receive and answer with the phone locked or FamCall in the background; check mute, speaker and hangup.
+• Settings: switch between English and Persian. Both use the same left-to-right layout and your choice stays saved.
+• Log out and sign back in without deleting your account.
+• Account deletion: verification and clear confirmation before permanent deletion.
 
-Android Settings Force stop blocks incoming delivery until you reopen FamCall; it is a separate case from a recent-apps swipe. iPhone VoIP ringing after swiping the app away still needs testing on devices with this build. Record sound, Focus, notification and battery settings; FamCall must respect the phone's settings.
-
-Include the build number, phone model, OS version, approximate time and timezone, connection type at each end, whether a VPN was used, and reproduction steps. Include a diagnostic reference if shown. Do not send verification codes, passwords, other people's phone numbers, contact lists or recordings of private conversations. Send feedback through TestFlight or info@silvergridtech.com.
+The other person also needs FamCall. Network and phone settings can affect delivery. FamCall does not support emergency calls.

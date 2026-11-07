@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { FieldValue, Timestamp, getFirestore } from "firebase-admin/firestore";
+import { FieldValue, Timestamp, getFirestore, type Transaction } from "firebase-admin/firestore";
 import {
   onCall,
   HttpsError,
@@ -61,6 +61,15 @@ async function identity(request: CallableRequest) {
     throw new HttpsError("permission-denied", "This account is being deleted.");
   return verified;
 }
+async function writeUserData(uid: string, write: (transaction: Transaction) => void) {
+  await db.runTransaction(async transaction => {
+    // Checking in the write transaction also closes the race with a deletion
+    // requested after this callable's initial identity check.
+    if ((await transaction.get(db.doc("accountDeletions/" + uid))).exists)
+      throw new HttpsError("permission-denied", "This account is being deleted.");
+    write(transaction);
+  });
+}
 function parse<T>(schema: z.ZodType<T>, value: unknown): T {
   const result = schema.safeParse(value);
   if (!result.success)
@@ -112,24 +121,35 @@ async function targetFor(number: string): Promise<string | null> {
 
 export const registerProfile = onCall(secure, async (request) => {
   const { uid, phone } = await identity(request);
-  await db
-    .doc("users/" + uid)
-    .set({ phone, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+  await writeUserData(uid, transaction => transaction.set(db.doc("users/" + uid),
+    { phone, updatedAt: FieldValue.serverTimestamp() }, { merge: true }));
   return { phone };
 });
 
 export const saveContact = onCall(secure, async (request) => {
   const { uid } = await identity(request);
   const data = parse(
-    z.object({ phone: z.string(), name: z.string().trim().min(1).max(80) }),
+    z.object({ phone: z.string(), name: z.string().trim().min(1).max(80), previousPhone: z.string().optional() }),
     request.data,
   );
   const normalized = phone(data.phone);
   await rateLimit(uid, "contacts", 100, 86_400_000);
   // Save only contacts the user explicitly selects; no address-book upload or public directory.
-  await db
-    .doc("users/" + uid + "/contacts/" + normalized)
-    .set({ phone: normalized, name: data.name });
+  const previous = data.previousPhone ? phone(data.previousPhone) : undefined;
+  const target = db.doc("users/" + uid + "/contacts/" + normalized);
+  const old = previous && previous !== normalized ? db.doc("users/" + uid + "/contacts/" + previous) : null;
+  await db.runTransaction(async transaction => {
+    const [deleting, destination, original] = await transaction.getAll(
+      db.doc("accountDeletions/" + uid), target, ...(old ? [old] : []));
+    if (deleting.exists)
+      throw new HttpsError("permission-denied", "This account is being deleted.");
+    if (previous && !(old ? original : destination)?.exists)
+      throw new HttpsError("not-found", "This person is no longer in your list.");
+    if (old && destination.exists)
+      throw new HttpsError("already-exists", "This phone number is already in your list.");
+    transaction.set(target, { phone: normalized, name: data.name });
+    if (old) transaction.delete(old);
+  });
   return { phone: normalized, name: data.name };
 });
 
@@ -143,12 +163,13 @@ export const setBlocked = onCall(secure, async (request) => {
   if (own === normalized)
     throw new HttpsError("invalid-argument", "Choose another number.");
   const ref = db.doc("users/" + uid + "/blocked/" + normalized);
-  if (data.blocked)
-    await ref.set({
+  await writeUserData(uid, transaction => {
+    if (data.blocked) transaction.set(ref, {
       phone: normalized,
       createdAt: FieldValue.serverTimestamp(),
     });
-  else await ref.delete();
+    else transaction.delete(ref);
+  });
   return { blocked: data.blocked };
 });
 
@@ -169,7 +190,10 @@ export const registerDevice = onCall(secure, async (request) => {
     throw new HttpsError("permission-denied", "Sign in again before registering this device.");
   const ref = db.doc("users/" + uid + "/devices/" + data.installationId);
   await db.runTransaction(async (t) => {
-    const previous = (await t.get(ref)).data();
+    const [device, deleting] = await t.getAll(ref, db.doc("accountDeletions/" + uid));
+    if (deleting.exists)
+      throw new HttpsError("permission-denied", "This account is being deleted.");
+    const previous = device.data();
     if (Number(previous?.sequence ?? 0) > data.sequence) return;
     if (previous?.sequence === data.sequence) {
       // An invalidated registration stays invalid even if its old upload arrives again.
@@ -181,6 +205,29 @@ export const registerDevice = onCall(secure, async (request) => {
     t.set(ref, {
       ...data,
       invalidated: false,
+      updatedAt: FieldValue.serverTimestamp(),
+      expiresAt: ttl(60),
+    });
+  });
+  return { ok: true };
+});
+
+export const unregisterDevice = onCall({ ...secure, invoker: "public" }, async request => {
+  const { uid } = await identity(request);
+  const data = parse(z.object({
+    installationId: z.string().uuid(),
+    sequence: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
+  }), request.data);
+  const ref = db.doc("users/" + uid + "/devices/" + data.installationId);
+  await db.runTransaction(async transaction => {
+    const [device, deleting] = await transaction.getAll(ref, db.doc("accountDeletions/" + uid));
+    if (deleting.exists) return;
+    if (Number(device.data()?.sequence ?? 0) > data.sequence)
+      throw new HttpsError("failed-precondition", "Device registration changed. Please try again.");
+    // Retain ordering so an upload already in flight cannot re-enable call alerts.
+    transaction.set(ref, {
+      sequence: data.sequence,
+      invalidated: true,
       updatedAt: FieldValue.serverTimestamp(),
       expiresAt: ttl(60),
     });
@@ -478,7 +525,7 @@ export const dispatchCall = onDocumentWritten(
   },
 );
 
-export const deleteAccount = onCall(secure, async (request) => {
+export const deleteAccount = onCall({ ...secure, timeoutSeconds: 120 }, async (request) => {
   const { uid } = verifiedPhoneIdentity(request);
   // The job is the durable boundary: rules deny this identity immediately and
   // the worker retries cleanup even if the app closes or the request disconnects.
@@ -498,15 +545,23 @@ export const deleteAccount = onCall(secure, async (request) => {
     // Concurrent requests retry this transaction and observe the same job.
     transaction.create(job, { status: "pending", requestedAt: FieldValue.serverTimestamp() });
   });
-  return { accepted: true };
+  try {
+    // Ordinary accounts finish in this request. Larger histories and transient
+    // failures retain the durable trigger as a fallback instead of claiming completion.
+    const complete = await cleanUpAccount(uid, 100, 20_000);
+    return { accepted: true, status: complete ? "complete" : "pending" };
+  } catch {
+    console.warn("Account cleanup deferred to the durable deletion worker.");
+    return { accepted: true, status: "pending" };
+  }
 });
 
-export const processAccountDeletion = onDocumentCreated({
-  document: "accountDeletions/{uid}", retry: true, timeoutSeconds: 300,
-}, async event => {
-  const uid = event.params.uid;
-  const job = event.data?.ref;
-  if (!job || (await job.get()).data()?.status === "complete") return;
+async function cleanUpAccount(uid: string, callLimit: number, budgetMs: number): Promise<boolean> {
+  const startedAt = Date.now();
+  const job = db.doc("accountDeletions/" + uid);
+  const snapshot = await job.get();
+  if (!snapshot.exists) throw new Error("Account cleanup requires a durable deletion job.");
+  if (snapshot.data()?.status === "complete") return true;
   try { await getAuth().updateUser(uid, { disabled: true }); }
   catch (error) { if ((error as {code?: string}).code !== "auth/user-not-found") throw error; }
   const active = await db.doc("activeCalls/" + uid).get();
@@ -514,14 +569,34 @@ export const processAccountDeletion = onDocumentCreated({
     try { await transition(active.data()!.callId, null, "fail"); }
     catch (error) { if ((error as {code?: string}).code !== "not-found") throw error; }
   }
-  const calls = await db.collection("calls").where("participants", "array-contains", uid).limit(100).get();
-  for (const call of calls.docs) await db.recursiveDelete(call.ref);
-  if (calls.size === 100) throw new Error("Account cleanup continues in the next retry");
-  await db.recursiveDelete(db.doc("users/" + uid));
-  await db.doc("activeCalls/" + uid).delete();
+  // Free the phone identity immediately. Any new phone verification gets a new
+  // UID, while this job and its transactional guards remain scoped to the old UID.
   try { await getAuth().deleteUser(uid); }
   catch (error) { if ((error as {code?: string}).code !== "auth/user-not-found") throw error; }
-  await job.update({ status: "complete", completedAt: FieldValue.serverTimestamp(), expiresAt: ttl(30) });
+  const calls = await db.collection("calls").where("participants", "array-contains", uid).limit(callLimit).get();
+  for (const call of calls.docs) {
+    if (Date.now() - startedAt >= budgetMs) return false;
+    await db.recursiveDelete(call.ref);
+  }
+  if (Date.now() - startedAt >= budgetMs ||
+      !(await db.collection("calls").where("participants", "array-contains", uid).limit(1).get()).empty)
+    return false;
+  await db.recursiveDelete(db.doc("users/" + uid));
+  await db.doc("activeCalls/" + uid).delete();
+  await db.runTransaction(async transaction => {
+    if ((await transaction.get(job)).data()?.status === "complete") return;
+    transaction.update(job, { status: "complete", completedAt: FieldValue.serverTimestamp(), expiresAt: ttl(30) });
+  });
+  return true;
+}
+
+export const processAccountDeletion = onDocumentCreated({
+  document: "accountDeletions/{uid}", retry: true, timeoutSeconds: 300,
+}, async event => {
+  // A delayed/redelivered creation event must not restart an expired job.
+  if (!event.data || !(await event.data.ref.get()).exists) return;
+  if (!await cleanUpAccount(event.params.uid, 100, 240_000))
+    throw new Error("Account cleanup continues in the next retry");
 });
 
 export const pruneHistory = onSchedule({ schedule: "every 24 hours", timeoutSeconds: 300 }, async () => {

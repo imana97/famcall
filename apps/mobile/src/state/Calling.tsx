@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { AppState } from "react-native";
 import { router } from "expo-router";
+import { signOut } from "@react-native-firebase/auth";
 import * as Calls from "expo-callkit-telecom";
 import { randomUUID } from "expo-crypto";
 import NetInfo from "@react-native-community/netinfo";
@@ -18,6 +19,7 @@ import { DeviceRegistration } from "../services/DeviceRegistration";
 import { prepareDeviceRegistration } from "../services/deviceRegistrationStorage";
 import { consumeNativeEvents } from "../services/nativeEvents";
 import { NativeCallCoordinator } from "../services/NativeCallCoordinator";
+import { presentIncomingCall } from "../services/incomingCallPresentation";
 import { OutgoingCallAttempt } from "../services/OutgoingCallAttempt";
 import { recordTestMetric, waitForTestCallStart } from "../services/e2eDiagnostics";
 import { VoicePeer, type VoiceState } from "../services/VoicePeer";
@@ -45,6 +47,7 @@ interface Calling extends CallView {
   start: (phone: string) => Promise<void>;
   answer: () => Promise<void>;
   end: () => Promise<void>;
+  logOut: () => Promise<void>;
   toggleMute: () => void;
   toggleSpeaker: () => void;
 }
@@ -62,6 +65,7 @@ const Context = createContext<Calling>({
   async start() {},
   async answer() {},
   async end() {},
+  async logOut() {},
   toggleMute() {},
   toggleSpeaker() {},
 });
@@ -83,11 +87,18 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
   const endedNativeIds = useRef(new Set<string>());
   const reporting = useRef<string | null>(null);
   const flushPending = useRef<() => void>(() => undefined);
+  const pauseRegistration = useRef<() => (() => void)>(() => () => undefined);
   const update = (patch: Partial<CallView>) => {
     current.current = { ...current.current, ...patch };
     setView(current.current);
   };
-  const fail = (e: unknown) => update({ error: errorMessage(e) });
+  const fail = (e: unknown) => {
+    if (__DEV__) console.info("[FamCall call error]", JSON.stringify({
+      code: (e as { code?: string } | null)?.code,
+      name: (e as { name?: string } | null)?.name,
+    }));
+    update({ error: errorMessage(e) });
+  };
   const applyMute = (muted: boolean) => {
     peer.current?.mute(muted);
     update({ muted });
@@ -98,7 +109,11 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         !permissionsReady.current || nativeId.current || reporting.current === call.id ||
         watchedId.current !== call.id || hasEndedLocally(call.id) || Date.now() >= call.ringExpiresAtMs) return;
     reporting.current = call.id;
-    void Calls.reportIncomingCall({
+    void presentIncomingCall(Calls.getActiveCallSession, () =>
+      watchedId.current === call.id && !nativeId.current &&
+      current.current.call?.id === call.id && current.current.call.status === "ringing" &&
+      !hasEndedLocally(call.id) && Date.now() < call.ringExpiresAtMs,
+    () => Calls.reportIncomingCall({
       eventId: call.id,
       serverCallId: call.id,
       hasVideo: false,
@@ -106,7 +121,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       supportsHolding: false,
       startedAt: new Date(call.createdAtMs).toISOString(),
       caller: { id: call.callerId, phoneNumber: call.callerPhone, displayName: call.callerPhone },
-    }).catch(error => { if (watchedId.current === call.id) fail(error); });
+    })).catch(error => { if (watchedId.current === call.id) fail(error); });
   }
 
   function watch(id: string, initialMuted?: boolean) {
@@ -245,7 +260,8 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
           if (nativeId.current === systemId) fail(error);
         });
         if (current.current.call?.status === "accepted") void connect(current.current.call);
-        router.replace({ pathname: "/call/[id]", params: { id: call.id } });
+        // The outgoing screen already owns this attempt. Its call data comes
+        // from context; replacing /call/new would remount and animate it again.
       },
       cancelled: () => { void end(); },
       error: error => {
@@ -322,7 +338,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
   useEffect(() => {
     if (!uid) return;
     let mounted = true;
-    const registration = new DeviceRegistration(uid, {
+    const createRegistration = () => new DeviceRegistration(uid, {
       current: () => mounted && auth.currentUser?.uid === uid && permissionsReady.current,
       registerNative: Calls.registerVoIPPush,
       readToken: Calls.getVoIPPushToken,
@@ -330,13 +346,25 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       send: (data) => api("registerDevice", data),
       error: failEvent,
     });
+    let registration = createRegistration();
+    let registrationPaused = false;
     const register = () => {
-      if (!isE2E && mounted && permissionsReady.current) {
+      if (!isE2E && mounted && !registrationPaused && permissionsReady.current) {
         registration.start();
         registration.refresh();
       }
     };
     refreshRegistration.current = register;
+    pauseRegistration.current = () => {
+      registrationPaused = true;
+      registration.dispose();
+      return () => {
+        if (!mounted || auth.currentUser?.uid !== uid) return;
+        registrationPaused = false;
+        registration = createRegistration();
+        register();
+      };
+    };
     register();
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     const flush = () => {
@@ -385,9 +413,11 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       },
       answer: (session, requestId) => {
         const id = session.incomingCallEvent!.serverCallId;
+        if (__DEV__) console.info("[FamCall answer] received", id);
         answerRequest.current = requestId;
         void assertMicrophonePermission()
           .then(() => {
+            if (__DEV__) console.info("[FamCall answer] microphone allowed", id);
             if (!mounted || nativeId.current !== session.id || hasEndedLocally(id)) return;
             return api("updateCall", { callId: id, action: "accept" });
           })
@@ -395,6 +425,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
             if (mounted && nativeId.current === session.id && watchedId.current === id && !hasEndedLocally(id))
               router.replace({ pathname: "/call/[id]", params: { id } });
           }).catch(error => {
+            if (__DEV__) console.info("[FamCall answer] failed", id, (error as {code?: string})?.code, (error as {name?: string})?.name);
             if (!mounted || nativeId.current !== session.id || watchedId.current !== id) return;
             failEvent(error);
             answerRequest.current = null;
@@ -433,6 +464,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     return () => {
       mounted = false;
       registration.dispose();
+      pauseRegistration.current = () => () => undefined;
       refreshRegistration.current = () => undefined;
       flushPending.current = () => undefined;
       if (retryTimer) clearTimeout(retryTimer);
@@ -459,6 +491,21 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         start,
         answer,
         end,
+        logOut: async () => {
+          if (!uid || auth.currentUser?.uid !== uid) return;
+          if (outgoing.current?.active || (current.current.call && !isTerminal(current.current.call.status)))
+            throw new Error("A call is still in progress.");
+          const resume = pauseRegistration.current();
+          try {
+            const registration = await prepareDeviceRegistration();
+            await api("unregisterDevice", registration);
+            if (auth.currentUser?.uid !== uid) throw new Error("Account changed.");
+            await signOut(auth);
+          } catch (error) {
+            resume();
+            throw error;
+          }
+        },
         toggleMute: () => {
           const muted = !current.current.muted;
           peer.current?.mute(muted);

@@ -7,6 +7,12 @@ export type NativeEvent =
 let handler: ((event: NativeEvent) => void) | undefined;
 const waiting: NativeEvent[] = [];
 const send = (event: NativeEvent) => {
+  if (__DEV__) console.info("[FamCall native]", JSON.stringify({
+    kind: event.kind,
+    id: event.kind === "session" ? event.event.session.id : event.event.id,
+    status: event.kind === "session" || event.kind === "end" ? event.event.session.status : undefined,
+    serverCallId: event.kind === "session" || event.kind === "end" ? event.event.session.incomingCallEvent?.serverCallId : undefined,
+  }));
   if (handler) handler(event);
   else waiting.push(event);
 };

@@ -15,7 +15,7 @@ const config: ExpoConfig = {
   name: e2e ? "FamCall Test" : "FamCall",
   slug: "famcall",
   owner: "silvergrid",
-  version: "0.1.0",
+  version: "0.2.0",
   scheme: e2e ? "famcall-test" : "famcall",
   orientation: "portrait",
   userInterfaceStyle: "automatic",
@@ -82,7 +82,7 @@ const config: ExpoConfig = {
         resizeMode: "contain",
       },
     ],
-    ["expo-localization", { supportedLocales: ["en"], supportsRTL: false }],
+    ["expo-localization", { supportedLocales: ["en", "fa"], supportsRTL: false }],
     [
       "expo-contacts",
       {
