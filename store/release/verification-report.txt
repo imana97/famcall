@@ -971,3 +971,33 @@ service ends the call almost immediately (disconnect reason 55 / generic error).
 Its logs also show failure to open the incoming-call system interface. This
 reproduces without an active iOS Maestro flow. It is not counted as an incoming
 call pass; validate the actual signed app on an iPhone before release.
+
+STANDALONE IOS CONTROL — 7 NOVEMBER 2026 UTC
+The independent native probe in e2e/ios-callkit-probe contains no FamCall,
+Firebase or WebRTC code and performs no microphone/network work. The same probe
+binary was tested once on each of two fresh, dedicated iPhone 16 Pro simulators.
+Both accepted reportNewIncomingCall, then ended the call before probe cleanup:
+44 ms after report completion on iOS 26.5 and 216 ms on iOS 18.6. Both system
+logs failed to open facetime://?launchForIncomingCall=1; only the 26.5 log showed
+reason 55. No user answered or ended the calls. Cleanup succeeded on both.
+
+Three setup attempts are retained separately: a missing simulated identity
+caused service rejection, and a restricted ad-hoc signing entitlement prevented
+launch in two attempts. The corrected packaging matches Xcode's simulator
+entitlement sections. The committed build script reproduced the exact binary
+used for both valid observations. Source/binary/event/log hashes and manifests
+are retained in .local/callkit-probe/audit.json. This isolates a simulator failure
+from the app but does not prove physical iPhone calling or rule out other bugs.
+
+STORE PACK AUDIT — 7 NOVEMBER 2026 UTC
+The store pack and generator now record the deployed website/policy/deletion
+URLs, delivered internal builds and the owner-approved testing encryption
+declaration. Public legal/reliability gates remain open. All exported text fields
+match the structured source and pass the existing character/brand checks.
+The Google Play icon was incorrectly exported as 24-bit RGB. Its renderer now
+exports the required 32-bit RGBA PNG: 512 x 512, 5,944 bytes. ImageMagick comparison
+reports zero changed pixels, so the approved design is preserved. Apple icon,
+feature graphic and draft screenshots retain their required dimensions and
+opaque RGB exports. The screenshots remain development captures, not evidence
+of the final signed candidate. Source requirement checked:
+https://support.google.com/googleplay/android-developer/answer/9866151?hl=en
