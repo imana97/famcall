@@ -178,13 +178,47 @@
     "effective_limit_verified": 50
   },
   "pending": [
-    "Measured weak-network behavior",
+    "Measured weak-network and interruption/recovery results for the final candidate; the positive user report does not replace this matrix",
     "Real screenshots matching the candidate build",
-    "Verified hosting URLs and final app privacy policy",
-    "Actual store data, content, age and encryption declarations",
-    "Private reviewer credentials and complete contact details",
-    "Store account enrollment and submission access",
-    "Production release candidate validation (UI approved; native simulator builds pass)",
-    "Physical-device deletion and external support-process verification"
-  ]
+    "Final-candidate privacy inventory, disclosures and consistency with the live policy",
+    "Actual store data, content, age and public-release encryption declarations",
+    "Private reviewer credentials, reachable second endpoint and complete contact details",
+    "Recheck current store agreements and permissions before public submission; testing submission access is already demonstrated",
+    "Production release candidate validation, including the new icon and calling-setup changes",
+    "Physical-device background/push/audio-route qualification, deletion and external support-process verification"
+  ],
+  "preparation_status_updated_on": "2026-11-07",
+  "verified_preparation": {
+    "hosting": {
+      "status": "live",
+      "record": "website-delivery-2026-11-07.json",
+      "urls": [
+        "https://famcall.web.app/",
+        "https://famcall.web.app/privacy",
+        "https://famcall.web.app/terms",
+        "https://famcall.web.app/delete-account"
+      ],
+      "limit": "Hosting availability does not establish final-candidate privacy disclosures or completion of the support/deletion process."
+    },
+    "testing_submission_access": {
+      "status": "demonstrated by completed protected submissions",
+      "record": "testing-delivery-2026-11-07.json",
+      "source_commit": "fecda4296f7c1e64576b172d8d170e0883ad958b",
+      "ios": "TestFlight 0.1.0 (3), owner group, VALID/IN_BETA_TESTING",
+      "android": "Google Play internal 0.1.0 (4), completed",
+      "limit": "Earlier test builds; no new icon/setup build or public-store approval is established."
+    },
+    "current_icon": {
+      "concept": "Signal bridge",
+      "source_commit": "96c0a65",
+      "master": "brand/famcall-glyph.svg",
+      "status": "Prepared and locally validated; not yet delivered in a new testing build or deployed website",
+      "evidence": "pre-submission-progress-2026-11-07.json"
+    },
+    "user_device_report": {
+      "status": "Positive user-reported call on real iPhone and Android under a reportedly poor connection",
+      "record": "user-reported-device-test-2026-11-07.json",
+      "limit": "Exact builds, phone models, operating systems and measured network conditions were not supplied; not an automated or complete background/push qualification."
+    }
+  }
 }
