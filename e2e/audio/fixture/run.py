@@ -147,20 +147,25 @@ def one_run(index, pcm, reference, env, build):
     route_timer = None
     try:
         args = [EMULATOR, "-avd", "famcall_fixture", "-port", "5554", "-grpc", "8554",
-                "-grpc-use-token", "-no-window", "-no-snapshot", "-wipe-data",
+                "-grpc-use-token", "-no-snapshot", "-wipe-data",
                 "-gpu", "swiftshader", "-memory", "2048", "-cores", "2"]
         if USE_PULSE:
+            if not re.fullmatch(r":\d+(?:\.\d+)?", env.get("DISPLAY", "")):
+                raise RuntimeError("Pulse fixture requires a local private Xvfb display")
             record["virtualAudio"] = verify_virtual_audio(env)
             # The emulator otherwise zeroes host input even when its microphone
             # RPC reports enabled. Only our verified virtual sources are exposed.
             args.extend(["-audio", "pa", "-allow-host-audio"])
             record["hostAudioGateEnabledForVirtualSource"] = True
         else:
-            args.append("-no-audio")
+            args.extend(["-no-audio", "-no-window"])
         with log_path.open("w") as log:
             child = subprocess.Popen([str(x) for x in args], env=env, stdout=log, stderr=log)
         record["emulatorPid"] = child.pid
         first_boot_id = wait_for_boot(child)
+        record["emulatorExecutable"] = Path(f"/proc/{child.pid}/exe").resolve(strict=True).name
+        if USE_PULSE and record["emulatorExecutable"] != "qemu-system-x86_64":
+            raise RuntimeError("Pulse requires the normal emulator executable, not headless audio stubs")
         if adb("emu", "avd", "name").stdout.splitlines()[0] != "famcall_fixture":
             raise RuntimeError("Unexpected AVD; refusing to use this device")
         if adb("shell", "getprop", "ro.kernel.qemu").stdout.strip() != "1":
@@ -175,7 +180,6 @@ def one_run(index, pcm, reference, env, build):
         record["installedApkSha256"] = adb("shell", "sha256sum", installed).stdout.split()[0]
         if record["installedApkSha256"] != build["apkSha256"]:
             raise RuntimeError("Installed fixture differs from build")
-        adb("shell", "pm", "grant", PACKAGE, "android.permission.RECORD_AUDIO")
         # These package-manager queues do not fence AudioService's separate
         # audioserver_lifecycle executor; retain their results as setup evidence.
         record["packageHandlers"] = [
@@ -205,11 +209,16 @@ def one_run(index, pcm, reference, env, build):
             raise RuntimeError("Fixture identity changed during reboot")
         if adb("shell", "getprop", "ro.build.fingerprint").stdout.strip() != record["deviceFingerprint"]:
             raise RuntimeError("Android image changed during reboot")
+        # Grant on the measuring boot. The earlier pre-reboot grant did not
+        # produce a positive permission readback after restart.
+        adb("shell", "pm", "grant", PACKAGE, "android.permission.RECORD_AUDIO")
         package_state = adb("shell", "dumpsys", "package", PACKAGE).stdout
+        record["reboot"]["permissionLines"] = [line.strip() for line in package_state.splitlines()
+                                                if line.strip().startswith("android.permission.RECORD_AUDIO")]
         record["reboot"]["microphonePermissionGranted"] = bool(re.search(
             r"android\.permission\.RECORD_AUDIO: granted=true(?:,|\s|$)", package_state))
         if not record["reboot"]["microphonePermissionGranted"]:
-            raise RuntimeError("Microphone permission did not survive reboot")
+            raise RuntimeError("Microphone permission not verified after grant")
         if adb("shell", "getprop", "init.svc.audioserver").stdout.strip() != "running":
             raise RuntimeError("Android audio service unavailable after reboot")
         adb("shell", "input", "keyevent", "82")
@@ -226,6 +235,7 @@ def one_run(index, pcm, reference, env, build):
             if not stub.getMicrophoneState(Empty(), metadata=metadata, timeout=5).realAudioEnabled:
                 raise RuntimeError("Emulator refused synthetic host input")
             record["syntheticHostInputReadyAt"] = int(time.time() * 1000)
+            record["pulseRoutesBeforeRecorder"] = pulse_routes(env)
         record["activityLaunchStartedAt"] = int(time.time() * 1000)
         record["activityLaunch"] = adb("shell", "am", "start", "-W", "-n", PACKAGE + "/.MainActivity", "--es", "runId", run_id).stdout
         record["stage"] = "wait-for-recorder"

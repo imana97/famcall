@@ -23,7 +23,8 @@ The Android app also refuses hardware other than ranchu/goldfish emulators.
 After installation, each emulator reboots once before any measurement. This makes
 the fixture part of AudioService's initial native UID/package population instead
 of relying on its asynchronous package-added update, which package-manager queue
-waits do not fence. The controller verifies a new boot ID and unchanged APK/UID.
+waits do not fence. The controller verifies a new boot ID and unchanged APK/UID,
+then grants and verifies microphone permission on the measuring boot.
 No failed recording is retried. The previous unknown-UID failures remain failures.
 
 The grpc method starts emulators with -no-audio and temporarily injects generated
@@ -39,6 +40,11 @@ an ordinary virtual input source, with no hardware devices, and supplies generat
 PCM at real-time speed. Pulse input/output stream snapshots identify the emulator's
 route before and during playback. The workflow currently runs this diagnostic.
 Virtual host input is enabled and verified before Android opens AudioRecord.
+Pulse controls use the normal emulator on a private Xvfb display and verify the
+running executable. The no-window launcher selects a headless executable whose
+Linux PulseAudio implementation is stubbed; enabling the microphone gate cannot
+restore that backend. The grpc comparison retains its original headless mode.
+The display accepts no TCP connections and is cleaned up by xvfb-run afterward.
 The pulse route explicitly sets QEMU_PA_SERVER/SOURCE/SINK and uses the emulator's
 -allow-host-audio flag, which otherwise zeroes host input even when the microphone
 state RPC is enabled. This flag is only used inside the isolated Linux runner
