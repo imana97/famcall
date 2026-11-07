@@ -60,7 +60,7 @@ const config: ExpoConfig = {
     },
   },
   plugins: [
-    // Info.plist mods run in reverse order; remove the camera entry after SDK plugins.
+    // Info.plist mods run in reverse order; apply voice-only wording after SDK plugins.
     "./plugins/withAudioOnly",
     "./plugins/withTestBackend",
     "expo-router",

@@ -92,7 +92,9 @@ PREPARED / OWNER OR STORE ACTION NEEDED
 - Workflows are now available on main. Backend workflow supports website-only
   deployment separately. First-deployment prerequisites now include the immutable
   GitHub subject, scoped App Engine service-account use, and Firebase Extensions
-  configuration-read access. Noninteractive deployment explicitly accepts the
+  configuration-read access. Event delivery roles are preconfigured by the
+  maintainer so the deployment identity does not need project IAM administration.
+  Noninteractive deployment explicitly accepts the
   reviewed event-handler retry policies. Successful deployment is still pending.
 - First owner-approved testing workflow started Android build 2, then failed
   during iOS preparation because the GitHub runner lacked the native Firebase
@@ -108,7 +110,11 @@ PREPARED / OWNER OR STORE ACTION NEEDED
   an explicit tested build using fastlane, after the candidate record contains
   passing evidence and the owner approves. Apple submission requests automatic
   publication after Apple review; Android promotes internal to production.
-  These workflows have not been exercised against live store builds.
+  The first iOS store build and upload completed, but Apple processing rejected
+  build 1 with ITMS-90683 because bundled WebRTC camera APIs require a camera
+  purpose string. The native configuration now retains truthful voice-only
+  wording; camera capture and video calling remain disabled. A new iOS binary
+  must pass Apple processing before testing availability can be claimed.
 - Direct Android APK distribution has a build profile but no public download
   yet. Play Integrity recognition and signing compatibility must be validated.
 
