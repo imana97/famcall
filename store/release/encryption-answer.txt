@@ -1,0 +1,28 @@
+FAMCALL — EXISTING ENCRYPTION EXPORT ANSWER
+
+The owner approved the existing encryption declaration for TestFlight, with no
+France distribution for now. App Store Connect readbacks for version 0.1.0 builds
+2 and 3 confirm usesNonExemptEncryption=false. Build 3 reused the already approved
+answer; this configuration change carries that same answer into future binaries.
+It is not a new encryption classification or a change to country availability.
+
+Expo SDK 58 maps ios.config.usesNonExemptEncryption to the boolean
+ITSAppUsesNonExemptEncryption in the generated iOS Info.plist. Keeping the approved
+false value in app.config.ts avoids having to supply the same missing answer
+manually after each upload. The flag does not disable or alter encrypted voice
+transport, Firebase connections, or any other runtime encryption.
+
+Reassess this declaration if the app's encryption implementation or dependencies
+change. Revisit the existing France restriction before enabling distribution
+there. Any changed declaration requires an appropriate reviewed answer; do not
+infer it from this stored value. Public-store release gates remain separate.
+
+For a future protected build, inspect the packaged IPA's Info.plist and confirm
+the key is present as a boolean false, then verify App Store Connect processing.
+Local Expo prebuild validation proves generated configuration, not acceptance of
+a future archive. Do not edit generated native files to supply this answer.
+
+Configuration reference:
+https://docs.expo.dev/versions/v58.0.0/config/app/#usesnonexemptencryption
+Apple key reference:
+https://developer.apple.com/documentation/bundleresources/information-property-list/itsappusesnonexemptencryption

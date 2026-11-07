@@ -23,6 +23,8 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: "com.silvergridtech.famcall" + (e2e ? ".e2e" : ""),
     supportsTablet: false,
+    // Carry forward the approved export answer; reassess if encryption changes.
+    config: { usesNonExemptEncryption: false },
     ...(e2e
       ? {}
       : {
