@@ -26,6 +26,8 @@ sys.path.insert(0, str(WORK / "proto"))
 from fixture_analysis import analyze
 from fixture_observation import (OBSERVER_CHANNELS, OBSERVER_RATE,
                                  analyze_observer_pcm, observer_route)
+from fixture_guest_diagnostics import guest_audio_snapshot, guest_audio_logs
+from pulse_observer import prepare_observer, observer_provenance
 import emulator_controller_pb2 as pb
 import emulator_controller_pb2_grpc as rpc
 
@@ -47,6 +49,14 @@ def command(*args, check=True, binary=False, timeout=30, **kwargs):
 
 def adb(*args, **kwargs):
     return command(ADB, "-s", SERIAL, *args, **kwargs)
+
+
+def observe_guest_audio():
+    try:
+        return guest_audio_snapshot(adb)
+    except Exception as error:
+        return {"known": False, "error": type(error).__name__,
+                "scope": "Guest observation unavailable; not a waveform result"}
 
 
 def sha(path):
@@ -281,7 +291,9 @@ def one_run(index, pcm, reference, env, build):
     child = None
     channel = None
     route_timer = None
+    guest_timer = None
     observer = None
+    qemu_observer = None
     try:
         args = [EMULATOR, "-avd", "famcall_fixture", "-port", "5554", "-grpc", "8554",
                 "-grpc-use-token", "-no-snapshot", "-wipe-data",
@@ -296,8 +308,17 @@ def one_run(index, pcm, reference, env, build):
             record["hostAudioGateEnabledForVirtualSource"] = True
         else:
             args.extend(["-no-audio", "-no-window"])
+        emulator_env = env
+        if USE_PULSE:
+            try:
+                qemu_observer = prepare_observer(
+                    folder, WORK / "build/libfamcall_pulse_observer.so",
+                    record["virtualAudio"]["sourceIds"][PULSE_INPUT])
+                emulator_env = qemu_observer.emulator_env(env)
+            except Exception as error:
+                record["qemuPulseObservation"] = {"known": False, "error": type(error).__name__}
         with log_path.open("w") as log:
-            child = subprocess.Popen([str(x) for x in args], env=env, stdout=log, stderr=log)
+            child = subprocess.Popen([str(x) for x in args], env=emulator_env, stdout=log, stderr=log)
         record["emulatorPid"] = child.pid
         first_boot_id = wait_for_boot(child)
         record["emulatorExecutable"] = Path(f"/proc/{child.pid}/exe").resolve(strict=True).name
@@ -360,6 +381,7 @@ def one_run(index, pcm, reference, env, build):
             raise RuntimeError("Android audio service unavailable after reboot")
         adb("shell", "input", "keyevent", "82")
         record["reboot"]["finishedAt"] = int(time.time() * 1000)
+        record["guestAudio"] = {"before": observe_guest_audio()}
         record["stage"] = "prepare-audio-input"
         channel, stub, metadata, version = grpc_client(log_path)
         record["emulatorVersion"] = version
@@ -411,6 +433,14 @@ def one_run(index, pcm, reference, env, build):
                                      audio=pcm[offset:offset + 1920])
 
         record["injectionStartedAt"] = int(time.time() * 1000)
+        # Guest metadata uses its own bounded observer so it cannot extend the
+        # existing gate/Pulse observation deadline or block the PCM reader.
+        def observe_guest():
+            record["guestAudio"]["during"] = observe_guest_audio()
+
+        guest_timer = threading.Timer(5, observe_guest)
+        guest_timer.daemon = True
+        guest_timer.start()
         if USE_PULSE:
             record["pulseRoutes"] = {"before": pulse_routes(env)}
 
@@ -498,6 +528,10 @@ def one_run(index, pcm, reference, env, build):
         if route_timer:
             route_timer.cancel()
             route_timer.join(timeout=22)
+        if guest_timer:
+            guest_timer.cancel()
+            guest_timer.join(timeout=6)
+            record["guestObservationThreadStopped"] = not guest_timer.is_alive()
         if observer:
             record["pulseObserver"] = observer.finish(reference)
         if "deviceFingerprint" in record:
@@ -524,6 +558,12 @@ def one_run(index, pcm, reference, env, build):
                 record["audioDiagnosticsSha256"] = sha(diagnostics)
             except Exception:
                 record["audioDiagnosticsUnavailable"] = True
+            try:
+                record["guestAudioLogs"] = guest_audio_logs(
+                    adb, record.get("activityLaunchStartedAt", record["startedAt"]),
+                    int(time.time() * 1000))
+            except Exception as error:
+                record["guestAudioLogs"] = {"known": False, "error": type(error).__name__}
         if USE_PULSE:
             unknown = []
             if not record.get("pulseObserver", {}).get("complete"):
@@ -551,6 +591,13 @@ def one_run(index, pcm, reference, env, build):
             except subprocess.TimeoutExpired:
                 child.kill()
                 child.wait(timeout=10)
+        if qemu_observer:
+            try:
+                record["qemuPulseObservation"] = qemu_observer.finish(
+                    child.pid if child else None,
+                    record.get("injectionStartedAt"), record.get("injectionFinishedAt"))
+            except Exception as error:
+                record["qemuPulseObservation"] = {"known": False, "error": type(error).__name__}
         record["finishedAt"] = int(time.time() * 1000)
         (folder / "report.json").write_text(json.dumps(record, indent=2) + "\n")
     print(json.dumps(record), flush=True)
@@ -618,10 +665,14 @@ def main():
     provenance = {"commit": os.environ.get("GITHUB_SHA"), "sourceSha256": sha(Path(__file__)),
                   "analysisSha256": sha(ROOT / "e2e/audio/fixture_analysis.py"),
                   "observationSha256": sha(ROOT / "e2e/audio/fixture_observation.py"),
+                  "guestDiagnosticsSha256": sha(ROOT / "e2e/audio/fixture_guest_diagnostics.py"),
+                  "qemuObserverSha256": sha(ROOT / "e2e/audio/fixture/pulse_observer.py"),
                   "referenceSha256": sha(source_path), "grpcVersion": grpc.__version__,
                   "host": platform.platform(), "attemptCount": ATTEMPTS,
                   "inputMethod": INPUT_METHOD,
                   "scope": "Fixture qualification only; not FamCall, network impairment, or physical audio"}
+    if USE_PULSE:
+        provenance["qemuPulseObserver"] = observer_provenance(WORK / "build/libfamcall_pulse_observer.so")
     (RESULTS / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
     try:
         records = [one_run(index, pcm, reference, env, build) for index in range(1, ATTEMPTS + 1)]

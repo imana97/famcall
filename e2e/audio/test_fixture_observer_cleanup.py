@@ -2,6 +2,7 @@
 import importlib.util
 import os
 from pathlib import Path
+import sys
 import tempfile
 import types
 import unittest
@@ -30,7 +31,9 @@ def load_controller():
     source = Path(__file__).parent / "fixture/run.py"
     spec = importlib.util.spec_from_file_location("fixture_controller_test", source)
     module = importlib.util.module_from_spec(spec)
-    with patch.dict(os.environ, {"ANDROID_HOME": "/unused-test-sdk"}), patch.dict("sys.modules", stubs):
+    with patch.dict(os.environ, {"ANDROID_HOME": "/unused-test-sdk"}), \
+            patch.dict("sys.modules", stubs), \
+            patch("sys.path", [str(source.parent), *sys.path]):
         spec.loader.exec_module(module)
     return module
 

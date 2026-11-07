@@ -59,6 +59,18 @@ whether source/gate/native configuration observations were available;
 pipelineObservation.qualified additionally requires matching generated host PCM.
 These fields never determine the Android passed/content result or the original
 repeatability result: a passing host observation cannot promote an Android failure.
+Guest boundary observations are also independent of the waveform result:
+- Read-only guest snapshots identify registered audio services and ALSA capture
+  state/formats before and during injection. Service presence alone does not
+  establish the active route; readable owner PIDs provide a separate join.
+  A separate bounded observer reads these fields, without root access or changes
+  to Android services, logging levels, permissions, or audio configuration.
+- Allowlisted ranchu HAL messages retain only numeric late-frame/zero-fill and
+  PCM error evidence within the measurement interval. Missing or filtered logs
+  cannot establish that the HAL did not insert silence.
+These diagnostics locate missing speech; they do not repair the audio path or
+qualify FamCall calls. The original source, sample rate and content gates stay
+unchanged, and every failed experiment remains part of the evidence.
 Virtual host input is enabled and verified before Android opens AudioRecord.
 Pulse controls use the normal emulator on a private Xvfb display and verify the
 running executable. The no-window launcher selects a headless executable whose
