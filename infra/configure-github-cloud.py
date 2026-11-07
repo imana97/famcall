@@ -25,15 +25,17 @@ def ensure(kind, name, create):
     print('Configured ' + name, flush=True)
 
 
+cloud('services', 'enable', 'firebaseextensions.googleapis.com')
 ensure(['iam', 'service-accounts'], DEPLOY, ['iam', 'service-accounts', 'create', 'famcall-deploy', '--display-name=FamCall reviewed workflow deployment'])
 ensure(['iam', 'service-accounts'], RUNTIME, ['iam', 'service-accounts', 'create', 'famcall-runtime', '--display-name=FamCall backend runtime'])
 pools = json.loads(cloud('iam', 'workload-identity-pools', 'list', '--location=global', '--format=json'))
 if not any(p['name'].endswith('/famcall-github') for p in pools):
     cloud('iam', 'workload-identity-pools', 'create', 'famcall-github', '--location=global', '--display-name=FamCall GitHub Actions')
 providers = json.loads(cloud('iam', 'workload-identity-pools', 'providers', 'list', '--workload-identity-pool=famcall-github', '--location=global', '--format=json'))
+# New repositories use GitHub's immutable subject format with owner/repository IDs.
 condition = (f"assertion.repository_id == '{REPOSITORY_ID}' && assertion.repository_owner_id == '{OWNER_ID}' && "
              f"assertion.actor_id == '{OWNER_ID}' && assertion.ref == 'refs/heads/main' && "
-             "assertion.sub == 'repo:silvergrid/famcall:environment:backend' && "
+             f"assertion.sub == 'repo:silvergrid@{OWNER_ID}/famcall@{REPOSITORY_ID}:environment:backend' && "
              "assertion.workflow_ref == 'silvergrid/famcall/.github/workflows/backend.yml@refs/heads/main'")
 operation = 'update-oidc' if any(p['name'].endswith('/github') for p in providers) else 'create-oidc'
 cloud('iam', 'workload-identity-pools', 'providers', operation, 'github', '--location=global', '--workload-identity-pool=famcall-github',
@@ -42,11 +44,16 @@ cloud('iam', 'service-accounts', 'add-iam-policy-binding', DEPLOY,
       '--role=roles/iam.workloadIdentityUser', '--member=' + f'principalSet://iam.googleapis.com/projects/{NUMBER}/locations/global/workloadIdentityPools/famcall-github/attribute.repository_id/{REPOSITORY_ID}')
 for role in ['cloudfunctions.admin', 'firebasehosting.admin', 'firebaserules.admin', 'datastore.indexAdmin',
              'serviceusage.serviceUsageConsumer', 'cloudscheduler.admin', 'run.admin', 'eventarc.admin',
-             'artifactregistry.admin', 'storage.admin', 'secretmanager.viewer']:
+             'artifactregistry.admin', 'storage.admin', 'secretmanager.viewer',
+             # This role supplies configs.list; its current permissions are read-only.
+             'firebaseextensions.editor']:
     cloud('projects', 'add-iam-policy-binding', PROJECT, '--member=serviceAccount:' + DEPLOY, '--role=roles/' + role, '--condition=None')
 for role in ['datastore.user', 'firebaseauth.admin', 'firebasecloudmessaging.admin', 'logging.logWriter', 'eventarc.eventReceiver']:
     cloud('projects', 'add-iam-policy-binding', PROJECT, '--member=serviceAccount:' + RUNTIME, '--role=roles/' + role, '--condition=None')
 cloud('iam', 'service-accounts', 'add-iam-policy-binding', RUNTIME, '--member=serviceAccount:' + DEPLOY, '--role=roles/iam.serviceAccountUser')
+# Firebase CLI checks the App Engine account before reading the v2 runtime config.
+cloud('iam', 'service-accounts', 'add-iam-policy-binding', PROJECT + '@appspot.gserviceaccount.com',
+      '--member=serviceAccount:' + DEPLOY, '--role=roles/iam.serviceAccountUser')
 build = NUMBER + '-compute@developer.gserviceaccount.com'
 cloud('projects', 'add-iam-policy-binding', PROJECT, '--member=serviceAccount:' + build, '--role=roles/cloudbuild.builds.builder', '--condition=None')
 cloud('iam', 'service-accounts', 'add-iam-policy-binding', build, '--member=serviceAccount:' + DEPLOY, '--role=roles/iam.serviceAccountUser')
