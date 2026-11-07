@@ -46,7 +46,9 @@ def sha(path):
 
 
 def read_json(name):
-    result = adb("exec-out", "run-as", PACKAGE, "cat", "files/" + name, check=False)
+    # exec-out does not reliably propagate the remote command's exit status.
+    # The shell protocol does: a not-yet-created status file means keep waiting.
+    result = adb("shell", "run-as", PACKAGE, "cat", "files/" + name, check=False)
     if result.returncode:
         return None
     return json.loads(result.stdout)
@@ -106,6 +108,7 @@ def one_run(index, pcm, reference, env, build):
         if adb("shell", "getprop", "ro.kernel.qemu").stdout.strip() != "1":
             raise RuntimeError("Physical device refused")
         record["deviceFingerprint"] = adb("shell", "getprop", "ro.build.fingerprint").stdout.strip()
+        record["stage"] = "install"
         adb("shell", "input", "keyevent", "82")
         adb("install", "-r", WORK / "build/fixture.apk", timeout=60)
         installed = adb("shell", "pm", "path", PACKAGE).stdout.strip().removeprefix("package:")
@@ -114,6 +117,7 @@ def one_run(index, pcm, reference, env, build):
             raise RuntimeError("Installed fixture differs from build")
         adb("shell", "pm", "grant", PACKAGE, "android.permission.RECORD_AUDIO")
         adb("shell", "am", "start", "-W", "-n", PACKAGE + "/.MainActivity", "--es", "runId", run_id)
+        record["stage"] = "wait-for-recorder"
         deadline = time.monotonic() + 15
         while time.monotonic() < deadline:
             started = read_json(run_id + "-started.json")
@@ -124,6 +128,7 @@ def one_run(index, pcm, reference, env, build):
             raise RuntimeError("Android recorder did not start")
         if started.get("rate") != 8000 or started.get("source") != 7:
             raise RuntimeError("Unexpected Android recording format")
+        record["stage"] = "inject"
         channel, stub, metadata, version = grpc_client(log_path)
         record["emulatorVersion"] = version
         record["protoDescriptorSha256"] = hashlib.sha256(pb.DESCRIPTOR.serialized_pb).hexdigest()
@@ -139,6 +144,7 @@ def one_run(index, pcm, reference, env, build):
         # One injection only per fresh process; failed samples remain failures.
         stub.injectAudio(packets(), metadata=metadata, timeout=38)
         record["injectionFinishedAt"] = int(time.time() * 1000)
+        record["stage"] = "wait-for-completion"
         deadline = time.monotonic() + 50
         while time.monotonic() < deadline:
             native = read_json(run_id + "-result.json")
@@ -152,6 +158,7 @@ def one_run(index, pcm, reference, env, build):
                 native.get("pid") != started["pid"] or native.get("runId") != run_id):
             raise RuntimeError("Native recorder did not complete cleanly")
         captured = adb("exec-out", "run-as", PACKAGE, "cat", "files/" + run_id + ".pcm", binary=True).stdout
+        record["stage"] = "analyze"
         if len(captured) != native["sampleCount"] * 2:
             raise RuntimeError("Native sample count does not match recording")
         capture_path = folder / "capture.wav"
@@ -163,6 +170,21 @@ def one_run(index, pcm, reference, env, build):
         record["passed"] = record["content"]["passed"]
     except Exception as error:
         record["error"] = error.code().name if isinstance(error, grpc.RpcError) else type(error).__name__ + ": " + str(error)
+        # Preserve partial synthetic data for diagnosis, never as a passing sample.
+        try:
+            size = adb("shell", "run-as", PACKAGE, "wc", "-c", "files/" + run_id + ".pcm", check=False)
+            if size.returncode == 0:
+                expected = int(size.stdout.split()[0])
+                partial = adb("exec-out", "run-as", PACKAGE, "cat", "files/" + run_id + ".pcm", binary=True).stdout
+                if expected > 0 and len(partial) >= expected and expected % 2 == 0:
+                    partial_path = folder / "partial-capture.wav"
+                    with wave.open(str(partial_path), "wb") as wav:
+                        wav.setparams((1, 2, 8000, 0, "NONE", "not compressed"))
+                        wav.writeframes(partial[:expected])
+                    record["partialCaptureSha256"] = sha(partial_path)
+                    record["partialCaptureNotQualified"] = True
+        except Exception:
+            record["partialCaptureUnavailable"] = True
     finally:
         if channel:
             channel.close()

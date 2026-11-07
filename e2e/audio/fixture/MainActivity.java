@@ -89,9 +89,12 @@ public class MainActivity extends Activity {
   }
 
   private void save(String name, JSONObject value) throws Exception {
-    try (FileOutputStream file = new FileOutputStream(new File(getFilesDir(), name))) {
+    File pending = new File(getFilesDir(), name + ".pending");
+    try (FileOutputStream file = new FileOutputStream(pending)) {
       file.write(value.toString().getBytes(StandardCharsets.UTF_8));
     }
+    if (!pending.renameTo(new File(getFilesDir(), name)))
+      throw new IllegalStateException("Could not publish recorder status");
   }
   @Override public void onDestroy() { active = false; super.onDestroy(); }
 }
