@@ -41,6 +41,7 @@ vi.mock("react-native-nitro-keepalive-timer", () => ({
 }));
 
 import { VoicePeer } from "../apps/mobile/src/services/VoicePeer";
+import { errorMessage, MicrophonePermissionError } from "../apps/mobile/src/services/errors";
 
 const stream = () => ({
   getTracks: () => [mocks.track], getAudioTracks: () => [mocks.track], release: vi.fn(),
@@ -128,5 +129,49 @@ describe("microphone mute during connection setup", () => {
     await started;
     const peer = (voice as unknown as { pc: InstanceType<typeof mocks.Peer> }).pc;
     expect(peer.attachedTrackEnabled).toEqual([!muted]);
+  });
+});
+
+describe("microphone failure guidance", () => {
+  let voice: VoicePeer;
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mocks.api.mockImplementation(async (method: string) => method === "heartbeatCall"
+      ? { active: true } : { iceServers: [], refreshAfterMs: 420_000 });
+    voice = new VoicePeer({ id: "call", callerId: "alice", calleeId: "bob" } as ConstructorParameters<typeof VoicePeer>[0],
+      "alice", vi.fn(), vi.fn());
+  });
+  afterEach(() => { voice.close(); vi.useRealTimers(); vi.clearAllMocks(); });
+
+  it.each(["SecurityError", "NotAllowedError"])(
+    "recognizes a denied microphone only at capture: %s", async name => {
+      mocks.getUserMedia.mockRejectedValue({ name, message: "Permission denied." });
+      const error = await voice.start().catch(error => error);
+      expect(error).toBeInstanceOf(MicrophonePermissionError);
+      expect(errorMessage(error))
+        .toBe("Please allow microphone access in your phone’s settings to make a call.");
+    },
+  );
+
+  it.each(["permission-denied", "functions/permission-denied"])(
+    "does not turn relay authorization into microphone guidance: %s", async code => {
+      const denied = { code };
+      mocks.api.mockImplementation(async (method: string) => {
+        if (method === "getIceServers") throw denied;
+        return { active: true };
+      });
+      const error = await voice.start().catch(error => error);
+      expect(error).toBe(denied);
+      expect(mocks.getUserMedia).not.toHaveBeenCalled();
+      expect(errorMessage(error)).toBe("Couldn’t finish that. Please try again.");
+    },
+  );
+
+  it("does not claim a permission problem for an unavailable audio device", async () => {
+    const unavailable = { name: "NotReadableError", message: "Audio device unavailable" };
+    mocks.getUserMedia.mockRejectedValue(unavailable);
+    const error = await voice.start().catch(error => error);
+    expect(error).toBe(unavailable);
+    expect(errorMessage(error)).toBe("Couldn’t finish that. Please try again.");
   });
 });

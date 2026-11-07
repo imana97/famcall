@@ -21,7 +21,7 @@ appId: com.silvergridtech.famcall.e2e
     env: { ACTION: wait, ROLE: callee, STAGE: blocked }
 - tapOn: Call ${CONTACT_NAME}
 - extendedWaitUntil:
-    visible: This person is not available on FamCall right now.
+    visible: Couldn’t connect right now. Please try again shortly.
     timeout: 15000
 - takeScreenshot: caller-blocked
 - tapOn: Done

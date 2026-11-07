@@ -3,7 +3,7 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: contact-\+12025550102
 - extendedWaitUntil:
-    visible: This person is not available on FamCall right now.
+    visible: Couldn’t connect right now. Please try again shortly.
     timeout: 15000
 - tapOn: Done
 - assertVisible: Your people.
