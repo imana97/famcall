@@ -47,7 +47,12 @@ export function Page({
   children,
   scroll = true,
   safeBottom = true,
-}: React.PropsWithChildren<{ scroll?: boolean; safeBottom?: boolean }>) {
+  footer,
+}: React.PropsWithChildren<{
+  scroll?: boolean;
+  safeBottom?: boolean;
+  footer?: React.ReactNode;
+}>) {
   const c = useTheme();
   return (
     <SafeAreaView
@@ -69,6 +74,22 @@ export function Page({
       ) : (
         <View style={[styles.page, { flex: 1 }]}>{children}</View>
       )}
+      {footer && (
+        <View
+          style={{
+            flexShrink: 0,
+            paddingHorizontal: 24,
+            paddingTop: 12,
+            paddingBottom: 8,
+            gap: 8,
+            borderTopWidth: 1,
+            borderTopColor: c.line,
+            backgroundColor: c.bg,
+          }}
+        >
+          {footer}
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -76,14 +97,16 @@ export function Heading({
   title,
   subtitle,
   back = false,
+  bottomSpacing = 26,
 }: {
   title: string;
   subtitle?: string;
   back?: boolean;
+  bottomSpacing?: number;
 }) {
   const c = useTheme();
   return (
-    <View style={{ gap: 12, marginBottom: 26 }}>
+    <View style={{ gap: 12, marginBottom: bottomSpacing }}>
       {back && (
         <Pressable
           accessibilityRole="button"
@@ -215,6 +238,8 @@ export function Field({ label, ...props }: TextInputProps & { label: string }) {
     <View style={{ gap: 8 }}>
       <Label style={{ fontSize: 14, fontWeight: "500" }}>{label}</Label>
       <TextInput
+        returnKeyType="done"
+        inputAccessoryViewButtonLabel={t("done")}
         {...props}
         accessibilityLabel={label}
         placeholderTextColor={c.muted}

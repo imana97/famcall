@@ -73,6 +73,15 @@ const config: ExpoConfig = {
     "./plugins/withTestBackend",
     "./plugins/withCallPermissions",
     "expo-router",
+    [
+      "expo-splash-screen",
+      {
+        backgroundColor: "#183D34",
+        image: "./assets/splash-icon.png",
+        imageWidth: 240,
+        resizeMode: "contain",
+      },
+    ],
     ["expo-localization", { supportedLocales: ["en"], supportsRTL: false }],
     [
       "expo-contacts",

@@ -67,13 +67,13 @@ export default function AuthScreen() {
     }
   };
   return (
-    <Page>
+    <Page key={confirmation ? "verification" : "phone"}>
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
           gap: 10,
-          marginBottom: 24,
+          marginBottom: 8,
         }}
       >
         <BrandMark size={48} />
@@ -83,6 +83,7 @@ export default function AuthScreen() {
       </View>
       <Heading
         title={t(confirmation ? "verifyTitle" : "welcome")}
+        bottomSpacing={10}
         subtitle={
           confirmation ? t("verifyBody", { phone: number }) : t("welcomeBody")
         }
@@ -149,6 +150,9 @@ export default function AuthScreen() {
           <Label muted style={{ fontSize: 14 }}>
             {t("countryCodeHint")}
           </Label>
+          <Label muted style={{ fontSize: 13, lineHeight: 20 }}>
+            {t("phoneConsent")}
+          </Label>
           <Button
             testID="send-code"
             title={
@@ -160,9 +164,6 @@ export default function AuthScreen() {
             disabled={!number.trim() || remaining > 0}
             onPress={send}
           />
-          <Label muted style={{ fontSize: 13, lineHeight: 20 }}>
-            {t("phoneConsent")}
-          </Label>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
             <Pressable
               accessibilityRole="link"

@@ -52,7 +52,24 @@ export default function CallingSetup() {
     );
   };
   return (
-    <Page>
+    <Page
+      footer={
+        <>
+          <Button
+            testID="setup-finish"
+            title={t(readiness.canCall ? "setupStartCalling" : "setupLater")}
+            secondary={!readiness.canCall}
+            disabled={!readiness.checked || busy !== null}
+            onPress={() => { void finish(); }}
+          />
+          {!readiness.ready && (
+            <Label muted style={{ fontSize: 13, lineHeight: 18 }}>
+              {t(readiness.canCall ? "setupOptionalBody" : "setupLaterBody")}
+            </Label>
+          )}
+        </>
+      }
+    >
       <Heading title={t("setupTitle")} subtitle={t("setupBody")} />
       <ErrorBanner message={readiness.error} retry={() => { void readiness.refresh(); }} />
       {!readiness.checked && <ActivityIndicator color={c.text} />}
@@ -63,14 +80,6 @@ export default function CallingSetup() {
         row("fullScreen", LockKeyhole, t("setupFullScreen"), t("setupFullScreenBody"))}
       <Label muted style={{ fontSize: 14 }}>{t("setupContactsOptional")}</Label>
       {readiness.ready && <View accessibilityLiveRegion="polite"><Label>{t("setupReadyBody")}</Label></View>}
-      <Button
-        testID="setup-finish"
-        title={t(readiness.canCall ? "setupStartCalling" : "setupLater")}
-        secondary={!readiness.canCall}
-        disabled={!readiness.checked || busy !== null}
-        onPress={() => { void finish(); }}
-      />
-      {!readiness.ready && <Label muted style={{ fontSize: 13 }}>{t(readiness.canCall ? "setupOptionalBody" : "setupLaterBody")}</Label>}
     </Page>
   );
 }
