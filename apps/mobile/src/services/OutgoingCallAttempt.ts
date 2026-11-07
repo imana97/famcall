@@ -45,6 +45,7 @@ export class OutgoingCallAttempt {
     try {
       if (this.hooks.preflight && !await this.hooks.preflight()) {
         this.cancelled = true;
+        if (this.hooks.isCurrent()) this.hooks.cancelled();
         return;
       }
       if (!this.active) return;

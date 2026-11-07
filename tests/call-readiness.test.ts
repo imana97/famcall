@@ -115,7 +115,7 @@ describe("calling setup permissions", () => {
   it("asks for audible notifications only from the setup action and respects denial", async () => {
     mocks.readNotifications.mockResolvedValue({ status: "undetermined", granted: false, canAskAgain: true });
     await requestCallingPermission("notifications");
-    expect(mocks.requestNotifications).toHaveBeenCalledWith({ ios: { allowAlert: true, allowSound: true, allowBadge: true } });
+    expect(mocks.requestNotifications).toHaveBeenCalledWith();
     mocks.readNotifications.mockResolvedValue({ status: "denied", granted: false, canAskAgain: false });
     expect((await readCallingPermissions()).notifications.status).toBe("denied");
     await requestCallingPermission("notifications");
@@ -123,16 +123,15 @@ describe("calling setup permissions", () => {
     expect(mocks.settings).toHaveBeenCalledOnce();
   });
 
-  it("does not mistake quiet iOS authorization or disabled sound for alert readiness", async () => {
+  it("accurately marks ordinary iOS notifications as unnecessary for native CallKit calls", async () => {
     mocks.platform.OS = "ios";
-    mocks.readNotifications.mockResolvedValue({ status: "granted", granted: true, canAskAgain: true,
-      ios: { status: 3, allowsAlert: true, allowsSound: true } });
-    expect(isCallingReady(await readCallingPermissions())).toBe(false);
-    mocks.readNotifications.mockResolvedValue({ status: "granted", granted: true, canAskAgain: true,
-      ios: { status: 2, allowsAlert: true, allowsSound: false } });
-    expect(isCallingReady(await readCallingPermissions())).toBe(false);
+    const result = await readCallingPermissions();
+    expect(result.notifications).toEqual({ status: "not-required", canAskAgain: false });
+    expect(result.fullScreen).toBe("not-required");
+    expect(isCallingReady(result)).toBe(true);
+    expect(mocks.readNotifications).not.toHaveBeenCalled();
     await requestCallingPermission("notifications");
-    expect(mocks.settings).toHaveBeenCalledOnce();
+    expect(mocks.settings).not.toHaveBeenCalled();
     expect(mocks.requestNotifications).not.toHaveBeenCalled();
   });
 

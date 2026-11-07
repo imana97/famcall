@@ -211,7 +211,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         // Nothing rings and no server call exists until this check succeeds.
         const allowed = await readiness.preflight();
         if (!attempt.active || auth.currentUser?.uid !== uid) return false;
-        if (!allowed && AppState.currentState === "active") router.push("/calling-setup");
+        if (!allowed && AppState.currentState === "active") router.replace("/calling-setup");
         return allowed;
       },
       create: async () => {

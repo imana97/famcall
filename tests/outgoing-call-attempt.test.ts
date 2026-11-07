@@ -30,6 +30,7 @@ describe("outgoing setup cancellation", () => {
     expect(hooks.create).not.toHaveBeenCalled();
     expect(hooks.startNative).not.toHaveBeenCalled();
     expect(hooks.persistEnd).not.toHaveBeenCalled();
+    expect(hooks.cancelled).toHaveBeenCalledOnce();
   });
 
   it("can cancel during permission preflight without starting a late call", async () => {

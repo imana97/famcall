@@ -57,7 +57,8 @@ export default function CallingSetup() {
       <ErrorBanner message={readiness.error} retry={() => { void readiness.refresh(); }} />
       {!readiness.checked && <ActivityIndicator color={c.text} />}
       {row("microphone", Mic, t("setupMicrophone"), t("setupMicrophoneBody"))}
-      {row("notifications", BellRing, t("setupNotifications"), t("setupNotificationsBody"))}
+      {permissions && permissions.notifications.status !== "not-required" &&
+        row("notifications", BellRing, t("setupNotifications"), t("setupNotificationsBody"))}
       {permissions && permissions.fullScreen !== "not-required" &&
         row("fullScreen", LockKeyhole, t("setupFullScreen"), t("setupFullScreenBody"))}
       <Label muted style={{ fontSize: 14 }}>{t("setupContactsOptional")}</Label>
