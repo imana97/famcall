@@ -42,7 +42,7 @@ const callIdSchema = z.string().uuid();
 const ttl = (days: number) =>
   Timestamp.fromMillis(Date.now() + days * 86_400_000);
 
-async function identity(request: CallableRequest) {
+function verifiedPhoneIdentity(request: CallableRequest) {
   if (
     !request.auth?.uid ||
     !request.auth.token.phone_number ||
@@ -50,12 +50,16 @@ async function identity(request: CallableRequest) {
   ) {
     throw new HttpsError("unauthenticated", "Verify your phone number first.");
   }
-  if ((await db.doc("accountDeletions/" + request.auth.uid).get()).exists)
-    throw new HttpsError("permission-denied", "This account is being deleted.");
   return {
     uid: request.auth.uid,
     phone: normalizePhone(String(request.auth.token.phone_number)),
   };
+}
+async function identity(request: CallableRequest) {
+  const verified = verifiedPhoneIdentity(request);
+  if ((await db.doc("accountDeletions/" + verified.uid).get()).exists)
+    throw new HttpsError("permission-denied", "This account is being deleted.");
+  return verified;
 }
 function parse<T>(schema: z.ZodType<T>, value: unknown): T {
   const result = schema.safeParse(value);
@@ -475,16 +479,25 @@ export const dispatchCall = onDocumentWritten(
 );
 
 export const deleteAccount = onCall(secure, async (request) => {
-  const { uid } = await identity(request);
-  const authTime = Number(request.auth!.token.auth_time) * 1000;
-  if (Date.now() - authTime > 5 * 60_000)
-    throw new HttpsError(
-      "unauthenticated",
-      "Verify your number again to delete your account.",
-    );
+  const { uid } = verifiedPhoneIdentity(request);
   // The job is the durable boundary: rules deny this identity immediately and
   // the worker retries cleanup even if the app closes or the request disconnects.
-  await db.doc("accountDeletions/" + uid).create({ status: "pending", requestedAt: FieldValue.serverTimestamp() });
+  // A lost response must be retryable, including after cleanup completes. The
+  // caller can only acknowledge its own UID's existing job; every other API
+  // continues to reject a deleting identity through identity().
+  const job = db.doc("accountDeletions/" + uid);
+  await db.runTransaction(async transaction => {
+    if ((await transaction.get(job)).exists) return;
+    const authTime = Number(request.auth!.token.auth_time) * 1000;
+    const age = Date.now() - authTime;
+    if (!Number.isFinite(authTime) || authTime <= 0 || age < 0 || age > 5 * 60_000)
+      throw new HttpsError(
+        "unauthenticated",
+        "Verify your number again to delete your account.",
+      );
+    // Concurrent requests retry this transaction and observe the same job.
+    transaction.create(job, { status: "pending", requestedAt: FieldValue.serverTimestamp() });
+  });
   return { accepted: true };
 });
 
