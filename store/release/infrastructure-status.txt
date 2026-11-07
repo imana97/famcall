@@ -74,6 +74,10 @@ CONFIGURED
   by account, so it can access other silvergrid projects at the same role.
 - Restricted GitHub OIDC cloud federation for the owner-approved main-branch
   backend workflow; no long-lived GCP deployment key.
+  The subject matches GitHub's immutable owner/repository-ID format, confirmed
+  by the repository's OIDC settings. The initial name-only subject was rejected;
+  its correction retains the exact repository, owner, actor, main branch,
+  backend environment and workflow restrictions.
 
 PREPARED / OWNER OR STORE ACTION NEEDED
 - Validate Firebase phone-auth APNs, DeviceCheck/App Attest, and production
@@ -86,7 +90,10 @@ PREPARED / OWNER OR STORE ACTION NEEDED
   identity; public copy now consistently uses SilverGrid Technology LLC.
   Play's trader-status declaration requires the developer account owner.
 - Workflows are now available on main. Backend workflow supports website-only
-  deployment separately; its first deployment awaits owner environment approval.
+  deployment separately. First-deployment prerequisites now include the immutable
+  GitHub subject, scoped App Engine service-account use, and Firebase Extensions
+  configuration-read access. Noninteractive deployment explicitly accepts the
+  reviewed event-handler retry policies. Successful deployment is still pending.
 - First owner-approved testing workflow started Android build 2, then failed
   during iOS preparation because the GitHub runner lacked the native Firebase
   plist during local entitlement resolution. Android continued on Expo, but no

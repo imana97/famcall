@@ -49,5 +49,6 @@ jobs:
             all) target=firestore,functions,hosting ;;
             *) exit 1 ;;
           esac
-          npx --yes firebase-tools@15.5.1 deploy --project famcall --only "$target" --non-interactive
+          # Accept the reviewed event-handler retry policies in noninteractive CI.
+          npx --yes firebase-tools@15.5.1 deploy --project famcall --only "$target" --non-interactive --force
 
