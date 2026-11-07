@@ -13,6 +13,6 @@ pod install
 # Firebase Auth. FAMCALLLAB is a test identifier, never a production Apple team.
 xcodebuild -workspace FamCallTest.xcworkspace -scheme FamCallTest \
   -configuration Release -sdk iphonesimulator \
-  -destination 'generic/platform=iOS Simulator' -arch arm64 \
+  -destination 'generic/platform=iOS Simulator' ARCHS=arm64 \
   -derivedDataPath "$task_root/.local/ios-build" -jobs 3 \
   CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM=FAMCALLLAB build
