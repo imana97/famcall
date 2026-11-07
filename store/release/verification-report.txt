@@ -867,15 +867,57 @@ disables push registration. Rebuild the backend before future exact-source tests
 The call-suite SHA-256 is 0a44323d02a5c0a553554366d3c6a85b8b7640633c66ee4b173d7740da8b496e.
 Private run: e81990ab-12db-4fb3-85b0-261b2da01dd2. Both command/native/Maestro
 logs and screenshots were saved and connected screenshots inspected. Provider
-crash-log counts were zero. Video/audio recording was requested; API downloads
-returned 404, and the dashboard download did not complete. No captured-output
-audio claim follows. History UI, background/push and iPhone calling were not
+crash-log counts were zero. Maestro video URLs returned 404 and the dashboard
+download timed out; the general session API subsequently supplied working signed
+video URLs. Both MP4 files and extracted PCM audio are retained privately. Their
+AAC tracks contain brief click-like pulses and long exact-silence intervals;
+zero-tolerance frame extraction confirms connected screens during sampled silent
+intervals. No known microphone signal was injected. Received-speech capture and
+intelligibility remain unqualified. History UI, background/push and iPhone calling were not
 tested in this run. The initial empty users/{uid}/history probe was the wrong
 collection: app history queries participant records in calls instead.
 
 The refreshed dashboard showed 89 free minutes remaining, with no paid upgrade.
 The provider reported zero running/queued sessions. The temporary tunnel,
 collector and emulators were stopped; ports 9099/8080/5001/8787 were closed.
+
+A separate bounded microphone-injection capability request was rejected before
+session creation with HTTP 422 / BROWSERSTACK_INVALID_ACTION_BY_GROUP: audio
+injection is not enabled for this account/framework. The account remained Free,
+with zero running/queued sessions immediately after rejection. Only a generated
+ten-second tone and a two-file capability suite were uploaded; no personal audio,
+backend access or production credentials were included. No vendor access request
+or paid upgrade was made. This is an account capability limit, not an app failure.
+
+HOSTED ANDROID HISTORY AND BLOCKING
+The seventeen-file lifecycle suite passed on two concurrent Pixel 6 / Android 12
+devices. Caller build 90205742a2ae8b2590d048c1d046d01f0992abfc and callee build
+9bfa3bcd5ac88f01926bc67d0039f75b0e8e94ed completed all commands. The recipient
+observed ringing before caller cancellation, saw Missed in Recents, and blocked
+that number from the history row. The caller's next attempt was refused. Backend
+snapshots confirmed the block existed during that attempt and no new call record
+was created. Unblocking removed the record. Both then connected and ended a
+second call; acceptance-to-hangup was 21.705 seconds. After restarting both apps,
+the caller retained two Outgoing rows and the recipient retained Incoming and
+Missed rows. Screenshots agree with the command assertions and backend records.
+The final two calls were cancelled/ended, with zero active leases.
+
+An earlier attempt is retained: the provider failed starting the caller session
+before test commands; the other phone passed signup then timed out waiting. No
+call was created. One bounded retry passed with unchanged app/suite inputs. These
+failures are not counted as passes or excluded from the experiment history.
+
+Private run: e4bb9181-e880-461a-bd50-906fe478a5c1. APK remains source 360faa2,
+SHA-256 71ef6afd1a123833bc41710c49bac5ed0a18eaac8967c71f2d1ddef9ef4ea65a.
+Suite SHA-256: 77713e79d240fcbd353fb136167e4591c200717083e306db5bf80c0fc22c3619.
+Backend was rebuilt from eacbbb4 before this run; its executed JS is archived,
+SHA-256 890d87d0fd6d01d1c0b7484d1d7917e1512c29dc5d04baa08e324bd5281e8aa6.
+The trial remained Free. No sessions were running/queued after completion, and
+the tunnel, collector and emulators were stopped with ports verified closed.
+The earlier 89-minute dashboard balance predates these four lifecycle sessions
+and is not a current balance. This run establishes foreground history/blocking
+behavior, not scheduled ring expiry, original signing, push, speech quality or
+poor-network recovery. No personal phones or paid upgrades were used.
 
 RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen

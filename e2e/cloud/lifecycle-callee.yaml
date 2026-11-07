@@ -1,0 +1,54 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- runFlow: signup-and-contacts.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: callee, STAGE: ready }
+- extendedWaitUntil:
+    visible: { id: answer-call }
+    timeout: 90000
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: callee, STAGE: ringing }
+- extendedWaitUntil:
+    visible: Call cancelled
+    timeout: 30000
+- tapOn: Done
+- tapOn: Recents
+- assertVisible: ${CONTACT_NAME} Missed
+- takeScreenshot: callee-missed-history
+- runFlow: ../maestro/block-history.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: callee, STAGE: blocked }
+- runScript:
+    file: call-event.js
+    env: { ACTION: wait, ROLE: caller, STAGE: blockChecked }
+- assertNotVisible: { id: answer-call }
+- assertVisible: Your people.
+- runFlow: ../maestro/unblock.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: callee, STAGE: unblocked }
+- extendedWaitUntil:
+    visible: { id: answer-call }
+    timeout: 90000
+- tapOn: { id: answer-call }
+- runFlow: ../maestro/wait-connected.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: callee, STAGE: connected }
+- takeScreenshot: callee-connected-after-unblock
+- extendedWaitUntil:
+    visible: Call ended
+    timeout: 60000
+- tapOn: Done
+- stopApp
+- runFlow: ../maestro/open-people.yaml
+- tapOn: Recents
+- assertVisible: ${CONTACT_NAME} Incoming
+- assertVisible: ${CONTACT_NAME} Missed
+- takeScreenshot: callee-history-after-relaunch
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: callee, STAGE: finished }

@@ -21,7 +21,9 @@ records, audio captures and private local files. BrowserStack's execute path is:
 
 Before running: confirm free minutes and concurrency, start the demo backend,
 restrict Local to the necessary emulator ports and use local=true in the request.
-Do not enable paid network logs/audio injection on an unqualified trial account.
+Keep paid network features disabled. A bounded free-account audio capability
+request was rejected before session creation; microphone injection is unavailable
+for this account/framework. Do not purchase an upgrade or assume trial access.
 Pass the four parameters via setEnvVariables; never put production secrets in
 those variables, which BrowserStack displays. AUTH_EMULATOR_HOST is bs-local.com.
 Use a freshly installed app for signup: Maestro reported that clearState is not
@@ -83,6 +85,40 @@ received audio energy. Screenshots and logs are retained. No known speech was
 injected and no network impairment was applied. This is foreground call/media
 transport evidence; it does not establish intelligibility, push or poor-network
 recovery. See the release verification record for the precise artifact scope.
+
+MISSED HISTORY AND BLOCKING
+Package the longer two-endpoint flows with:
+  node scripts/package-cloud-smoke.mjs --lifecycle
+
+This produces famcall-cloud-lifecycle.zip with seventeen allowlisted files.
+Use the same private backend, collector, endpoint identities and tunnel as above,
+but execute lifecycle-caller.yaml and lifecycle-callee.yaml in separate sessions.
+The caller cancels only after the callee observes the ringing screen. The callee
+checks that this unanswered call appears as Missed in Recents, blocks the number
+from that history row, and waits for the caller to verify its next attempt is
+refused. After unblocking, both endpoints must complete a connected call. Both
+apps restart and check the persisted history; the callee checks both Incoming
+and Missed rows. Save backend snapshots while blocked and after unblocking, plus
+the final calls and active leases. This does not test ring-expiry scheduling,
+background notifications, speech quality or a blocked call racing with unblock.
+
+The two lifecycle flows passed on hosted Pixel 6 / Android 12 devices on
+6 November 2026 after one retained provider-startup failure and bounded retry.
+Backend snapshots confirmed the block existed during the refused attempt, no
+extra call record was created, unblocking removed it, and the subsequent call
+ended with no active leases. Post-relaunch history screenshots were inspected.
+
+RECORDING AND FEATURE QUALIFICATION
+If Maestro's per-test video URL returns 404, the general session endpoint
+/app-automate/sessions/<session-id>.json can provide a working video_url. Treat
+the returned signed URL as a credential: retain it only in private artifacts and
+never forward API authorization headers to its download/redirect destinations.
+Retain file hashes and examine the audio track before claiming usable capture.
+The paired run's recovered videos show connected calls but include long silent
+audio intervals. With no known microphone signal injected, speech capture is
+unqualified. The subsequent injection capability request returned HTTP 422 /
+BROWSERSTACK_INVALID_ACTION_BY_GROUP without creating a session. The account
+remained Free. Do not interpret that account limit as a FamCall audio failure.
 
 Keep app/ZIP hashes, provider build/session IDs, backend evidence and full
 pass/failure artifacts. See store/release/cloud-device-testing.txt for updated

@@ -10,7 +10,7 @@ await mkdir(directory, { recursive: true, mode: 0o700 });
 const events = new Map();
 const hosts = new Set(['127.0.0.1:8787', 'localhost:8787', 'bs-local.com:8787']);
 const roles = new Set(['caller', 'callee']);
-const stages = new Set(['ready', 'connected', 'finished']);
+const stages = new Set(['ready', 'ringing', 'blocked', 'blockChecked', 'unblocked', 'connected', 'finished']);
 let sequence = 0;
 const server = http.createServer(async (req, res) => {
   res.setHeader('Content-Type', 'application/json');

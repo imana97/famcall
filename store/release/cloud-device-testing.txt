@@ -14,8 +14,10 @@ initially showed 100 unused App Automate minutes. The API reports Free plan and
 five parallel session slots. Separate demo APK/IPA files were uploaded and trial
 tests have now run. No paid subscription or upgrade was purchased. After the first
 three smoke runs, the dashboard showed 94 free minutes. After two further paired
-Android call runs, a refreshed dashboard showed 89 free minutes. This is an observed account balance;
-build duration alone is not a billing statement. Recheck before further runs.
+Android call runs, a refreshed dashboard showed 89 free minutes. Four lifecycle
+sessions subsequently ran (one failed pair, then one passing pair); the dashboard
+balance has not been refreshed since. Do not present 89 as the current balance.
+Build duration alone is not a billing statement. Recheck before further runs.
 
 Firebase Test Lab: the existing Blaze pricing tier includes 30 physical-device
 minutes and 60 virtual-device minutes per day. Additional physical time is $5 per
@@ -46,9 +48,12 @@ attribution and actual voice/network features also need review before adoption.
 No application has been submitted and no vendor has been contacted.
 
 BrowserStack's public trial includes 100 App Automate minutes and a separate 30
-App Live minutes. This account reports five concurrent slots; its Pro audio and
-network features remain unqualified. Evaluate entitlement before enabling paid
-features; no paid upgrade is authorized by a trial evaluation.
+App Live minutes. This account reports five concurrent slots. A bounded audio
+capability request was rejected before a session started: HTTP 422,
+BROWSERSTACK_INVALID_ACTION_BY_GROUP, audio injection not enabled for this
+account/framework. The account remained Free. No vendor access request or paid
+upgrade was made. Network features remain unqualified; a trial evaluation does
+not authorize purchasing them.
 
 Use existing local emulators for the bulk of repeatable checks, Test Lab for
 limited recurring device coverage, and a qualified trial for the remaining cloud
@@ -112,15 +117,47 @@ the latest registration build. Private records retain runtime backend hashes;
 its compiled registration handler predates the final APNs sequence-conflict
 check in 4065490, so this run does not validate that fix. Push is disabled in
 the demo app. Both command/native/Maestro logs and connected/ended screenshots
-were saved. Video/audio capture was requested; both API video links returned
-404. The dashboard showed a recording player, but its download did not complete.
-No recorded-output audio has therefore been qualified.
+were saved. The Maestro video links returned 404 and the dashboard download
+timed out. Both recordings were subsequently recovered from the general session
+API's signed video URL. Their hashes and private audio analysis are retained.
+The AAC tracks contain sparse click-like pulses and long silent intervals;
+exact-frame extraction confirms connected screens during sampled silent audio
+intervals. No known microphone signal was supplied, so received-speech capture
+remains unqualified. A downloadable video with an audio track is not a speech pass.
 
 No microphone reference was injected, and the network was not impaired. Nonzero
 energy alone cannot establish intelligible speech or rule out background noise
 and echo. Known-speech qualification, weak-network recovery, iPhone calling and
 background/push remain open. The provider remained on Free with zero running
 and queued sessions after completion; local test services were stopped.
+
+HOSTED HISTORY / BLOCKING LIFECYCLE
+Two further Pixel 6 / Android 12 flows passed on 6 November 2026 (7 November UTC).
+Caller build: 90205742a2ae8b2590d048c1d046d01f0992abfc.
+Callee build: 9bfa3bcd5ac88f01926bc67d0039f75b0e8e94ed.
+After the recipient observed ringing, the caller cancelled. Recents showed that
+unanswered call as Missed for the recipient and Outgoing for the caller. Blocking
+from the history row refused the next attempt. Independent backend snapshots
+confirmed the block existed and that the rejected attempt created no call record.
+Unblocking removed it; a subsequent accepted call ended after 21.705 seconds.
+Both apps restarted and retained the expected history, including Incoming and
+Missed rows on the recipient. The final backend had two terminal calls and zero
+active leases. Command/native/Maestro logs, screenshots and runtime hashes are
+retained. History and refused-call screenshots were visually inspected.
+
+The initial lifecycle pair is retained as failed setup: caller build
+647a6a9225659c75864774ba5739592255f2efae returned a provider session error before
+test commands; callee build 28a327b762096008c4aadd141e011ad0a058e7a4 completed
+signup then timed out waiting for an incoming call. No call was created. Only
+one retry was made, using the unchanged app and suite. The passing run used the
+same historical 360faa2 APK and a freshly rebuilt eacbbb4 backend; no push or
+current mobile registration validation is implied. Suite SHA-256:
+77713e79d240fcbd353fb136167e4591c200717083e306db5bf80c0fc22c3619.
+
+This validates foreground cancellation/history/block/unblock behavior. Ring
+expiry scheduling, background delivery, intelligible speech and network recovery
+remain open. Final account state was Free with zero running/queued sessions;
+the test services were stopped and all four tunnel service ports were closed.
 
 BROWSERSTACK CAPABILITIES
 App Automate supports the existing Maestro approach on real Android and iOS
@@ -134,6 +171,13 @@ output audio on Android 11+ and iOS 15+. Qualify that capture with a known signa
 normal media playback support does not by itself prove in-call audio capture.
 Android-to-iPhone received speech can be evaluated only after this qualification;
 the reverse iPhone microphone path remains an explicit gap.
+
+Android's ordinary playback-capture API permits media, game and unknown usages,
+not voice-communication playback. BrowserStack's published audio-recording page
+does not identify its capture implementation. This is a possible explanation for
+silent in-call recordings, not a verified diagnosis. Do not change FamCall's
+communication audio usage merely to make a screen recording audible: that would
+test a different audio route. Qualify a supported in-call output path instead.
 
 Maestro network settings apply for the whole build. Mid-call network changes need
 Appium's update_network API or a separately verified impairment gateway. Network
@@ -185,6 +229,7 @@ PRIMARY SOURCES
 https://www.browserstack.com/docs/app-automate/maestro/overview
 https://www.browserstack.com/docs/app-automate/maestro/test-specific-scenarios/audio-injection
 https://www.browserstack.com/docs/app-automate/maestro/debug-failed-tests/audio-recording
+https://developer.android.com/media/platform/av-capture
 https://www.browserstack.com/docs/app-automate/maestro/set-up-test-env/simulate-network-conditions
 https://www.browserstack.com/docs/app-automate/appium/test-real-user-conditions/simulate-network-conditions
 https://docs.kobiton.com/automation-testing/scripting/add-audio-injection-to-appium-script

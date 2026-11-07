@@ -1,5 +1,5 @@
 if (typeof RUN_ID === 'undefined' || !/^[0-9a-f-]{36}$/.test(RUN_ID) ||
-    !/^(caller|callee)$/.test(ROLE) || !/^(ready|connected|finished)$/.test(STAGE)) {
+    !/^(caller|callee)$/.test(ROLE) || !/^(ready|ringing|blocked|blockChecked|unblocked|connected|finished)$/.test(STAGE)) {
   throw new Error('A run UUID, endpoint role and call stage are required.');
 }
 var base = 'http://bs-local.com:8787';

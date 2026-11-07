@@ -1,0 +1,55 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- runFlow: signup-and-contacts.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: caller, STAGE: ready }
+- runScript:
+    file: call-event.js
+    env: { ACTION: wait, ROLE: callee, STAGE: ready }
+- tapOn: Call ${CONTACT_NAME}
+- runScript:
+    file: call-event.js
+    env: { ACTION: wait, ROLE: callee, STAGE: ringing, MIN_AGE_MS: 3000 }
+- runFlow: ../maestro/cancel-starting-call.yaml
+- tapOn: Recents
+- assertVisible: ${CONTACT_NAME} Outgoing
+- takeScreenshot: caller-cancelled-history
+- tapOn: People
+- runScript:
+    file: call-event.js
+    env: { ACTION: wait, ROLE: callee, STAGE: blocked }
+- tapOn: Call ${CONTACT_NAME}
+- extendedWaitUntil:
+    visible: This person is not available on FamCall right now.
+    timeout: 15000
+- takeScreenshot: caller-blocked
+- tapOn: Done
+- assertVisible: Your people.
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: caller, STAGE: blockChecked }
+- runScript:
+    file: call-event.js
+    env: { ACTION: wait, ROLE: callee, STAGE: unblocked }
+- tapOn: Call ${CONTACT_NAME}
+- runFlow: ../maestro/wait-connected.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: caller, STAGE: connected }
+- takeScreenshot: caller-connected-after-unblock
+- runScript:
+    file: call-event.js
+    env: { ACTION: wait, ROLE: callee, STAGE: connected, MIN_AGE_MS: 15000 }
+- assertVisible: You’re connected.
+- runFlow: ../maestro/end-call.yaml
+- stopApp
+- runFlow: ../maestro/open-people.yaml
+- tapOn: Recents
+- assertVisible:
+    text: ${CONTACT_NAME} Outgoing
+    index: 0
+- takeScreenshot: caller-history-after-relaunch
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: caller, STAGE: finished }
