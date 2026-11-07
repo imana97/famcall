@@ -30,11 +30,12 @@ claims_requiring_release_evidence array before upload. The beta descriptions and
 release notes also require a matching working build before use.
 
 The website is live at https://famcall.web.app. Its homepage, app-specific privacy,
-terms and account-deletion pages returned HTTP 200 and matched deployed source
-336c6be from protected workflow 42322194542. The revised privacy and deletion
-notices in PR #5 are not live; they require a protected website update after
-review. The homepage provides the support email link. Public-store privacy
-declarations still need review against the actual app and SDK behavior.
+terms and account-deletion pages returned HTTP 200 and byte-matched source
+5ace4bb after protected website-only workflow 42339257054. The revised privacy
+and deletion notices are live, verified 7 November 2026 at 04:39 UTC; see
+release/website-delivery-2026-11-07.json. The homepage provides the support email
+link. Public-store privacy declarations still need review against the actual
+app and SDK behavior.
 
 No location-specific marketing is included. All public text uses the FamCall
 name and the weak-connection positioning. There are no claims about guaranteed

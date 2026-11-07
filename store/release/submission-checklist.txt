@@ -75,9 +75,9 @@ type; do not assume internal testing satisfies that separate requirement.
   stretch phone screenshots into tablet screenshots.
 - Set a live support page containing a working contact route, and confirm the
   marketing URL. The famcall.web.app site and policy/deletion pages are live and
-  verified against deployed source 336c6be from workflow 42322194542; the
-  homepage contains the support email link. Revised privacy/deletion notices
-  in PR #5 still require a protected website deployment after review.
+  verified against deployed source 5ace4bb from website-only workflow
+  42339257054; the homepage contains the support email link. The revised
+  privacy/deletion notices are live. See website-delivery-2026-11-07.json.
 
 5. PRIVACY, DELETION, AND DISCLOSURES
 - Inventory data processed by the app, servers, Firebase, the call provider,

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-11-07T04:39:34.625667+00:00",
+  "scope": "Successful website delivery and exact page-byte verification; not production-auth/calling validation or public-store approval. This record requires no further deployment.",
+  "source_commit": "5ace4bbbef217ab0496d62fa6a822e44478e6a43",
+  "workflow": {
+    "name": "backend.yml",
+    "run": 42339257054,
+    "url": "https://github.com/silvergrid/famcall/actions/runs/42339257054",
+    "deployment_scope": "website",
+    "conclusion": "success"
+  },
+  "pages": [
+    {
+      "url": "https://famcall.web.app/",
+      "sourcePath": "website/index.html",
+      "httpStatus": 200,
+      "sha256": "c71978c5a62ff300b8026b8ea56ac6bf88bd16702f89dd16d9f1affa2bba0e5a",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/privacy",
+      "sourcePath": "website/privacy.html",
+      "httpStatus": 200,
+      "sha256": "8e2020a60a0fb5217ac6d294661922b4c6e6ab07b41dbbccc5950fda3b22f293",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/terms",
+      "sourcePath": "website/terms.html",
+      "httpStatus": 200,
+      "sha256": "43b4d4f113587e1a8a94cfef396c96c3f8f4911a42dcf008e71e564d43b8352b",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/delete-account",
+      "sourcePath": "website/delete-account.html",
+      "httpStatus": 200,
+      "sha256": "c77996955618fbaf3bf3697844da44a446645cd016a7c06d0a450a83826c1b2e",
+      "matchesSource": true
+    }
+  ]
+}
