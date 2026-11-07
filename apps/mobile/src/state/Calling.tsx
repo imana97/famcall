@@ -22,7 +22,7 @@ import { NativeCallCoordinator } from "../services/NativeCallCoordinator";
 import { OutgoingCallAttempt } from "../services/OutgoingCallAttempt";
 import { recordTestMetric, waitForTestCallStart } from "../services/e2eDiagnostics";
 import { VoicePeer, type VoiceState } from "../services/VoicePeer";
-import { errorMessage } from "../services/errors";
+import { callStartError, errorMessage } from "../services/errors";
 import {
   flushCallOutbox,
   hasEndedLocally,
@@ -208,7 +208,8 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       nativeEnded: systemId => endedNativeIds.current.has(systemId),
       create: async () => {
         await waitForTestCallStart("before-request", id);
-        const call = await api<CallRecord>("startCall", { phone, requestId: id });
+        const call = await api<CallRecord>("startCall", { phone, requestId: id })
+          .catch(error => { throw callStartError(error); });
         await waitForTestCallStart("after-response", id);
         return call;
       },

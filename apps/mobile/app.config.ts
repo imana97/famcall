@@ -23,6 +23,8 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: "com.silvergridtech.famcall" + (e2e ? ".e2e" : ""),
     supportsTablet: false,
+    // Carry forward the approved export answer; reassess if encryption changes.
+    config: { usesNonExemptEncryption: false },
     ...(e2e
       ? {}
       : {
@@ -52,6 +54,11 @@ const config: ExpoConfig = {
       "android.permission.CAMERA",
       "android.permission.READ_CALL_LOG",
       "android.permission.WRITE_CALL_LOG",
+      // FamCall reads a selected contact and uses app-private storage only.
+      "android.permission.WRITE_CONTACTS",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.SYSTEM_ALERT_WINDOW",
     ],
     adaptiveIcon: {
       foregroundImage: "./assets/android-icon-foreground.png",
@@ -62,6 +69,7 @@ const config: ExpoConfig = {
   plugins: [
     // Info.plist mods run in reverse order; apply voice-only wording after SDK plugins.
     "./plugins/withAudioOnly",
+    "./plugins/withFirebasePhoneAuth",
     "./plugins/withTestBackend",
     "expo-router",
     ["expo-localization", { supportedLocales: ["en"], supportsRTL: false }],
@@ -72,7 +80,7 @@ const config: ExpoConfig = {
           "Choose someone from your contacts to add to FamCall.",
       },
     ],
-    "expo-notifications",
+    ["expo-notifications", { enableBackgroundRemoteNotifications: true }],
     [
       "expo-build-properties",
       {

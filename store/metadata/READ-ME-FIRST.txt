@@ -1,9 +1,16 @@
 FAMCALL — STORE COPY PACK
-Prepared 6 November 2026
+Updated 7 November 2026 UTC
 
-Status: DRAFT. These files are prepared writing assets, not a published listing.
-The mobile app is not implemented. Wireframes require product review. No real
-app screenshots or completed network-test results exist yet.
+Status: PUBLIC LISTING DRAFT. The approved app is implemented and available through
+Android internal testing (code 4) and owner-only TestFlight (build 3). English
+TestFlight description, feedback address and test instructions are saved and
+read-back verified. Actual development screenshots exist; final release captures
+and the full network/speech qualification remain open. Protected testing workflow
+42336889833 succeeded for source fecda429. The 7 November 2026 04:27 UTC readback
+confirms iOS build 3 IN_BETA_TESTING in the owner group and Android code 4 in the
+completed internal release; Play received the expected bundle hash. This proves
+delivery, not installation of the update or successful production calls. See
+release/testing-delivery-2026-11-07.json. No public store launch.
 
 Publisher: SilverGrid Technology LLC
 Support: info@silvergridtech.com
@@ -22,9 +29,12 @@ that a finished app has already been built. Check the final app against the
 claims_requiring_release_evidence array before upload. The beta descriptions and
 release notes also require a matching working build before use.
 
-The desired website is https://famcall.web.app. Hosting availability and the
-deployed pages must be verified before using this URL in store forms. A public
-website privacy notice does not replace the future app's privacy policy.
+The website is live at https://famcall.web.app. Its homepage, app-specific privacy,
+terms and account-deletion pages returned HTTP 200 and matched deployed source
+336c6be from protected workflow 42322194542. The revised privacy and deletion
+notices in PR #5 are not live; they require a protected website update after
+review. The homepage provides the support email link. Public-store privacy
+declarations still need review against the actual app and SDK behavior.
 
 No location-specific marketing is included. All public text uses the FamCall
 name and the weak-connection positioning. There are no claims about guaranteed

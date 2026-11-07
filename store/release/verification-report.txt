@@ -1,5 +1,45 @@
 FAMCALL — VERIFICATION RECORD
-6 November 2026. Development evidence, not release approval.
+7 November 2026 UTC. Development/internal-testing evidence, not public release approval.
+
+CURRENT VERIFIED TESTING DELIVERY — 7 NOVEMBER 2026 04:27 UTC
+- Protected workflow 42336889833 completed successfully for source fecda429.
+  iOS 0.1.0 (3) is VALID/IN_BETA_TESTING and assigned to the owner group.
+  Android 0.1.0 code 4 is in the completed internal release; Google Play's
+  bundle SHA-256 matches the submitted artifact. Both EAS submissions finished.
+- The update includes PR #6 native iOS phone verification and PR #7 Android
+  permission cleanup. Exact delivery identities and scope are recorded in
+  testing-delivery-2026-11-07.json. The owner already has testing access, but
+  installation of the latest iOS update and runtime behavior are not established
+  by store status. Preserve the older privacy reports as historical evidence;
+  inspect the final candidate archives before completing store disclosures.
+
+EARLIER TESTING DELIVERY AND DEPLOYMENT EVIDENCE
+- PR #4 exact source b873d7a passed 70 JS/TS tests and 16 Python tests, typecheck,
+  lint, backend build and dependency audit (zero vulnerabilities). The owner
+  delegated narrow testing-rollout approvals; automated delegated PR reviews are
+  explicitly labeled, and permanent repository/environment protections remain.
+- Backend workflow 42322194542 attempt 3 succeeded: 13 ACTIVE functions and three
+  READY composite indexes. Three credential-free callable checks correctly
+  returned HTTP 401 / UNAUTHENTICATED. Scheduled call expiry is running.
+- Android code 3 from 0c92b91 was built/uploaded by workflow 42320459512; Google
+  Play confirmed delivery to the configured internal testers. Play signing
+  SHA-1/SHA-256 certificates were registered and read back from Firebase.
+- iOS build 1 uploaded successfully but Apple processing rejected ITMS-90683.
+  The camera-purpose description required by bundled WebRTC APIs is restored
+  with truthful voice-only wording; camera capture remains disabled. Replacement
+  build 2 from 60d0406 was built/uploaded successfully by workflow 42323018488.
+  The signed binary contains the corrected purpose string, production push and
+  App Attest entitlements, and get-task-allow=false. Apple processing is VALID,
+  internal state IN_BETA_TESTING, build 2 belongs to the owner-only group, and
+  the configured owner tester is INSTALLED in the 7 November 2026 04:07 UTC
+  readback. The owner approved the saved standard-encryption declaration and
+  no France distribution for now. Reassess before France distribution or
+  encryption changes. English TestFlight description,
+  feedback address and test instructions were saved and read-back verified.
+- https://famcall.web.app and privacy/terms/delete-account return HTTP 200 with
+  bytes matching deployed source 336c6be from workflow 42322194542. The revised
+  privacy/deletion notices in PR #5 await a protected website deployment after
+  review; the live landing page was viewed.
 
 PASS
 - 25 automated local tests: 7 shared-logic tests, 7 Firestore isolation tests,
@@ -49,10 +89,11 @@ PASS
   registered with Firebase. Apple bundle ID, distribution certificate, active
   provisioning profile and unpublished App Store app record created.
   App Attest and Play Integrity configurations registered; actual device
-  attestation and Play App Signing SHA/project linkage remain unverified.
+  attestation remains unverified. Play App Signing SHA/project linkage is now
+  configured and verified by read-back, as recorded above.
 - Original Apple/Play icons and Play feature graphic exported at required sizes.
 - Website checked at desktop and phone widths; privacy/deletion links work in
-  the local preview. The public site is not deployed yet.
+  the local preview; the deployed site is verified above.
 - GCP provider quota effectiveLimit and override both read back as 50/day for
   send_verification_code, including after phone authentication was initialized.
   A later read-only check confirmed phone sign-in remains enabled and the SMS
@@ -923,8 +964,9 @@ RELEASE GATES
 - Physical Android and iPhone calls, including cross-platform audio, screen
   lock/background, incoming push after process reclamation, audio routes and
   microphone permissions. Force-stop/force-quit behavior must be documented.
-- Production App Check, signing fingerprints, phone verification fallback,
-  Apple push credentials, and Google Play/TestFlight distribution.
+- Successful production App Check, phone verification fallback and Apple push
+  delivery on the distributed builds. Signing fingerprints and internal store
+  distribution are configured and verified above; device behavior remains open.
 - Real-provider quota boundary/concurrency validation; routine tests sent no SMS.
 - Genuine store screenshots matching the tested release candidate and final
   store privacy, age, content, encryption, and contact declarations.
@@ -944,3 +986,33 @@ service ends the call almost immediately (disconnect reason 55 / generic error).
 Its logs also show failure to open the incoming-call system interface. This
 reproduces without an active iOS Maestro flow. It is not counted as an incoming
 call pass; validate the actual signed app on an iPhone before release.
+
+STANDALONE IOS CONTROL — 7 NOVEMBER 2026 UTC
+The independent native probe in e2e/ios-callkit-probe contains no FamCall,
+Firebase or WebRTC code and performs no microphone/network work. The same probe
+binary was tested once on each of two fresh, dedicated iPhone 16 Pro simulators.
+Both accepted reportNewIncomingCall, then ended the call before probe cleanup:
+44 ms after report completion on iOS 26.5 and 216 ms on iOS 18.6. Both system
+logs failed to open facetime://?launchForIncomingCall=1; only the 26.5 log showed
+reason 55. No user answered or ended the calls. Cleanup succeeded on both.
+
+Three setup attempts are retained separately: a missing simulated identity
+caused service rejection, and a restricted ad-hoc signing entitlement prevented
+launch in two attempts. The corrected packaging matches Xcode's simulator
+entitlement sections. The committed build script reproduced the exact binary
+used for both valid observations. Source/binary/event/log hashes and manifests
+are retained in .local/callkit-probe/audit.json. This isolates a simulator failure
+from the app but does not prove physical iPhone calling or rule out other bugs.
+
+STORE PACK AUDIT — 7 NOVEMBER 2026 UTC
+The store pack and generator now record the deployed website/policy/deletion
+URLs, delivered internal builds and the owner-approved testing encryption
+declaration. Public legal/reliability gates remain open. All exported text fields
+match the structured source and pass the existing character/brand checks.
+The Google Play icon was incorrectly exported as 24-bit RGB. Its renderer now
+exports the required 32-bit RGBA PNG: 512 x 512, 5,944 bytes. ImageMagick comparison
+reports zero changed pixels, so the approved design is preserved. Apple icon,
+feature graphic and draft screenshots retain their required dimensions and
+opaque RGB exports. The screenshots remain development captures, not evidence
+of the final signed candidate. Source requirement checked:
+https://support.google.com/googleplay/android-developer/answer/9866151?hl=en

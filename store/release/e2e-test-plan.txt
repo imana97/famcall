@@ -92,6 +92,12 @@ J01 Fresh install → consent/permissions → verify → add contact → call �
     answer → two-way speech → hang up. Repeat in reverse direction.
 J02 Wrong, expired, reused, delayed, and out-of-order codes; resend countdown;
     app restart during verification; interrupted browser verification fallback.
+    On a store-signed iPhone, verify silent APNs phone verification with Background
+    App Refresh enabled, including when notification alerts are denied. Record
+    whether the SMS screen opens without a browser. Disable Background App Refresh
+    or make APNs unavailable and verify Firebase's browser fallback still returns
+    to the app and permits sign-in. Local emulator sign-in does not qualify either
+    production verification path; never disable app verification in a store build.
 J03 Restart, reboot, upgrade, token refresh, token revocation, reinstall, and
     number change. Verify sign-in persistence where expected and safe reauth.
     Interrupt incoming-call registration before/after the server receives it;

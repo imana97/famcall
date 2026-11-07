@@ -4,7 +4,7 @@ import json
 
 ROOT = Path(__file__).resolve().parents[1]
 META = ROOT / 'metadata'
-DATE = '2026-11-06'
+DATE = '2026-11-07'
 
 description = '''A little signal. A familiar voice.
 
@@ -82,7 +82,7 @@ metadata = {
     'schema_version': 1,
     'locale': 'en-US',
     'checked_on': DATE,
-    'status': 'DRAFT — native prototypes and development screenshots exist; production call reliability and publisher review pending',
+    'status': 'PUBLIC LISTING DRAFT — Android internal code 4 and TestFlight build 3 from fecda429 are available, verified 7 November 2026 04:27 UTC. Final-candidate privacy reports, release screenshots, production call reliability and public-store review remain pending',
     'publisher': 'SilverGrid Technology LLC',
     'support_email': 'info@silvergridtech.com',
     'brand': {'name': 'FamCall', 'headline': 'A little signal. A familiar voice.', 'positioning': 'Simple voice calls designed for weak and unstable internet connections.', 'geographic_targeting_in_public_copy': False},
@@ -90,12 +90,12 @@ metadata = {
     'google_play': google,
     'beta': beta,
     'submission_configuration': {
-        'marketing_url': None,
+        'marketing_url': 'https://famcall.web.app',
         'desired_marketing_url': 'https://famcall.web.app',
-        'support_url': None,
-        'privacy_policy_url': None,
-        'external_account_deletion_url': None,
-        'url_status': 'Hosting reserved. App-specific privacy, terms, support and deletion pages are prepared; public deployment and link verification pending.',
+        'support_url': 'https://famcall.web.app',
+        'privacy_policy_url': 'https://famcall.web.app/privacy',
+        'external_account_deletion_url': 'https://famcall.web.app/delete-account',
+        'url_status': 'Protected backend workflow 42322194542 deployed source 336c6be. Homepage, privacy, terms and deletion pages returned HTTP 200 and matched that source on 7 November 2026 UTC. Revised privacy and deletion notices in PR #5 are not deployed and require a protected website update after review. The homepage provides the support email link.',
         'apple_bundle_id': 'com.silvergridtech.famcall',
         'android_application_id': 'com.silvergridtech.famcall',
         'apple_sku': 'famcall-ios',
@@ -112,6 +112,13 @@ metadata = {
         'app_privacy_answers': None,
         'google_data_safety_answers': None,
         'encryption_export_compliance': None,
+        'internal_testing_export_declaration': {
+            'ios_build': '2',
+            'encryption': 'Standard encryption outside or in addition to Apple OS encryption',
+            'france_distribution': False,
+            'owner_approved_and_saved_on': DATE,
+            'scope': 'Internal build 2 cleared Apple Missing Compliance; build 3 reused the same approved answer. See encryption-answer.txt. Reassess before France distribution or encryption changes; public-release compliance remains pending.'
+        },
         'review_contact_name': None,
         'review_contact_phone': None,
         'review_contact_email': 'info@silvergridtech.com',
@@ -119,7 +126,7 @@ metadata = {
         'review_account_b': None,
         'review_access_instructions': None,
         'testflight_join_url': None,
-        'google_play_internal_opt_in_url': None,
+        'google_play_internal_opt_in_url': 'https://play.google.com/apps/internaltest/4700744436494600533',
         'app_store_url': None,
         'google_play_url': None,
     },

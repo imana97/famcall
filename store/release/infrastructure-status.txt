@@ -1,5 +1,6 @@
 FAMCALL — ACCOUNT AND RELEASE SETUP
-Checked 6 November 2026. No production service or store build has been deployed.
+Checked 7 November 2026 UTC. Backend and website are live. Android internal
+testing and owner-only TestFlight are available. No public launch.
 
 CONFIGURED
 - Public repository silvergrid/famcall; development fork imana97/famcall.
@@ -8,7 +9,7 @@ CONFIGURED
 - Implementation PR #1 approved by silvergrid and merged after the required
   upstream quality check passed. Main commit d6d0e2e has the tested source tree.
 - Firebase/GCP project famcall; existing billing account; $10 monthly budget
-  alerts. Alerts do not cap spending. Hosting site famcall.web.app reserved.
+  alerts. Alerts do not cap spending. Hosting site https://famcall.web.app is live.
 - Phone authentication enabled. Provider daily send_verification_code effective
   quota read back as 50. Real SMS boundary/concurrency behavior not yet exercised.
   The current SMS region policy reads allowByDefault with no denied regions.
@@ -16,11 +17,14 @@ CONFIGURED
 - Dedicated Cloudflare TURN credentials stored in Google Secret Manager, with
   runtime-only read access. Previously exposed setup key revoked and replaced.
 - Google API keys limited to needed Firebase APIs; browser key limited to the
-  FamCall Firebase domains. Native application restrictions remain a validation
-  gate because phone-auth browser fallback uses the API key.
+  FamCall Firebase domains. Native keys retain service allowlists without an
+  Android application restriction so Firebase phone-auth reCAPTCHA fallback can
+  use the key. Production fallback behavior still requires device validation.
 - Android upload key generated, private local copy plus Secret Manager backup
   and protected GitHub release secret FAMCALL_ANDROID_SIGNING_JSON. Upload SHA-1
-  and SHA-256 registered with Firebase. This is NOT the Play App Signing key.
+  and SHA-256 registered with Firebase. Play App Signing's downloaded deployment
+  and two hybrid certificates are also registered: six SHA-1/SHA-256 fingerprints,
+  verified by reading Firebase back. No private signing key was downloaded.
 - Apple bundle com.silvergridtech.famcall registered; push and App Attest
   capabilities enabled. Production app configuration requests the App Attest
   production entitlement; generated simulator-test configuration omits it.
@@ -29,7 +33,13 @@ CONFIGURED
   Distribution certificate retained. App Store provisioning profile T23QGW5RTW
   replaces the earlier profile after enabling App Attest; its decoded entitlement
   permits production attestation and production push notifications. EAS holds
-  the current profile. No signed store build has been produced or uploaded.
+  the current profile. Store build 1 was signed and uploaded; Apple processing
+  rejected it for a missing SDK-required purpose string. Protected workflow
+  42323018488 built and uploaded corrected build 2 from main commit 60d0406.
+  Its actual signed binary has the required purpose string, production push and
+  App Attest entitlements, and debugging disabled. Apple processing is VALID;
+  build 2 is IN_BETA_TESTING. The 7 November 2026 04:07 UTC readback reports
+  the configured owner tester as INSTALLED.
   App Store Connect API credential stored in the protected GitHub release
   environment as FAMCALL_APPLE_API_KEY_JSON.
   Apple team ZGBBX2Y24U linked to the Firebase iOS app.
@@ -38,7 +48,7 @@ CONFIGURED
   APNS_TEAM_ID are in Secret Manager with FamCall runtime read access.
   Firebase DeviceCheck confirms the private key is configured; token TTL is
   one hour. Firebase Cloud Messaging confirms the production APNs key is
-  installed. TestFlight delivery remains pending. This key does not cover
+  installed. Production push delivery still requires device validation. This key does not cover
   development sandbox pushes.
 - Google Play app record created: FamCall: Simple Voice Calls,
   com.silvergridtech.famcall. Dedicated famcall-play-publisher service account
@@ -53,8 +63,22 @@ CONFIGURED
 - Play Integrity linked to FamCall Cloud project 635297130023 after owner
   acceptance of Google's terms. The console confirms a 10,000/day integrity
   request allowance; this is separate from the 50/day verification-SMS quota.
-- Owner-only internal testing groups configured in Play Console and TestFlight.
-  First usable build and invitation/opt-in completion remain pending.
+- Owner-only internal testing groups are configured in both stores. Protected
+  workflow 42336889833 succeeded for source fecda429 with PR #6 (iOS native
+  phone verification) and PR #7 (Android permission cleanup). The 7 November
+  2026 04:27 UTC readback confirms iOS 0.1.0 (3) VALID/IN_BETA_TESTING in the
+  owner group, and Android 0.1.0 code 4 in the completed internal release.
+  Google Play's received bundle SHA-256 matches the submitted artifact.
+  Updated TestFlight test notes were saved and read-back verified. The owner
+  already has testing access; installation of build 3 is not verified.
+  See testing-delivery-2026-11-07.json for exact delivery identities and limits.
+  Existing build 2/code 3 privacy reports remain historical evidence; repeat
+  privacy inspection on the final candidate rather than reusing those results.
+- The owner explicitly approved Apple's standard-encryption declaration and no
+  France distribution for now. It was saved for iOS build 2, clearing Missing
+  Compliance, and reused for build 3. See encryption-answer.txt. Reassess the
+  declaration before any France distribution or change
+  in encryption. This does not approve a public release or all legal obligations.
 - Play Integrity currently requires Play-recognized app, not Play licensing;
   this supports Play plus off-Play distribution after Play recognizes the same
   signed build. Do not promise an arbitrary unsigned/sideloaded build will pass.
@@ -82,9 +106,9 @@ CONFIGURED
 PREPARED / OWNER OR STORE ACTION NEEDED
 - Validate Firebase phone-auth APNs, DeviceCheck/App Attest, and production
   notification delivery on real devices.
-- Register Play App Signing fingerprints and make the first upload through
-  the protected workflow. Play automatic protection
-  is enabled; direct APK installation compatibility has not been validated.
+- Play automatic protection is enabled; direct APK installation compatibility
+  has not been validated. The Play internal release and Firebase certificate
+  registration are complete; production authentication still needs device tests.
 - Store legal identity/contact, age/audience, encryption, data safety and privacy
   declarations require publisher review. The owner confirmed Apple's account
   identity; public copy now consistently uses SilverGrid Technology LLC.
@@ -95,7 +119,13 @@ PREPARED / OWNER OR STORE ACTION NEEDED
   configuration-read access. Event delivery roles are preconfigured by the
   maintainer so the deployment identity does not need project IAM administration.
   Noninteractive deployment explicitly accepts the
-  reviewed event-handler retry policies. Successful deployment is still pending.
+  reviewed event-handler retry policies. Run 42322194542 attempt 3 succeeded:
+  all 13 functions are ACTIVE, all three composite indexes READY, and the website,
+  privacy, terms and account-deletion pages return HTTP 200 and match that
+  workflow's deployed source 336c6be. Revised privacy/deletion notices in PR #5
+  await a protected website deployment after review.
+  Credential-free requests to registerProfile, startCall and getIceServers return
+  UNAUTHENTICATED. This does not establish successful authenticated app calling.
 - First owner-approved testing workflow started Android build 2, then failed
   during iOS preparation because the GitHub runner lacked the native Firebase
   plist during local entitlement resolution. Android continued on Expo, but no
@@ -114,12 +144,12 @@ PREPARED / OWNER OR STORE ACTION NEEDED
   build 1 with ITMS-90683 because bundled WebRTC camera APIs require a camera
   purpose string. The native configuration now retains truthful voice-only
   wording; camera capture and video calling remain disabled. A new iOS binary
-  must pass Apple processing before testing availability can be claimed.
+  passed Apple processing and is available to the configured internal tester.
 - Direct Android APK distribution has a build profile but no public download
   yet. Play Integrity recognition and signing compatibility must be validated.
 
 RELEASE BLOCKERS
 Valid two-way audio and interruption/recovery evidence, actual iPhone call delivery,
 physical-device background/push/audio routes, production auth/App Check fallbacks,
-store signing/distribution, and owner review remain mandatory gates. Refer to
+public-store declarations and owner review remain mandatory gates. Refer to
 verification-report.txt; a successful simulator UI check does not clear them.
