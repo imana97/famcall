@@ -69,6 +69,16 @@ int main(void) {
 '''
 
 
+def build_native(args):
+    try:
+        subprocess.run(args, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as error:
+        # These mock builds contain no credentials; keep compiler failures useful
+        # in hosted logs while bounding their diagnostic output.
+        diagnostic = (error.stderr or "No compiler stderr")[:4096]
+        raise RuntimeError(f"Native observer test compile failed:\n{diagnostic}") from error
+
+
 class NativeObserverTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -87,12 +97,10 @@ class NativeObserverTests(unittest.TestCase):
         cls.shim = cls.root / ("libobserver" + suffix)
         cls.client = cls.root / "qemu-system-x86_64"
         compile_common = ["cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I", str(cls.root)]
-        def build(args):
-            subprocess.run(args, check=True, capture_output=True, text=True)
-        build([*compile_common, *shared, str(cls.root / "mock.c"), "-o", str(cls.lib)])
-        build([*compile_common, *shared, str(FIXTURE / "pulse_observer.c"), "-pthread",
+        build_native([*compile_common, *shared, str(cls.root / "mock.c"), "-o", str(cls.lib)])
+        build_native([*compile_common, *shared, str(FIXTURE / "pulse_observer.c"), "-pthread",
                *([str(cls.lib)] if cls.apple else ["-ldl"]), "-o", str(cls.shim)])
-        build([*compile_common, str(cls.root / "client.c"), str(cls.lib),
+        build_native([*compile_common, str(cls.root / "client.c"), str(cls.lib),
                *(["-Wl,-flat_namespace"] if cls.apple else []), "-o", str(cls.client)])
 
     @classmethod
@@ -176,12 +184,11 @@ class NativeObserverTests(unittest.TestCase):
             source.write_text("int main(void) { return 0; }\n")
             client = folder / "qemu-system-x86_64"
             shim = folder / ("unbound.dylib" if self.apple else "unbound.so")
-            subprocess.run(["cc", str(source), "-o", str(client)], check=True, capture_output=True)
-            subprocess.run(["cc", "-std=c11", "-I", str(self.root),
+            build_native(["cc", str(source), "-o", str(client)])
+            build_native(["cc", "-std=c11", "-I", str(self.root),
                             *(["-dynamiclib"] if self.apple else ["-shared", "-fPIC"]),
                             str(FIXTURE / "pulse_observer.c"), "-pthread",
-                            *([] if self.apple else ["-ldl"]), "-o", str(shim)],
-                           check=True, capture_output=True)
+                            *([] if self.apple else ["-ldl"]), "-o", str(shim)])
             observer = prepare_observer(folder, shim, 0)
             env = observer.emulator_env({"PATH": os.environ["PATH"]})
             if self.apple:

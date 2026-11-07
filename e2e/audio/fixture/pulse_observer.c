@@ -198,7 +198,7 @@ static void route(Stream *s) {
     s->index = index; s->source = source;
     s->rate = spec ? spec->rate : 0;
     s->channels = spec ? spec->channels : 0;
-    s->format = spec ? spec->format : -1;
+    s->format = spec ? (int)spec->format : -1;
     s->route_matches = s->index != PA_INVALID_INDEX && s->source == (uint32_t)expected_source &&
         name && strcmp(name, "famcall_input") == 0 && spec && spec->format == PA_SAMPLE_S16LE &&
         spec->rate == 44100 && spec->channels == 2;
