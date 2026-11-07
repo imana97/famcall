@@ -12,14 +12,25 @@ from scipy.signal import resample_poly
 
 
 def load_controller():
-    # Controller definitions have no import-time device work. Stub only generated
-    # RPC modules so these process/file tests need no installed emulator SDK.
+    # Controller definitions have no import-time device work. These process/file
+    # tests use only analysis-requirements.txt, without gRPC, protobuf or an SDK.
+    # Keep every unused RPC import isolated; no runtime dependencies are added.
+    stubs = {name: types.ModuleType(name) for name in
+             ("grpc", "google", "google.protobuf", "google.protobuf.empty_pb2",
+              "emulator_controller_pb2", "emulator_controller_pb2_grpc")}
+    stubs["google"].__path__ = []
+    stubs["google.protobuf"].__path__ = []
+    stubs["google"].protobuf = stubs["google.protobuf"]
+    stubs["google.protobuf"].empty_pb2 = stubs["google.protobuf.empty_pb2"]
+
+    def unexpected_rpc(*args, **kwargs):
+        raise AssertionError("RPC calls are outside these process/file tests")
+
+    stubs["google.protobuf.empty_pb2"].Empty = unexpected_rpc
     source = Path(__file__).parent / "fixture/run.py"
     spec = importlib.util.spec_from_file_location("fixture_controller_test", source)
     module = importlib.util.module_from_spec(spec)
-    with patch.dict(os.environ, {"ANDROID_HOME": "/unused-test-sdk"}), patch.dict(
-            "sys.modules", {name: types.ModuleType(name) for name in
-                            ("emulator_controller_pb2", "emulator_controller_pb2_grpc")}):
+    with patch.dict(os.environ, {"ANDROID_HOME": "/unused-test-sdk"}), patch.dict("sys.modules", stubs):
         spec.loader.exec_module(module)
     return module
 
