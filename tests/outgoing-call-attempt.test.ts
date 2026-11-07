@@ -23,6 +23,28 @@ function fixture() {
 const settle = async () => { await Promise.resolve(); await Promise.resolve(); };
 
 describe("outgoing setup cancellation", () => {
+  it("does not ring or write a server cancellation when permission preflight is denied", async () => {
+    const { hooks } = fixture();
+    const attempt = new OutgoingCallAttempt(call.id, { ...hooks, preflight: async () => false });
+    await attempt.run();
+    expect(hooks.create).not.toHaveBeenCalled();
+    expect(hooks.startNative).not.toHaveBeenCalled();
+    expect(hooks.persistEnd).not.toHaveBeenCalled();
+  });
+
+  it("can cancel during permission preflight without starting a late call", async () => {
+    const { hooks } = fixture();
+    const permission = deferred<boolean>();
+    const attempt = new OutgoingCallAttempt(call.id, { ...hooks, preflight: () => permission.promise });
+    const run = attempt.run();
+    await attempt.cancel();
+    permission.resolve(true);
+    await run;
+    expect(hooks.create).not.toHaveBeenCalled();
+    expect(hooks.startNative).not.toHaveBeenCalled();
+    expect(hooks.persistEnd).not.toHaveBeenCalled();
+  });
+
   it("persists cancellation before creation resolves and never creates a native call afterward", async () => {
     const { attempt, hooks, create } = fixture();
     const run = attempt.run();

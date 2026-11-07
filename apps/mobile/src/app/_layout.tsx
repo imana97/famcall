@@ -2,11 +2,13 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SessionProvider } from "../state/Session";
 import { CallingProvider } from "../state/Calling";
+import { CallReadinessProvider } from "../state/CallReadiness";
 import { useTheme } from "../components/ui";
 export default function RootLayout() {
   const c = useTheme();
   return (
     <SessionProvider>
+      <CallReadinessProvider>
       <CallingProvider>
         <StatusBar style="auto" />
         <Stack
@@ -17,6 +19,7 @@ export default function RootLayout() {
           }}
         />
       </CallingProvider>
+      </CallReadinessProvider>
     </SessionProvider>
   );
 }

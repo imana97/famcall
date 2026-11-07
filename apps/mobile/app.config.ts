@@ -71,6 +71,7 @@ const config: ExpoConfig = {
     "./plugins/withAudioOnly",
     "./plugins/withFirebasePhoneAuth",
     "./plugins/withTestBackend",
+    "./plugins/withCallPermissions",
     "expo-router",
     ["expo-localization", { supportedLocales: ["en"], supportsRTL: false }],
     [
@@ -80,7 +81,11 @@ const config: ExpoConfig = {
           "Choose someone from your contacts to add to FamCall.",
       },
     ],
-    ["expo-notifications", { enableBackgroundRemoteNotifications: true }],
+    ["expo-notifications", {
+      enableBackgroundRemoteNotifications: true,
+      icon: "./assets/notification-icon.png",
+      color: "#183D34",
+    }],
     [
       "expo-build-properties",
       {
@@ -110,6 +115,8 @@ const config: ExpoConfig = {
         supportsVideo: false,
         supportsHolding: false,
         includesCallsInRecents: false,
+        iconTemplateIos: "./assets/callkit-icon.png",
+        notificationIconAndroid: "./assets/notification-icon.png",
         cameraPermission: false,
         microphonePermission:
           "FamCall uses your microphone during voice calls.",

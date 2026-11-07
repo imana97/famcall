@@ -4,6 +4,7 @@ type Hooks = {
   isCurrent: () => boolean;
   hasEndedLocally: () => boolean;
   nativeEnded: (id: string) => boolean;
+  preflight?: () => Promise<boolean>;
   create: () => Promise<CallRecord>;
   startNative: (call: CallRecord) => Promise<string>;
   endNative: (id: string) => Promise<void>;
@@ -18,6 +19,7 @@ type Hooks = {
 export class OutgoingCallAttempt {
   private cancelled = false;
   private endWrite?: Promise<void>;
+  private createStarted = false;
 
   constructor(readonly id: string, private hooks: Hooks) {}
 
@@ -36,11 +38,17 @@ export class OutgoingCallAttempt {
 
   cancel() {
     this.cancelled = true;
-    return this.persistEnd();
+    return this.createStarted ? this.persistEnd() : Promise.resolve();
   }
 
   async run() {
     try {
+      if (this.hooks.preflight && !await this.hooks.preflight()) {
+        this.cancelled = true;
+        return;
+      }
+      if (!this.active) return;
+      this.createStarted = true;
       const call = await this.hooks.create();
       if (!this.active) {
         await this.persistEnd();
@@ -63,7 +71,7 @@ export class OutgoingCallAttempt {
     } catch (error) {
       const report = this.active;
       // A failed/timeout response does not prove the server failed to create it.
-      try { await this.persistEnd(); }
+      try { if (this.createStarted) await this.persistEnd(); }
       catch (storageError) {
         if (this.hooks.isCurrent()) this.hooks.error(storageError);
       }
