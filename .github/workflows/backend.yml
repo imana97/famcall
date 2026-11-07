@@ -41,11 +41,19 @@ jobs:
       - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
         with:
           project_id: famcall
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        if: inputs.scope == 'website' || inputs.scope == 'all'
+        with:
+          distribution: temurin
+          java-version: '25'
       - name: Deploy the reviewed main commit
         if: inputs.scope != 'backend-permissions'
         env:
           DEPLOY_SCOPE: ${{ inputs.scope }}
         run: |
+          if [ "$DEPLOY_SCOPE" = website ] || [ "$DEPLOY_SCOPE" = all ]; then
+            node scripts/preserve-website-download.mjs
+          fi
           case "$DEPLOY_SCOPE" in
             website) target=hosting ;;
             backend) target=firestore,functions ;;
