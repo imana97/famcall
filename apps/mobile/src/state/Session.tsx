@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import { onAuthStateChanged, type User } from "@react-native-firebase/auth";
+import { AppState } from "react-native";
+import { onAuthStateChanged, reload, signOut, type User } from "@react-native-firebase/auth";
 import {
   collection,
   onSnapshot,
@@ -11,6 +12,7 @@ import {
 import type { CallRecord } from "@famcall/core";
 import { api, auth, database, initializeFirebase } from "../services/firebase";
 import { errorMessage } from "../services/errors";
+import { SessionValidation } from "../services/SessionValidation";
 
 export interface Person {
   phone: string;
@@ -61,6 +63,23 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
   const [blockedError, setBlockedError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const identity = useRef<string | null | undefined>(undefined);
+  const validation = useRef<SessionValidation<User> | null>(null);
+  useEffect(() => {
+    const validator = new SessionValidation({
+      current: () => auth.currentUser,
+      reload,
+      signOut: () => signOut(auth),
+    });
+    validation.current = validator;
+    const subscription = AppState.addEventListener("change", state => {
+      if (state === "active") void validator.validate();
+    });
+    return () => {
+      validator.dispose();
+      subscription.remove();
+      validation.current = null;
+    };
+  }, []);
   useEffect(() => {
     let alive = true;
     let unsubscribe: (() => void) | undefined;
@@ -87,6 +106,9 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
           }
           setUser(next);
           setReady(true);
+          // Auth restores cached users before it learns about server-side
+          // deletion. Recheck in the background on attach (including Retry).
+          void validation.current?.validate();
         });
       })
       .catch((e) => {

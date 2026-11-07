@@ -8,7 +8,6 @@ import {
   Avatar,
   Button,
   ErrorBanner,
-  Heading,
   Label,
   useTheme,
 } from "../../components/ui";
@@ -76,33 +75,31 @@ export default function CallScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg, direction: "ltr" }}>
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 20, paddingBottom: 24, gap: 18 }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingHorizontal: 24, paddingVertical: 32, gap: 24 }}
       >
-        <View style={{ alignItems: "center", paddingTop: 48, gap: 24 }}>
-          <Avatar name={name || "?"} size={112} />
-          <View style={{ alignItems: "center", gap: 8 }}>
-            <Label style={{ fontSize: 30, fontWeight: "600" }}>{name}</Label>
-            <Label muted>{displayPhone(phone)}</Label>
+        <View style={{ alignItems: "center", gap: 28 }}>
+          <Avatar name={name || "?"} size={96} />
+          <View style={{ alignItems: "center", gap: 8, width: "100%" }}>
+            <Label style={{ fontSize: 32, lineHeight: 40, fontWeight: "600", textAlign: "center" }}>{name}</Label>
+            {phone && name !== displayPhone(phone) && <Label muted style={{ textAlign: "center" }}>{displayPhone(phone)}</Label>}
           </View>
-        </View>
-        <View style={{ paddingTop: 36 }}>
-          <Heading
-            title={t(status)}
-            subtitle={
-              calling.voice === "reconnecting" ? t("reconnectingBody") : undefined
-            }
-          />
-        </View>
-        {calling.connectedAt && !ended && (
-          <Label muted>
+          <View style={{ alignItems: "center", gap: 8 }}>
+          <View accessibilityLiveRegion="polite">
+            <Label muted style={{ fontSize: 20, lineHeight: 28, textAlign: "center" }}>{t(status)}</Label>
+          </View>
+          {!ended && calling.voice === "reconnecting" && <Label muted style={{ textAlign: "center" }}>{t("reconnectingBody")}</Label>}
+          {calling.connectedAt && !ended && (
+          <Label muted style={{ fontSize: 18, lineHeight: 26, textAlign: "center", fontVariant: ["tabular-nums"] }}>
             {Math.floor(elapsed / 60) +
               ":" +
               String(elapsed % 60).padStart(2, "0")}
           </Label>
-        )}
+          )}
+          </View>
+        </View>
         <ErrorBanner message={calling.error} />
       </ScrollView>
-      <View style={{ flexShrink: 0, paddingHorizontal: 24, paddingTop: 12, paddingBottom: 24, gap: 18 }}>
+      <View style={{ flexShrink: 0, paddingHorizontal: 24, paddingTop: 12, paddingBottom: 24, gap: 16 }}>
         {incoming ? (
           <>
             <Button
@@ -110,16 +107,20 @@ export default function CallScreen() {
               title={t("answer")}
               icon={Phone}
               onPress={() => void calling.answer()}
+              style={{ minHeight: 64 }}
+              textStyle={{ fontSize: 20 }}
             />
             <Button
               title={t("decline")}
               danger
               secondary
               onPress={() => void calling.end()}
+              style={{ minHeight: 64 }}
+              textStyle={{ fontSize: 18 }}
             />
           </>
         ) : ended || (!call && calling.error) ? (
-          <Button title={t("done")} onPress={() => router.replace("/")} />
+          <Button title={t("done")} style={{ minHeight: 64 }} textStyle={{ fontSize: 20 }} onPress={() => router.replace("/")} />
         ) : (
           <>
             <View style={{ flexDirection: "row", gap: 12 }}>
@@ -128,16 +129,22 @@ export default function CallScreen() {
                   testID="mute-call"
                   title={t(calling.muted ? "unmute" : "mute")}
                   icon={calling.muted ? MicOff : Mic}
-                  secondary
+                  secondary={!calling.muted}
+                  selected={calling.muted}
+                  style={{ minHeight: 64 }}
+                  textStyle={{ fontSize: 18 }}
                   onPress={calling.toggleMute}
                 />
               </View>
               <View style={{ flex: 1 }}>
                 <Button
                   testID="speaker-call"
-                  title={t(calling.speaker ? "earpiece" : "speaker")}
+                  title={t("speaker")}
                   icon={Volume2}
-                  secondary
+                  secondary={!calling.speaker}
+                  selected={calling.speaker}
+                  style={{ minHeight: 64 }}
+                  textStyle={{ fontSize: 18 }}
                   onPress={calling.toggleSpeaker}
                 />
               </View>
@@ -148,6 +155,8 @@ export default function CallScreen() {
               icon={PhoneOff}
               danger
               onPress={() => void calling.end()}
+              style={{ minHeight: 66 }}
+              textStyle={{ fontSize: 20 }}
             />
           </>
         )}

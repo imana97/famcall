@@ -1,5 +1,6 @@
+import { HapticPressable as Pressable } from "../components/HapticPressable";
 import { useEffect, useState } from "react";
-import { Linking, Pressable, View } from "react-native";
+import { Linking, View } from "react-native";
 import { Redirect } from "expo-router";
 import {
   signInWithPhoneNumber,
@@ -13,6 +14,7 @@ import {
   Heading,
   Label,
   Page,
+  useTheme,
 } from "../components/ui";
 import { BrandMark } from "../components/BrandMark";
 import { t } from "../i18n";
@@ -21,6 +23,7 @@ import { preparePhoneVerification } from "../services/phoneVerification";
 import { errorMessage } from "../services/errors";
 import { useSession } from "../state/Session";
 export default function AuthScreen() {
+  const c = useTheme();
   const { user } = useSession();
   const [number, setNumber] = useState("");
   const [code, setCode] = useState("");
@@ -67,30 +70,28 @@ export default function AuthScreen() {
     }
   };
   return (
-    <Page key={confirmation ? "verification" : "phone"}>
+    <Page
+      key={confirmation ? "verification" : "phone"}
+      contentStyle={{ flexGrow: 1, gap: 0, paddingTop: 32 }}
+    >
       <View
         style={{
-          flexDirection: "row",
           alignItems: "center",
-          gap: 10,
-          marginBottom: 8,
+          marginBottom: confirmation ? 32 : 44,
         }}
       >
-        <BrandMark size={48} />
-        <Label style={{ fontWeight: "600", fontSize: 22 }}>
-          {t("appName")}
-        </Label>
+        <BrandMark size={64} />
       </View>
       <Heading
-        title={t(confirmation ? "verifyTitle" : "welcome")}
-        bottomSpacing={10}
+        title={t(confirmation ? "verifyTitle" : "loginTitle")}
+        bottomSpacing={32}
         subtitle={
-          confirmation ? t("verifyBody", { phone: number }) : t("welcomeBody")
+          confirmation ? t("verifyBody", { phone: number }) : undefined
         }
       />
       <ErrorBanner message={error} />
       {confirmation ? (
-        <>
+        <View style={{ gap: 18 }}>
           <Field
             testID="verification-code"
             label={t("code")}
@@ -132,13 +133,15 @@ export default function AuthScreen() {
               setError(null);
             }}
           />
-        </>
+        </View>
       ) : (
         <>
-          <Label style={{ fontWeight: "500" }}>{t("verifyOnce")}</Label>
+          <View style={{ gap: 12 }}>
+          <Label style={{ fontSize: 20, lineHeight: 28, fontWeight: "500" }}>{t("phone")}</Label>
           <Field
             testID="phone-number"
             label={t("phone")}
+            hideLabel
             placeholder={t("phonePlaceholder")}
             value={number}
             onChangeText={setNumber}
@@ -146,12 +149,10 @@ export default function AuthScreen() {
             keyboardType="phone-pad"
             textContentType="telephoneNumber"
             autoComplete="tel"
+            style={{ minHeight: 66, fontSize: 22, borderWidth: 1.5, borderColor: c.muted }}
           />
-          <Label muted style={{ fontSize: 14 }}>
-            {t("countryCodeHint")}
-          </Label>
-          <Label muted style={{ fontSize: 13, lineHeight: 20 }}>
-            {t("phoneConsent")}
+          <Label muted style={{ fontSize: 16, lineHeight: 24 }}>
+            {t("loginCountryCodeHint")}
           </Label>
           <Button
             testID="send-code"
@@ -163,14 +164,20 @@ export default function AuthScreen() {
             busy={busy}
             disabled={!number.trim() || remaining > 0}
             onPress={send}
+            style={{ minHeight: 66, marginTop: 12 }}
+            textStyle={{ fontSize: 20, lineHeight: 28 }}
           />
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
+          </View>
+          <Label muted style={{ fontSize: 15, lineHeight: 22, marginTop: 20 }}>
+            {t("phoneConsent")}
+          </Label>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 28, marginTop: "auto", paddingTop: 24 }}>
             <Pressable
               accessibilityRole="link"
               style={{ minHeight: 48, justifyContent: "center" }}
               onPress={() => Linking.openURL("https://famcall.web.app/privacy")}
             >
-              <Label style={{ textDecorationLine: "underline", fontSize: 13 }}>
+              <Label muted style={{ textDecorationLine: "underline", fontSize: 16 }}>
                 {t("privacy")}
               </Label>
             </Pressable>
@@ -179,7 +186,7 @@ export default function AuthScreen() {
               style={{ minHeight: 48, minWidth: 48, justifyContent: "center" }}
               onPress={() => Linking.openURL("https://famcall.web.app/terms")}
             >
-              <Label style={{ textDecorationLine: "underline", fontSize: 13 }}>
+              <Label muted style={{ textDecorationLine: "underline", fontSize: 16 }}>
                 {t("terms")}
               </Label>
             </Pressable>

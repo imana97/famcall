@@ -1,8 +1,10 @@
-New in this test build:
-- Signal bridge icon in FamCall's familiar colors.
-- Microphone setup before calling.
-- Clearer forms, keyboard behavior and navigation at larger text sizes.
+FamCall 0.2.0
+- Simpler people list, settings, call history and calling screens.
+- Dial any FamCall number from the new bottom-sheet keypad.
+- Edit contact names and numbers, or swipe to remove a contact.
+- Log out without deleting your account.
+- English and Persian, with the same left-to-right layout.
+- Subtle haptic feedback and clearer account verification.
+- Incoming-call and session-recovery fixes.
 
-Please test incoming calls while locked, in the background and after swiping FamCall away. Android Settings Force stop blocks delivery until you reopen the app. iPhone calling after a swipe away still needs device testing.
-
-This is a test build, not a public release.
+Please test incoming calls with the phone locked and FamCall in the background, call controls, language switching and contact editing. Android Force stop prevents incoming calls until the app is reopened.

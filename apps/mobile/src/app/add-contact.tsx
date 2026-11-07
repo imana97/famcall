@@ -1,24 +1,40 @@
+import { HapticPressable as Pressable } from "../components/HapticPressable";
 import { useCallback, useState } from "react";
-import { BackHandler } from "react-native";
+import { ActivityIndicator, BackHandler, View } from "react-native";
 import { Contact } from "expo-contacts";
-import { Redirect, router, useFocusEffect } from "expo-router";
-import { ContactRound } from "lucide-react-native";
+import { Redirect, router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { ArrowLeft, ChevronRight, ContactRound } from "lucide-react-native";
 import { displayPhone, normalizePhone } from "@famcall/core";
 import {
   Button,
   ErrorBanner,
   Field,
-  Heading,
   Label,
   Page,
+  useTheme,
 } from "../components/ui";
 import { useSession } from "../state/Session";
 import { api } from "../services/firebase";
 import { errorMessage } from "../services/errors";
 import { t } from "../i18n";
+function ContactHeader({ title, onBack }: { title: string; onBack: () => void }) {
+  const c = useTheme();
+  return <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+    <Pressable accessibilityRole="button" accessibilityLabel={t("back")}
+      onPress={onBack}
+      style={({ pressed }) => ({ width: 48, height: 48, marginLeft: -12, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.6 : 1 })}>
+      <ArrowLeft size={24} color={c.text} />
+    </Pressable>
+    <Label style={{ fontSize: 20, fontWeight: "600", flex: 1 }}>{title}</Label>
+  </View>;
+}
+
 export default function AddContact() {
+  const c = useTheme();
   const { user } = useSession();
-  const [{ name, phone }, setPerson] = useState({ name: "", phone: "" });
+  const params = useLocalSearchParams<{ editPhone?: string; name?: string }>();
+  const editing = !!params.editPhone;
+  const [{ name, phone }, setPerson] = useState({ name: params.name ?? "", phone: params.editPhone ?? "" });
   const [choice, setChoice] = useState<{
     name: string;
     numbers: string[];
@@ -79,24 +95,29 @@ export default function AddContact() {
       await api("saveContact", {
         name: name.trim(),
         phone: normalizePhone(phone),
+        ...(editing ? { previousPhone: params.editPhone } : {}),
       });
       router.back();
     } catch (e) {
-      setError(errorMessage(e));
+      setError(String((e as { code?: string })?.code).endsWith("already-exists")
+        ? t("errorContactExists") : errorMessage(e));
     } finally {
       setBusy(false);
     }
   }
   if (choice)
     return (
-      <Page key="contact-choice">
-        <Heading title={t("choosePhone")} subtitle={choice.name} />
+      <Page key="contact-choice" contentStyle={{ paddingHorizontal: 16, gap: 16 }} headerStyle={{ paddingHorizontal: 16 }}
+        header={<ContactHeader title={t("choosePhone")} onBack={() => setChoice(null)} />}>
+        <Label style={{ fontSize: 18, fontWeight: "500" }}>{choice.name}</Label>
         {choice.numbers.map((number, index) => (
           <Button
             key={number}
             testID={"contact-phone-choice-" + index}
             title={displayPhone(number)}
             secondary
+            style={{ minHeight: 60, borderRadius: 16 }}
+            textStyle={{ fontSize: 18 }}
             onPress={() => {
               setPerson({ name: choice.name, phone: number });
               setChoice(null);
@@ -112,48 +133,73 @@ export default function AddContact() {
       </Page>
     );
   return (
-    <Page key="contact-form">
-      <Heading back title={t("addContact")} />
+    <Page key="contact-form" contentStyle={{ paddingHorizontal: 16, paddingTop: 20, gap: 24 }} headerStyle={{ paddingHorizontal: 16 }}
+      header={<ContactHeader title={t(editing ? "editPerson" : "addContact")} onBack={() => router.back()} />}>
       <ErrorBanner message={error} />
-      <Button
-        testID="choose-contact"
-        title={t("chooseContacts")}
-        icon={ContactRound}
-        secondary
-        busy={picking}
-        disabled={busy}
-        onPress={pick}
-      />
-      <Label muted style={{ fontSize: 13 }}>
-        {t("contactPrivacy")}
-      </Label>
-      <Field
-        testID="contact-name"
-        label={t("name")}
-        placeholder={t("namePlaceholder")}
-        value={name}
-        onChangeText={(value) => setPerson((person) => ({ ...person, name: value }))}
-        editable={!busy && !picking}
-        autoCapitalize="words"
-        maxLength={80}
-      />
-      <Field
-        testID="contact-number"
-        label={t("phone")}
-        placeholder={t("phonePlaceholder")}
-        value={phone}
-        onChangeText={(value) => setPerson((person) => ({ ...person, phone: value }))}
-        editable={!busy && !picking}
-        keyboardType="phone-pad"
-      />
-      <Label muted style={{ fontSize: 14 }}>
-        {t("countryCodeHint")}
-      </Label>
+      {!editing && <View style={{ gap: 10 }}>
+        <Pressable
+          testID="choose-contact"
+          accessibilityRole="button"
+          accessibilityLabel={t("chooseContacts")}
+          accessibilityState={{ disabled: busy || picking, busy: picking }}
+          disabled={busy || picking}
+          onPress={() => void pick()}
+          style={({ pressed }) => ({
+            minHeight: 60,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 14,
+            marginHorizontal: -16,
+            paddingHorizontal: 16,
+            paddingBottom: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: c.line,
+            opacity: busy ? 0.5 : pressed ? 0.6 : 1,
+          })}
+        >
+          <ContactRound size={24} color={c.text} />
+          <Label style={{ flex: 1, fontSize: 18, fontWeight: "500" }}>{t("chooseContacts")}</Label>
+          {picking ? <ActivityIndicator color={c.primary} /> : <ChevronRight size={20} color={c.muted} />}
+        </Pressable>
+        <Label muted style={{ fontSize: 14, lineHeight: 22 }}>{t("contactPrivacy")}</Label>
+      </View>}
+      <View style={{ gap: 8 }}>
+        <Label style={{ fontSize: 18, fontWeight: "500" }}>{t("name")}</Label>
+        <Field
+          testID="contact-name"
+          label={t("name")}
+          hideLabel
+          placeholder={t("namePlaceholder")}
+          value={name}
+          onChangeText={(value) => setPerson((person) => ({ ...person, name: value }))}
+          editable={!busy && !picking}
+          autoCapitalize="words"
+          maxLength={80}
+          style={{ minHeight: 60, fontSize: 20, borderColor: c.muted }}
+        />
+      </View>
+      <View style={{ gap: 8 }}>
+        <Label style={{ fontSize: 18, fontWeight: "500" }}>{t("phone")}</Label>
+        <Field
+          testID="contact-number"
+          label={t("phone")}
+          hideLabel
+          placeholder={t("phonePlaceholder")}
+          value={phone}
+          onChangeText={(value) => setPerson((person) => ({ ...person, phone: value }))}
+          editable={!busy && !picking}
+          keyboardType="phone-pad"
+          style={{ minHeight: 60, fontSize: 20, borderColor: c.muted }}
+        />
+        <Label muted style={{ fontSize: 14, lineHeight: 22 }}>{t("countryCodeHint")}</Label>
+      </View>
       <Button
         testID="save-contact"
-        title={t("save")}
+        title={t(editing ? "saveChanges" : "save")}
         busy={busy}
         disabled={picking}
+        style={{ minHeight: 60, borderRadius: 16 }}
+        textStyle={{ fontSize: 18 }}
         onPress={save}
       />
     </Page>
