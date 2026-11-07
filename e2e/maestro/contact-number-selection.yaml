@@ -1,0 +1,110 @@
+# Requires scripts/seed-contact-fixtures.mjs and an authenticated demo build.
+appId: com.silvergridtech.famcall.e2e
+---
+- launchApp
+- tapOn:
+    id: add-person
+- tapOn:
+    id: contact-name
+- inputText: DraftPerson
+- tapOn: Add a person
+- tapOn:
+    id: contact-number
+- inputText: '+12025550102'
+- tapOn: Add a person
+# A contact without a number must not relabel the previously typed number.
+- tapOn:
+    id: choose-contact
+- tapOn: FamCallNoPhone
+- assertVisible: This contact has no phone number.*
+- assertVisible:
+    id: contact-name
+    text: DraftPerson
+- assertVisible:
+    id: contact-number
+    text: '\+12025550102'
+# Cancelling the native picker preserves the same complete draft.
+- tapOn:
+    id: choose-contact
+- back
+- assertVisible:
+    id: contact-name
+    text: DraftPerson
+- assertVisible:
+    id: contact-number
+    text: '\+12025550102'
+# The in-app chooser includes every number and an explicit Cancel action.
+- tapOn:
+    id: choose-contact
+- tapOn: FamCallManyNumbers
+- assertVisible: Choose a number.
+- assertVisible:
+    id: contact-phone-choice-0
+- scrollUntilVisible:
+    element:
+      id: contact-phone-choice-8
+    direction: DOWN
+- assertVisible:
+    id: contact-phone-choice-8
+- takeScreenshot: .local/contact-selection-chooser
+- scrollUntilVisible:
+    element:
+      id: cancel-contact-choice
+    direction: DOWN
+- tapOn:
+    id: cancel-contact-choice
+- assertVisible:
+    id: contact-name
+    text: DraftPerson
+- assertVisible:
+    id: contact-number
+    text: '\+12025550102'
+- takeScreenshot: .local/contact-selection-cancelled
+# Android's back action cancels only the chooser, preserving the draft.
+- tapOn:
+    id: choose-contact
+- tapOn: FamCallManyNumbers
+- back
+- assertVisible:
+    id: contact-name
+    text: DraftPerson
+- assertVisible:
+    id: contact-number
+    text: '\+12025550102'
+# A single-number choice replaces the name and phone together.
+- tapOn:
+    id: choose-contact
+- tapOn: FamCallOneNumber
+- assertVisible:
+    id: contact-name
+    text: FamCallOneNumber
+- assertVisible:
+    id: contact-number
+    text: '\+12025550104'
+# A choice beyond both the former Android three-button and eight-number caps works.
+- tapOn:
+    id: choose-contact
+- tapOn: FamCallManyNumbers
+- scrollUntilVisible:
+    element:
+      id: contact-phone-choice-8
+    direction: DOWN
+- tapOn:
+    id: contact-phone-choice-8
+- assertVisible:
+    id: contact-name
+    text: FamCallManyNumbers
+- assertVisible:
+    id: contact-number
+    text: '\+12025550109'
+- takeScreenshot: .local/contact-selection-ninth
+- scrollUntilVisible:
+    element:
+      id: save-contact
+    direction: DOWN
+- tapOn:
+    id: save-contact
+- extendedWaitUntil:
+    visible: Your people.
+    timeout: 15000
+- assertVisible: Call FamCallManyNumbers

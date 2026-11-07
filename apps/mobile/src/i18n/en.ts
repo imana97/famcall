@@ -16,6 +16,9 @@ export const en = {
   countryCodeHint: "Include the country code. Both + and 00 work.",
   save: "Save person",
   chooseContacts: "Choose from contacts",
+  choosePhone: "Choose a number.",
+  errorContactNumber:
+    "This contact has no phone number. Choose another person or enter their number below.",
   contactPrivacy:
     "Only the person you choose is added. Your address book stays on your phone.",
   emptyPeople: "Keep your people close.",
