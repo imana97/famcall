@@ -17,7 +17,8 @@ import {
   useTheme,
 } from "../components/ui";
 import { t } from "../i18n";
-import { auth, initializeFirebase } from "../services/firebase";
+import { auth, initializeFirebase, isE2E } from "../services/firebase";
+import { preparePhoneVerification } from "../services/phoneVerification";
 import { errorMessage } from "../services/errors";
 import { useSession } from "../state/Session";
 export default function AuthScreen() {
@@ -44,6 +45,7 @@ export default function AuthScreen() {
     try {
       const phone = normalizePhone(number);
       await initializeFirebase();
+      await preparePhoneVerification(isE2E);
       setNumber(phone);
       setConfirmation(await signInWithPhoneNumber(auth, phone));
       setRemaining(60);
