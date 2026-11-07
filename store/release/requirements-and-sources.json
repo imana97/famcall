@@ -12,11 +12,12 @@
       "max": 10
     },
     "selected_iphone_portrait_export": {
-      "width": 1320,
-      "height": 2868,
+      "width": 1206,
+      "height": 2622,
       "format": "PNG",
       "alpha": false,
-      "slot": "6.9-inch"
+      "slot": "iPhone with Dynamic Island (medium display)",
+      "required": true
     },
     "ipad_capture_required_if_app_supports_ipad": true,
     "app_preview_optional": true,
@@ -59,7 +60,15 @@
         "topic": "In-app account deletion",
         "url": "https://developer.apple.com/support/offering-account-deletion-in-your-app/"
       }
-    ]
+    ],
+    "screenshot_specs_rechecked_on": "2026-11-07",
+    "additional_iphone_portrait_export": {
+      "width": 1320,
+      "height": 2868,
+      "format": "PNG",
+      "alpha": false,
+      "slot": "iPhone with Dynamic Island (large display)"
+    }
   },
   "google_play": {
     "title_max_characters": 30,
@@ -86,7 +95,7 @@
       "height": 1920,
       "format": "24-bit PNG or JPEG",
       "alpha": false,
-      "count": 5
+      "count": 4
     },
     "phone_screenshots": {
       "minimum_across_device_types": 2,

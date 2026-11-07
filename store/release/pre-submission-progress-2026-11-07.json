@@ -43,7 +43,7 @@
   },
   "brand_preparation": {
     "concept": "Signal bridge",
-    "local_source_commit": "96c0a65",
+    "local_source_commit": "b6204c032308d98f10eb3b97caeb36ccfa03f20b",
     "master": "brand/famcall-glyph.svg",
     "palette": [
       "#183D34",
@@ -86,9 +86,9 @@
   },
   "user_device_report": "user-reported-device-test-2026-11-07.json",
   "calling_setup": {
-    "status": "Source implementation in progress; not included in delivered builds above",
+    "status": "Implemented and locally verified on Android and iPhone simulators; awaiting updated testing delivery.",
     "planned_review_path": "After phone verification, complete Get ready to call. Allow Microphone on iPhone and Android. Android additionally offers optional Call alerts and Lock screen calls when shown; declining them must not prevent outgoing calls. iPhone uses its native call screen without ordinary notification permission. Contacts remain optional.",
-    "verification_required": "Confirm the final candidate shows the documented setup, handles denial/re-enabling before calls, and presents the correct Android system settings."
+    "verification_required": "Final store-signed APNs/FCM lifecycle, audio-route and production verification remains required. See ui-review-2026-11-07/verification.txt for local permission/UI evidence."
   },
   "still_pending": [
     "Final candidate build identity and archive audit",
@@ -98,5 +98,6 @@
     "Measured network and background/push/audio-route qualification",
     "Final public-store privacy/legal declarations"
   ],
-  "candidate_record_changed": false
+  "candidate_record_changed": false,
+  "ui_review": "ui-review-2026-11-07/verification.txt"
 }

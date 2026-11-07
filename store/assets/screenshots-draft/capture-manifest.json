@@ -1,17 +1,24 @@
 {
-  "status": "DRAFT: actual development build captures; recapture the signed release candidate before store upload",
-  "capturedOn": "2026-11-06",
+  "status": "Development drafts: genuine E2E app captures; compare and recapture the signed public candidate before store upload",
+  "capturedOn": "2026-11-07",
+  "visuallyReviewedOn": "2026-11-07",
   "locale": "en",
   "version": "0.1.0",
-  "appVariant": "e2e; isolated Firebase demo project; fictional 202-555-01xx identities",
+  "applicationSourceCommit": "b6204c032308d98f10eb3b97caeb36ccfa03f20b",
+  "appVariant": "e2e; isolated local Firebase demo-famcall; fictional 202-555-01xx identities",
   "android": {
-    "device": "Pixel 7 emulator",
-    "system": "Android API 36",
+    "device": "famcall_a Android emulator",
+    "system": "Android 16 / API 36",
     "captureSize": [
       1080,
       1920
     ],
-    "note": "Emulator display set to the capture size; interface is not stretched."
+    "layoutDp": [
+      360,
+      640
+    ],
+    "note": "Emulator display override; interface is not stretched",
+    "apkSha256": "32ab8229b927c6d29b582884b1308c1a5314c3269547600049a37e98f213fe29"
   },
   "ios": {
     "device": "iPhone 17 Pro Max simulator",
@@ -19,19 +26,136 @@
     "captureSize": [
       1320,
       2868
-    ]
+    ],
+    "slot": "Dynamic Island large display"
   },
+  "ios-medium": {
+    "device": "FamCall iPhone simulator",
+    "system": "iOS 26.5",
+    "captureSize": [
+      1206,
+      2622
+    ],
+    "slot": "Dynamic Island medium display (required screenshot category as of source check)"
+  },
+  "iosBuild": {
+    "executableSha256": "621e1060c573cda0580073b11cb06df0fd72b3177bd467ee91e6f672726d86d1",
+    "javascriptBundleSha256": "37b66929e64223a6983c2038c9047402a38e82cbf4347c47d3744776d8524d1e"
+  },
+  "presentation": [
+    "System status-bar overrides show 09:41 and consistent status indicators; these are decorative, not connectivity/battery measurements.",
+    "No visual edits to actual app UI. Fully opaque alpha channels were removed for Apple file-format compliance with exact pixel equality checked.",
+    "Android People and Add person captures are scrolled to show the complete action."
+  ],
   "limitations": [
-    "No Android connected-call screenshot is included. The attempted dialing capture had already transitioned to Call declined and was removed from the store draft.",
-    "iOS incoming-call capture is withheld while investigating immediate native call termination.",
-    "No reconnection/quality claims or fabricated connected-call screen included."
+    "No connected-call, incoming/native-call or reconnection panels are included.",
+    "Some Android incoming/missed history rows are seeded fictional display fixtures; other rows reflect local outgoing/cancelled attempts.",
+    "The iOS outgoing attempt was ended by the simulator native in-call UI host; this is not two-way speech or production push evidence.",
+    "These E2E app captures do not establish signed-candidate behavior or public-release readiness."
   ],
-  "privacy": "Only fictional test contacts; no verification codes, secrets or real contacts.",
+  "privacy": "Only fictional test contacts. No verification codes, secrets, real contacts or call audio.",
+  "verification": "../../release/ui-review-2026-11-07/verification.txt",
+  "screenshotSpecificationsCheckedOn": "2026-11-07",
+  "sources": [
+    "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/",
+    "https://support.google.com/googleplay/android-developer/answer/9866151?hl=en-GB"
+  ],
   "screens": [
-    "people",
-    "recents",
-    "settings",
-    "add-person"
-  ],
-  "visuallyReviewedOn": "2026-11-06"
+    {
+      "path": "android/people.png",
+      "width": 1080,
+      "height": 1920,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 98872,
+      "sha256": "e24a13f8faa9d367f48f6fb5ad621096c37a456df316c2530c84d6c386bffe09"
+    },
+    {
+      "path": "android/recents.png",
+      "width": 1080,
+      "height": 1920,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 85889,
+      "sha256": "1573ec80f891775c35a3655d0e4b960969c9e7c3ed775422c31867fcf6ae2101"
+    },
+    {
+      "path": "android/settings.png",
+      "width": 1080,
+      "height": 1920,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 93160,
+      "sha256": "4684533581c971c56762bc25228ef1e91f05ac55b7c797ed637149819a4c3c01"
+    },
+    {
+      "path": "android/add-person.png",
+      "width": 1080,
+      "height": 1920,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 103328,
+      "sha256": "1d0ac1f470b76d8876291628a22cde320caecf5d3f3016c3e77092a9011d7020"
+    },
+    {
+      "path": "ios/people.png",
+      "width": 1320,
+      "height": 2868,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 151424,
+      "sha256": "fd16f7219d1effcbcad48f4cca4ad9c54f8660dd8690437b0e8e18982132f8d7"
+    },
+    {
+      "path": "ios/recents.png",
+      "width": 1320,
+      "height": 2868,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 113450,
+      "sha256": "a794ace7036704e187556a8f36fac61b7825ed777550d24dc42f88bad91e40dc"
+    },
+    {
+      "path": "ios/settings.png",
+      "width": 1320,
+      "height": 2868,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 159170,
+      "sha256": "e7fac1484baf2f07dc2298bd7df3be534a44ce99e0dfb058ee8c22927187a274"
+    },
+    {
+      "path": "ios/add-person.png",
+      "width": 1320,
+      "height": 2868,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 116733,
+      "sha256": "a0e776248f9253daef8d87b682a4f80e3f2a9b2da013f82977aaa04d2cdea5cb"
+    },
+    {
+      "path": "ios-medium/people.png",
+      "width": 1206,
+      "height": 2622,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 141960,
+      "sha256": "4505ae8f38473f4608eafd018b1685c589c66c35513251177bd7919a13241569"
+    },
+    {
+      "path": "ios-medium/recents.png",
+      "width": 1206,
+      "height": 2622,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 66095,
+      "sha256": "b38a0f77ecf8756a152c647a317a4764062b205d645859fb94b6197d323e0030"
+    },
+    {
+      "path": "ios-medium/settings.png",
+      "width": 1206,
+      "height": 2622,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 141621,
+      "sha256": "d27e71fdfaf8dacb9cf656f2299f830f032dbaca6f5b4501da4e05f88254244c"
+    },
+    {
+      "path": "ios-medium/add-person.png",
+      "width": 1206,
+      "height": 2622,
+      "format": "8-bit RGB PNG; no alpha",
+      "bytes": 154612,
+      "sha256": "717df6e15448ff29bf0ff4e4751ece984b78159f6fe418f2affa8218919af88a"
+    }
+  ]
 }

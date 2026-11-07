@@ -1,6 +1,15 @@
 FAMCALL — VERIFICATION RECORD
 7 November 2026 UTC. Development/internal-testing evidence, not public release approval.
 
+LOCAL UI AND SETUP REVIEW — 7 NOVEMBER 2026
+Final application source b6204c0 has passed local native UI checks on Android and
+iPhone, including upfront microphone setup, denial/recovery, keyboard behavior,
+large text and dark appearance. Signal bridge branding is integrated. The exact
+scope, source identities, simulator native-call limitation and remaining real
+push qualification are recorded in ui-review-2026-11-07/verification.txt.
+Refreshed store screenshots remain development drafts, pending signed-candidate
+comparison. This evidence does not change the public release gate.
+
 CURRENT VERIFIED TESTING DELIVERY — 7 NOVEMBER 2026 04:27 UTC
 - Protected workflow 42336889833 completed successfully for source fecda429.
   iOS 0.1.0 (3) is VALID/IN_BETA_TESTING and assigned to the owner group.
