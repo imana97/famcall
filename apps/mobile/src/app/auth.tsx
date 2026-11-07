@@ -5,7 +5,6 @@ import {
   signInWithPhoneNumber,
   type ConfirmationResult,
 } from "@react-native-firebase/auth";
-import { AudioLines } from "lucide-react-native";
 import { normalizePhone } from "@famcall/core";
 import {
   Button,
@@ -14,15 +13,14 @@ import {
   Heading,
   Label,
   Page,
-  useTheme,
 } from "../components/ui";
+import { BrandMark } from "../components/BrandMark";
 import { t } from "../i18n";
 import { auth, initializeFirebase, isE2E } from "../services/firebase";
 import { preparePhoneVerification } from "../services/phoneVerification";
 import { errorMessage } from "../services/errors";
 import { useSession } from "../state/Session";
 export default function AuthScreen() {
-  const c = useTheme();
   const { user } = useSession();
   const [number, setNumber] = useState("");
   const [code, setCode] = useState("");
@@ -48,6 +46,7 @@ export default function AuthScreen() {
       await preparePhoneVerification(isE2E);
       setNumber(phone);
       setConfirmation(await signInWithPhoneNumber(auth, phone));
+      setCode("");
       setRemaining(60);
     } catch (e) {
       setError(errorMessage(e));
@@ -77,7 +76,7 @@ export default function AuthScreen() {
           marginBottom: 24,
         }}
       >
-        <AudioLines color={c.text} size={28} />
+        <BrandMark size={48} />
         <Label style={{ fontWeight: "600", fontSize: 22 }}>
           {t("appName")}
         </Label>
@@ -96,6 +95,7 @@ export default function AuthScreen() {
             label={t("code")}
             value={code}
             onChangeText={setCode}
+            editable={!busy}
             keyboardType="number-pad"
             textContentType="oneTimeCode"
             autoComplete="sms-otp"
@@ -109,6 +109,7 @@ export default function AuthScreen() {
             onPress={verify}
           />
           <Button
+            testID="resend-code"
             title={
               remaining
                 ? t("resendCountdown", { seconds: remaining })
@@ -120,8 +121,10 @@ export default function AuthScreen() {
             onPress={send}
           />
           <Button
+            testID="change-number"
             title={t("changeNumber")}
             secondary
+            disabled={busy}
             onPress={() => {
               setConfirmation(null);
               setCode("");
@@ -138,6 +141,7 @@ export default function AuthScreen() {
             placeholder={t("phonePlaceholder")}
             value={number}
             onChangeText={setNumber}
+            editable={!busy}
             keyboardType="phone-pad"
             textContentType="telephoneNumber"
             autoComplete="tel"
@@ -147,7 +151,11 @@ export default function AuthScreen() {
           </Label>
           <Button
             testID="send-code"
-            title={t("continue")}
+            title={
+              remaining
+                ? t("resendCountdown", { seconds: remaining })
+                : t("continue")
+            }
             busy={busy}
             disabled={!number.trim() || remaining > 0}
             onPress={send}
@@ -155,9 +163,10 @@ export default function AuthScreen() {
           <Label muted style={{ fontSize: 13, lineHeight: 20 }}>
             {t("phoneConsent")}
           </Label>
-          <View style={{ flexDirection: "row", gap: 24 }}>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
             <Pressable
               accessibilityRole="link"
+              style={{ minHeight: 48, justifyContent: "center" }}
               onPress={() => Linking.openURL("https://famcall.web.app/privacy")}
             >
               <Label style={{ textDecorationLine: "underline", fontSize: 13 }}>
@@ -166,6 +175,7 @@ export default function AuthScreen() {
             </Pressable>
             <Pressable
               accessibilityRole="link"
+              style={{ minHeight: 48, minWidth: 48, justifyContent: "center" }}
               onPress={() => Linking.openURL("https://famcall.web.app/terms")}
             >
               <Label style={{ textDecorationLine: "underline", fontSize: 13 }}>

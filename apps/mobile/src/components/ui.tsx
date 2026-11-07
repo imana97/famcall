@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -45,20 +46,26 @@ export function useTheme() {
 export function Page({
   children,
   scroll = true,
-}: React.PropsWithChildren<{ scroll?: boolean }>) {
+  safeBottom = true,
+}: React.PropsWithChildren<{ scroll?: boolean; safeBottom?: boolean }>) {
   const c = useTheme();
   return (
     <SafeAreaView
-      edges={["top", "left", "right"]}
+      edges={
+        safeBottom ? ["top", "left", "right", "bottom"] : ["top", "left", "right"]
+      }
       style={{ flex: 1, backgroundColor: c.bg, direction: "ltr" }}
     >
       {scroll ? (
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.page}
-        >
-          {children}
-        </ScrollView>
+        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+          <ScrollView
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.page}
+          >
+            {children}
+          </ScrollView>
+        </KeyboardAvoidingView>
       ) : (
         <View style={[styles.page, { flex: 1 }]}>{children}</View>
       )}
@@ -188,7 +195,17 @@ export function Button({
       ) : (
         Icon && <Icon size={20} color={color} />
       )}
-      <Text style={{ fontSize: 16, fontWeight: "600", color }}>{title}</Text>
+      <Text
+        style={{
+          fontSize: 16,
+          fontWeight: "600",
+          color,
+          flexShrink: 1,
+          textAlign: "center",
+        }}
+      >
+        {title}
+      </Text>
     </Pressable>
   );
 }
