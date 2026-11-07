@@ -1,27 +1,33 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { mkdir, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { packageName, signingCertificate, validateApk } from './download-play-apk.mjs';
 
 // Ordinary hosting updates must retain the last explicitly published APK.
 const root = 'https://famcall.web.app/downloads/';
-const response = await fetch(root + 'release.json', { cache: 'no-store' });
-if (response.status === 404) {
+const local = process.argv.includes('--local');
+const output = resolve('website/downloads');
+const response = local ? null : await fetch(root + 'release.json', { cache: 'no-store' });
+if (response?.status === 404) {
   console.log('No existing APK download to preserve.');
 } else {
-  if (!response.ok) throw new Error('Cannot verify the existing download; website deployment stopped.');
-  const release = await response.json();
+  if (response && !response.ok) throw new Error('Cannot verify the existing download; website deployment stopped.');
+  const release = local ? JSON.parse(await readFile(resolve(output, 'release.json'), 'utf8')) : await response.json();
+  if (local) {
+    const version = JSON.parse(await readFile('apps/mobile/package.json', 'utf8')).version;
+    if (release.version !== version || release.sourceCommit !== process.env.FAMCALL_APK_SOURCE_SHA)
+      throw new Error('APK artifact version or source does not match the approved preparation run.');
+  }
   if (release.packageName !== packageName || release.signingCertificateSha256 !== signingCertificate ||
       !/^\d+\.\d+\.\d+$/.test(release.version) || !/^[1-9]\d*$/.test(release.versionCode) ||
       !/^[a-f0-9]{64}$/.test(release.sha256) || release.url !== '/downloads/famcall.apk')
     throw new Error('Unexpected website download metadata.');
-  const download = await fetch(root + 'famcall.apk', { cache: 'no-store' });
-  if (!download.ok) throw new Error('Could not preserve the published APK.');
-  const apk = Buffer.from(await download.arrayBuffer());
+  const download = local ? null : await fetch(root + 'famcall.apk', { cache: 'no-store' });
+  if (download && !download.ok) throw new Error('Could not preserve the published APK.');
+  const apk = local ? await readFile(resolve(output, 'famcall.apk')) : Buffer.from(await download.arrayBuffer());
   if (apk.length !== release.bytes || createHash('sha256').update(apk).digest('hex') !== release.sha256)
     throw new Error('Published APK checksum mismatch.');
-  const output = resolve('website/downloads');
   await mkdir(output, { recursive: true });
   const apkPath = resolve(output, 'famcall.apk');
   await writeFile(apkPath, apk);

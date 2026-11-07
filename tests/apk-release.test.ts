@@ -1,8 +1,21 @@
 import { expect, test } from "vitest";
 import { packageName, registeredCertificates, selectUniversalApk, signingCertificate, validateApk } from "../scripts/download-play-apk.mjs";
+import { validateArtifactSource } from "../scripts/check-apk-artifact-source.mjs";
 
 const badging = `package: name='${packageName}' versionCode='6' versionName='0.2.0' platformBuildVersionName='16'`;
 const certificate = `Signer #1 certificate SHA-256 digest: ${signingCertificate}`;
+
+test("only deploys artifacts prepared successfully by the owner on the reviewed main branch", () => {
+  const run = { repository: { full_name: "silvergrid/famcall" }, head_repository: { full_name: "silvergrid/famcall" },
+    head_branch: "main", event: "workflow_dispatch", actor: { login: "silvergrid" }, triggering_actor: { login: "silvergrid" },
+    path: ".github/workflows/apk-website.yml", head_sha: "a".repeat(40) };
+  const jobs = { jobs: [{ name: "prepare", conclusion: "success" }] };
+  expect(validateArtifactSource(run, jobs)).toBe(run.head_sha);
+  for (const change of [{ actor: { login: "contributor" } }, { head_branch: "feature" }, { event: "pull_request" },
+    { path: ".github/workflows/quality.yml" }, { head_repository: { full_name: "another/famcall" } }])
+    expect(() => validateArtifactSource({ ...run, ...change }, jobs)).toThrow();
+  expect(() => validateArtifactSource(run, { jobs: [{ name: "prepare", conclusion: "failure" }] })).toThrow();
+});
 
 test("only publishes a universal APK with the existing Play signing identity", () => {
   expect(selectUniversalApk({ generatedApks: [
