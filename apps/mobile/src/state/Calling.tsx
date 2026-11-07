@@ -22,7 +22,7 @@ import { NativeCallCoordinator } from "../services/NativeCallCoordinator";
 import { OutgoingCallAttempt } from "../services/OutgoingCallAttempt";
 import { recordTestMetric, waitForTestCallStart } from "../services/e2eDiagnostics";
 import { VoicePeer, type VoiceState } from "../services/VoicePeer";
-import { errorMessage } from "../services/errors";
+import { errorMessage, type ErrorContext } from "../services/errors";
 import {
   flushCallOutbox,
   hasEndedLocally,
@@ -82,7 +82,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     current.current = { ...current.current, ...patch };
     setView(current.current);
   };
-  const fail = (e: unknown) => update({ error: errorMessage(e) });
+  const fail = (e: unknown, context?: ErrorContext) => update({ error: errorMessage(e, context) });
   const applyMute = (muted: boolean) => {
     peer.current?.mute(muted);
     update({ muted });
@@ -243,7 +243,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         const call = current.current.call;
         if (call?.id === id && !isTerminal(call.status))
           update({ call: { ...call, status: "failed", endedAtMs: Date.now() } });
-        fail(error);
+        fail(error, "call-start");
       },
     });
     outgoing.current = attempt;

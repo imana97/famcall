@@ -22,6 +22,7 @@ import {
   type CallRecord,
 } from "@famcall/core";
 import { api, database } from "./firebase";
+import { MicrophonePermissionError } from "./errors";
 import {
   recordTestMetric,
   testTransport,
@@ -111,6 +112,13 @@ export class VoicePeer {
     this.stream = await mediaDevices.getUserMedia({
       audio: true,
       video: false,
+    }).catch((error: unknown) => {
+      // react-native-webrtc reports denied audio permission as SecurityError.
+      // Scope this interpretation to capture, never to server authorization.
+      const name = (error as { name?: unknown } | null)?.name;
+      if (name === "SecurityError" || name === "NotAllowedError")
+        throw new MicrophonePermissionError();
+      throw error;
     });
     if (this.closed) {
       this.stream.getTracks().forEach((t) => t.stop());
