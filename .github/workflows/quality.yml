@@ -1,0 +1,41 @@
+name: Quality
+on:
+  pull_request:
+  push:
+    branches: [main, 'feat/**']
+permissions:
+  contents: read
+concurrency:
+  group: quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build:backend
+      - name: Test audio evidence validation
+        run: |
+          python3 -m venv .local/audio-tests
+          .local/audio-tests/bin/pip install -r e2e/audio/analysis-requirements.txt
+          .local/audio-tests/bin/python -m unittest discover -s e2e/audio -p 'test_*.py'
+      - name: Test call behavior and database isolation
+        env:
+          FAMCALL_FUNCTIONS_TEST: '1'
+        run: npx --yes firebase-tools@15.5.1 emulators:exec --project demo-famcall --only auth,firestore,functions 'npm test'
+      - run: npm audit --audit-level=high
+

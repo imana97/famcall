@@ -1,0 +1,20 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- launchApp:
+    clearState: true
+    permissions:
+      all: allow
+- extendedWaitUntil:
+    visible:
+      id: phone-number
+    timeout: 30000
+- tapOn:
+    id: phone-number
+- inputText: ${PHONE}
+- tapOn: Make room for a familiar voice.
+- tapOn:
+    id: send-code
+- extendedWaitUntil:
+    visible:
+      id: verification-code
+    timeout: 30000

@@ -1,0 +1,8 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- extendedWaitUntil:
+    visible:
+      id: answer-call
+    timeout: 20000
+- tapOn:
+    id: answer-call

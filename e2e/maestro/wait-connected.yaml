@@ -1,0 +1,7 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- extendedWaitUntil:
+    visible: You’re connected.
+    timeout: 45000
+- assertVisible:
+    id: end-call

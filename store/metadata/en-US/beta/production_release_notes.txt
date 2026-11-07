@@ -1,0 +1,1 @@
+Initial FamCall release with phone-number verification, optional device-contact access, manual contact entry, one-to-one voice calls, incoming-call controls, and reconnection after supported network interruptions.

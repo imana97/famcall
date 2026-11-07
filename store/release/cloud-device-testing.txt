@@ -1,0 +1,248 @@
+FAMCALL — CLOUD DEVICE TESTING
+Provider qualification and hosted-device evidence, checked 6 November 2026.
+
+CONSTRAINT
+Use hosted devices; do not install, launch or test on the owner's personal phones.
+The local personal-phone setup has been discontinued. A cloud UI pass alone does
+not satisfy the two-way speech, network recovery, push or signing release gates.
+
+FREE / LOW-COST OPTIONS
+Prices and public trial allowances checked 6 November 2026; actual account
+eligibility, remaining minutes and feature entitlements must be checked before use.
+The owner requested evaluation of BrowserStack's free trial. Its account page now
+initially showed 100 unused App Automate minutes. The API reports Free plan and
+five parallel session slots. Separate demo APK/IPA files were uploaded and trial
+tests have now run. No paid subscription or upgrade was purchased. After the first
+three smoke runs, the dashboard showed 94 free minutes. After two further paired
+Android call runs, a refreshed dashboard showed 89 free minutes. Four lifecycle
+sessions subsequently ran (one failed pair, then one passing pair); the dashboard
+balance has not been refreshed since. Do not present 89 as the current balance.
+Build duration alone is not a billing statement. Recheck before further runs.
+
+Firebase Test Lab: the existing Blaze pricing tier includes 30 physical-device
+minutes and 60 virtual-device minutes per day. Additional physical time is $5 per
+device-hour; virtual time is $1 per device-hour. Android Device Streaming has a
+separate allowance of 30 minutes per month, then $0.15/minute; do not confuse that
+interactive product with the daily Test Lab allowance. Test Lab is a practical
+candidate for repeatable install/UI checks. Its documented native test frameworks
+require adaptation from Maestro; no two-way voice fixture is established here.
+
+AWS Device Farm: the public offer currently advertises a one-time 1,000 device-
+minute trial (a limited-time increase from 250), then $0.17/device-minute. A ten-
+minute two-device session uses at least 20 device-minutes, or $3.40 after the trial,
+before billed preparation/cleanup. AWS documents real Android/iOS devices and
+network shaping for bandwidth, delay, jitter and loss in both directions, with
+changes during a run. This makes it a candidate for weak-network testing, subject
+to verifying actual media impairment, microphone injection/output capture, paired
+device concurrency and iOS signing limitations. Wi-Fi shaping is not carrier
+coverage. Do not purchase unmetered/private-device subscriptions for this pilot.
+AWS's standard iOS re-signing removes push-notification entitlements, so that
+route cannot validate production incoming-call push. Media-file upload support
+does not establish microphone injection or in-call audio recording support.
+
+TestingBot's open-source program advertises free unlimited automated testing,
+real Android/iOS devices and two concurrent tests for qualifying active public,
+non-commercial projects with an OSI-approved license. FamCall's public MIT license
+alone does not establish non-commercial eligibility or approval. Its requested
+attribution and actual voice/network features also need review before adoption.
+No application has been submitted and no vendor has been contacted.
+
+BrowserStack's public trial includes 100 App Automate minutes and a separate 30
+App Live minutes. This account reports five concurrent slots. A bounded audio
+capability request was rejected before a session started: HTTP 422,
+BROWSERSTACK_INVALID_ACTION_BY_GROUP, audio injection not enabled for this
+account/framework. The account remained Free. No vendor access request or paid
+upgrade was made. Network features remain unqualified; a trial evaluation does
+not authorize purchasing them.
+
+Use existing local emulators for the bulk of repeatable checks, Test Lab for
+limited recurring device coverage, and a qualified trial for the remaining cloud
+checks. No researched free offer yet proves complete two-way speech, background
+push and production-signing coverage on both platforms. Keep those gates open.
+
+BROWSERSTACK EXECUTION EVIDENCE
+The Pixel 6 / Android 12 smoke build bdf852cb96bc51ae60bf9a63c2a3022545f987b7
+passed fictional-number verification, manual contact saving and sign-in/contact
+persistence after relaunch. Native Firebase and the runner's emulator-code lookup
+worked through the restricted Local tunnel. Independent demo backend records
+confirm the identity ending 0101 and contact ending 0102. Its provider session,
+command log, Maestro log and native log are retained privately. The provider
+returned 404 for the first run's screenshot endpoint; no screenshot is claimed.
+
+The iPhone 15 / iOS 17.4 build e305212df125898677c318a4596ccab6d6f413df failed
+at contact saving after successful fictional-number verification. Its screenshot
+and native/Maestro logs are retained. Firebase Functions 13.1.1 refused to attach
+authentication to the non-loopback HTTP emulator URL. Native Firestore attempted
+127.0.0.1:8080 and reported connection refused. This observed tunnel setup is not
+qualified for native iPhone backend traffic. A secure Functions endpoint plus a
+verified native database route is required before retrying; retain transport
+protections. This finding does not establish a defect against production Firebase.
+
+The initial flow's env constants also shadowed requested per-run phone numbers,
+so both first runs signed in as 0101. Those defaults were removed. The revised
+flow validates explicit distinct fictional identities before launch. It also
+captures the final contact-list screen. The follow-up Pixel 6 build
+39bca1f5e7958a116668fe098ecd2f09aea468d8 passed with supplied PHONE ending
+0102, CONTACT_PHONE ending 0101 and name Cloud Family. Its native/Maestro logs,
+command trace, final screenshot and independent backend record agree. The saved
+contact remains visible after app relaunch. This verifies parameter handling
+and a second identity in a separate run, not a simultaneous two-endpoint call.
+
+Both binaries contain demo-famcall and bs-local.com, use the separate e2e bundle
+and normal audio settings, and have verified source hashes and signatures. The
+iPhone binary has no camera usage description. The domain-specific iOS HTTP
+exception is restricted to the test bundle; a config plugin removes it when a
+previous test native project is reused for production or a different local host.
+Two regression tests and actual prebuild/introspection checks verify cleanup.
+
+APK SHA-256: 71ef6afd1a123833bc41710c49bac5ed0a18eaac8967c71f2d1ddef9ef4ea65a
+IPA SHA-256: 891480b10d0b50ec5b3c70c51601be1aae52bd30b8fc58ddbad628fbaa942da6
+Initial suite SHA-256: 0d58db0559f06b3f148d3dedea568f7c8e0bbe17d85c4312cd0143582f973c9f
+Revised suite SHA-256: 0be5092180efeea75ac9c700d791771d68e03b0b5bbdedce0dc9bf9515fdcff4
+
+Those first three runs verify basic demo flows only; they placed no calls.
+
+PAIRED ANDROID CALL — 6 NOVEMBER 2026
+Caller build 4799bbd5e21e4df6c24e6f40b46cf0e52d0fab85 and callee build
+627bba37e96ec0bb12ab12128a8bb6248f11b7ab both passed on separate hosted Pixel 6
+Android 12 sessions. The new twelve-file paired suite coordinates readiness,
+answer, connected-state assertions and caller hangup. The backend recorded a
+20.782-second accepted call and released both active-call leases. Each peer's
+six WebRTC samples span fifteen seconds. Following selectedCandidatePairId to
+the actual candidate records confirms UDP relay on both endpoints; received
+RTP and source/received audio energy increased in both directions.
+
+The APK is the earlier verified 360faa2 test artifact, not a store candidate or
+the latest registration build. Private records retain runtime backend hashes;
+its compiled registration handler predates the final APNs sequence-conflict
+check in 4065490, so this run does not validate that fix. Push is disabled in
+the demo app. Both command/native/Maestro logs and connected/ended screenshots
+were saved. The Maestro video links returned 404 and the dashboard download
+timed out. Both recordings were subsequently recovered from the general session
+API's signed video URL. Their hashes and private audio analysis are retained.
+The AAC tracks contain sparse click-like pulses and long silent intervals;
+exact-frame extraction confirms connected screens during sampled silent audio
+intervals. No known microphone signal was supplied, so received-speech capture
+remains unqualified. A downloadable video with an audio track is not a speech pass.
+
+No microphone reference was injected, and the network was not impaired. Nonzero
+energy alone cannot establish intelligible speech or rule out background noise
+and echo. Known-speech qualification, weak-network recovery, iPhone calling and
+background/push remain open. The provider remained on Free with zero running
+and queued sessions after completion; local test services were stopped.
+
+HOSTED HISTORY / BLOCKING LIFECYCLE
+Two further Pixel 6 / Android 12 flows passed on 6 November 2026 (7 November UTC).
+Caller build: 90205742a2ae8b2590d048c1d046d01f0992abfc.
+Callee build: 9bfa3bcd5ac88f01926bc67d0039f75b0e8e94ed.
+After the recipient observed ringing, the caller cancelled. Recents showed that
+unanswered call as Missed for the recipient and Outgoing for the caller. Blocking
+from the history row refused the next attempt. Independent backend snapshots
+confirmed the block existed and that the rejected attempt created no call record.
+Unblocking removed it; a subsequent accepted call ended after 21.705 seconds.
+Both apps restarted and retained the expected history, including Incoming and
+Missed rows on the recipient. The final backend had two terminal calls and zero
+active leases. Command/native/Maestro logs, screenshots and runtime hashes are
+retained. History and refused-call screenshots were visually inspected.
+
+The initial lifecycle pair is retained as failed setup: caller build
+647a6a9225659c75864774ba5739592255f2efae returned a provider session error before
+test commands; callee build 28a327b762096008c4aadd141e011ad0a058e7a4 completed
+signup then timed out waiting for an incoming call. No call was created. Only
+one retry was made, using the unchanged app and suite. The passing run used the
+same historical 360faa2 APK and a freshly rebuilt eacbbb4 backend; no push or
+current mobile registration validation is implied. Suite SHA-256:
+77713e79d240fcbd353fb136167e4591c200717083e306db5bf80c0fc22c3619.
+
+This validates foreground cancellation/history/block/unblock behavior. Ring
+expiry scheduling, background delivery, intelligible speech and network recovery
+remain open. Final account state was Free with zero running/queued sessions;
+the test services were stopped and all four tunnel service ports were closed.
+
+BROWSERSTACK CAPABILITIES
+App Automate supports the existing Maestro approach on real Android and iOS
+devices. Start by checking account access, enabled features, available concurrent
+sessions and trial minutes. Do not purchase a subscription without owner approval.
+Two actual app endpoints need overlapping device sessions and a shared backend.
+
+Its Maestro audio injection supports selected Android devices, not iOS, and is
+listed for Device Cloud Pro or higher plans. Session video can include device
+output audio on Android 11+ and iOS 15+. Qualify that capture with a known signal:
+normal media playback support does not by itself prove in-call audio capture.
+Android-to-iPhone received speech can be evaluated only after this qualification;
+the reverse iPhone microphone path remains an explicit gap.
+
+Android's ordinary playback-capture API permits media, game and unknown usages,
+not voice-communication playback. BrowserStack's published audio-recording page
+does not identify its capture implementation. This is a possible explanation for
+silent in-call recordings, not a verified diagnosis. Do not change FamCall's
+communication audio usage merely to make a screen recording audible: that would
+test a different audio route. Qualify a supported in-call output path instead.
+
+Maestro network settings apply for the whole build. Mid-call network changes need
+Appium's update_network API or a separately verified impairment gateway. Network
+profiles require a paid plan. The documentation does not establish that FamCall's
+selected UDP media path is impaired: measure actual relay traffic, packet loss,
+jitter and RTT before counting any weak-network or outage result.
+
+Uploaded iOS builds may be re-signed by the provider. Preserve a separate plan for
+original signing, App Attest, APNs/VoIP push and actual TestFlight distribution.
+Do not treat a re-signed demo app as production authenticity or delivery evidence.
+
+ALTERNATIVES
+Kobiton documents automated audio injection for iOS/XCUITest and Android/
+UiAutomator2 through Bluetooth audio. It is a candidate for the missing iPhone
+voice path, subject to hosted/private-device availability, plan cost, audio-route
+qualification and network shaping. Do not assume its public device pool includes
+that hardware feature. A Bluetooth route does not prove built-in microphone,
+earpiece, proximity-sensor or acoustic echo behavior.
+
+Sauce Labs' documented audio injection replaces speech-recognition input and
+excludes React Native. It is not evidence of continuous WebRTC microphone support.
+Firebase Test Lab is an option for supplementary installation and UI compatibility
+coverage; no continuous bidirectional microphone/voice harness is established here.
+
+EXECUTION ORDER
+1. Confirm account entitlement and cost before consuming paid device time. Obtain
+   credentials through secure local configuration, never the public repository.
+2. Produce separate demo-famcall test APK/IPA files configured for the provider's
+   supported private-backend tunnel. Validate native Firebase Auth, Firestore
+   streaming and callable functions through that tunnel before call testing.
+   Do not upload a package still pointing to a personal LAN address.
+3. Run signup, persistent sign-in, contacts, history and block/unblock Maestro
+   flows on one cloud Android and one cloud iPhone. Use fictional phone numbers.
+4. Coordinate two live endpoints; test ringing, answer, decline, cancellation,
+   busy state, hangup, mute and background transitions. Keep direction and roles.
+5. Qualify source injection and output capture with known generated audio, silence
+   and wrong-reference controls. Require sustained source activity and advancing
+   content matches. Preserve source/build hashes and both peer identities.
+6. Run the existing network matrix, verifying each actual selected media route
+   and realized impairment. Use dynamic control for the 2/5/15/30-second outages.
+7. Exercise original store-signed candidates via the protected release workflow
+   and a provider installation path that preserves required entitlements. Repeat
+   phone verification, App Check, lock/background push and voice recovery checks.
+8. Retain failed/invalid attempts, session IDs, app hashes, redacted logs, videos
+   with audio and measured recovery bounds. Keep unsupported routes and features
+   open in the release candidate record; never silently waive a gate.
+
+PRIMARY SOURCES
+https://www.browserstack.com/docs/app-automate/maestro/overview
+https://www.browserstack.com/docs/app-automate/maestro/test-specific-scenarios/audio-injection
+https://www.browserstack.com/docs/app-automate/maestro/debug-failed-tests/audio-recording
+https://developer.android.com/media/platform/av-capture
+https://www.browserstack.com/docs/app-automate/maestro/set-up-test-env/simulate-network-conditions
+https://www.browserstack.com/docs/app-automate/appium/test-real-user-conditions/simulate-network-conditions
+https://docs.kobiton.com/automation-testing/scripting/add-audio-injection-to-appium-script
+https://docs.kobiton.com/manual-testing/inject-audio
+https://docs.saucelabs.com/mobile-apps/features/audio-injection/index.html
+https://firebase.google.com/docs/test-lab/usage-quotas-pricing
+https://firebase.google.com/docs/test-lab
+https://aws.amazon.com/device-farm/pricing/
+https://aws.amazon.com/device-farm/faqs/
+https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-simulate-network-connections-and-conditions.html
+https://testingbot.com/open-source
+https://www.browserstack.com/support/faq/plans-pricing/plans/what-do-i-get-with-a-free-trial
+
+https://www.browserstack.com/docs/app-automate/maestro/set-up-test-env/configure-tests/set-env-variables
+https://docs.maestro.dev/maestro-flows/flow-control-and-logic/parameters-and-constants
+https://github.com/firebase/firebase-ios-sdk/blob/dc6dfd442b1f3ec215ed62b8beb2623ffab010d6/FirebaseFunctions/Sources/Functions.swift

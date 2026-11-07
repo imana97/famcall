@@ -1,0 +1,946 @@
+FAMCALL — VERIFICATION RECORD
+6 November 2026. Development evidence, not release approval.
+
+PASS
+- 25 automated local tests: 7 shared-logic tests, 7 Firestore isolation tests,
+  11 callable-backend integration tests. Includes call idempotency, concurrent
+  callers, outsider rejection, answer/hangup races, late answers, blocking,
+  lease renewal/expiry, and durable account deletion with stale-token denial.
+- An additional release-workflow test verifies that a tested source commit may
+  receive evidence updates, while subsequent app changes or missing network
+  evidence block public submission.
+- Three connection-policy tests cover initial ICE setup stalls, coalesced
+  credential-refresh restarts, and cancellation after connection/close.
+  Three mute-policy tests cover mute requested before startup and the latest
+  mute/unmute intent while microphone capture is pending. Two of these tests
+  fail against the previous implementation and pass with the fix.
+  Twelve native-event sequence tests cover restored mute, actions arriving during
+  startup, stale lookup/answer results, hangup while a lookup is pending, missed
+  session-added events, durable local hangup, disposal and storage-read failure.
+  Eight outgoing-attempt tests cover cancellation during server/native setup,
+  stale completions, uncertain create responses, terminal retries and storage
+  failures. Three outbox tests cover in-flight additions, retry and restoration;
+  the in-flight addition test fails on the old implementation and passes now.
+  Two diagnostic-plugin tests reject production enablement, remove generated
+  diagnostic code when disabled, and fail on an unrecognized native template.
+  Two hosted-backend plugin tests verify removal of the test HTTP exception when
+  reusing native configuration, require the separate test bundle, preserve
+  unrelated transport settings, and check idempotence.
+  Sixteen Python evidence tests cover profile changes, wrong relay paths, missing
+  outage drops, restored speech, silent output, replayed pre-outage audio, and
+  timing counter deltas, resets, missing values and stream/peer isolation in
+  outage and fixed-profile measurements, sustained sender activity, reference
+  pauses and unambiguous call/participant identity. An impaired
+  outage must restore the same weak-link conditions rather than a healthier link.
+- Android native standalone test build compiles, including WebRTC, Firebase,
+  native calling integration, native timers, and the background call-end worker.
+- Maestro on two Android API 36 emulators: phone verification using fictional
+  numbers, 00/+ normalization, persistent sign-in, manual contacts, outgoing
+  call, answer, hangup, decline, history blocking, blocked-call rejection,
+  unblocking, and another answered call.
+- iOS standalone simulator build compiles with native WebRTC/Firebase/calling
+  modules. Maestro on iPhone 17 Pro Max / iOS 26.5 verifies phone signup,
+  persistent sign-in, manual contacts (including 00 normalization), and navigation.
+- TypeScript checks, ESLint, GitHub workflow validation with actionlint, and
+  fastlane lane discovery. Incomplete release evidence is rejected by the
+  public-release guard. Invalid audio injection/capture produces a failing
+  measurement report rather than a quality pass.
+- Protected Android upload signing key created and backed up; upload SHA-1/SHA-256
+  registered with Firebase. Apple bundle ID, distribution certificate, active
+  provisioning profile and unpublished App Store app record created.
+  App Attest and Play Integrity configurations registered; actual device
+  attestation and Play App Signing SHA/project linkage remain unverified.
+- Original Apple/Play icons and Play feature graphic exported at required sizes.
+- Website checked at desktop and phone widths; privacy/deletion links work in
+  the local preview. The public site is not deployed yet.
+- GCP provider quota effectiveLimit and override both read back as 50/day for
+  send_verification_code, including after phone authentication was initialized.
+  A later read-only check confirmed phone sign-in remains enabled and the SMS
+  region policy allows by default with no denied regions. Delivery is untested.
+- Public source scanned for secret patterns and exact dedicated TURN secrets;
+  no matches. Private configurations, logs, recordings, and signing material
+  are excluded from source control.
+
+ANDROID AUDIO PILOT — VALID MEASUREMENTS, NOT RELEASE APPROVAL
+Eight 30-second generated-speech samples completed: one in each direction for
+four profiles, with a fresh pair of emulator processes for each profile.
+Android API 36 ARM64; emulator 36.1.9.0; the same installed test APK on both peers.
+Opus negotiation requests 16 kbps, mono, and 40 ms packet time; actual encoded
+packet duration has not yet been independently verified. Every sample selected Cloudflare
+UDP relay media and retained received audio plus statistics from both peers.
+
+Profile   Cap/leg   Delay/leg   Jitter/leg   Loss/leg   STOI A→B / B→A
+Baseline  uncapped  0 ms        0 ms        0%         0.898 / 0.836
+Modest    128 kbps  35 ms       10 ms       0.5%       0.862 / 0.841
+Weak      64 kbps   75 ms       25 ms       1.51%      0.730 / 0.760
+Stress    48 kbps   150 ms      50 ms       3%         0.469 / 0.333
+
+Settings apply independently in both directions on each endpoint relay leg.
+Measured median RTT across the two samples was 14.5–15 ms, 182.5–185 ms,
+377.5–396 ms, and 705.5–751 ms respectively. Observed per-peer packet-loss
+windows ranged from 0%, 0.76–1.09%, 2.76–3.37%, and 4.08–13.19% respectively.
+The small windows include silent-direction DTX traffic. These are realized
+measurements, not guaranteed values of the configured random process.
+
+The stress scores show substantial degradation. STOI is not a percentage of
+words understood, and no human intelligibility or supported-network claim is
+made. These pilot profiles do not substitute for the N0–N6 release matrix.
+The v2 shaper includes 28-byte IPv4/UDP headers in its bandwidth accounting;
+link-layer and VPN overhead remain excluded.
+
+Private evidence: matrix-2026-11-06T10-43-48.689Z, including all eight reports,
+synthetic captures/reference, source and installed-APK hashes, and an audit of
+unchanged profiles and selected paths. A prior matrix attempt stopped before
+the first call because Android System UI was unresponsive after boot. Staggered
+boots, two emulator CPU cores, and a short settling interval allowed this run.
+
+The earlier silence/crashes came from a virtual-microphone lifecycle limitation.
+The harness now uses buffered flow control and refuses a second injection into
+the same emulator process. The refusal was checked without crashing either
+emulator. Revalidate this workaround when changing emulator versions.
+
+TRANSPORT OUTAGE PILOT — PACKETS ONLY
+One native Android call recovered received packets at both peers after each
+5-, 15-, and 30-second 100% relay-drop interval. First observed recovery after
+restoration: 3.020/3.092 s, 2.144/2.216 s, and 5.639/5.713 s respectively.
+The lab counted 158, 637, and 830 dropped packets. The 30-second case included
+a disconnected/failed transition and reconnection. Statistics arrive about
+every three seconds; these are observation bounds, not precise recovery latency.
+These preliminary outage runs used the earlier v1 shaper with no bandwidth cap.
+They did not measure speech recovery and do not clear G4/G5.
+
+FORCED RELAY PATHS
+Separate 30-second observations selected TCP and TLS relay paths respectively,
+with current statistics and advancing received packets at both peers. These
+tests forced each protocol before placing a call; they did not simulate UDP
+blocking or prove automatic fallback. The UDP shaper did not impair these paths.
+
+The delayed UDP call below was then observed for eight minutes after it connected.
+Both peers continued receiving packets across the scheduled seven-minute
+renegotiation (offer/answer generation 1 → 2) and beyond the original ten-minute
+credential lifetime. The observed packet windows were approximately 477 seconds,
+with 2,573/2,570 received packets and no stagnant counter interval at the roughly
+three-second statistics cadence. This used the APK before the retry-policy fix;
+it is one transport-only observation, not a speech or endurance release pass.
+
+INITIAL SETUP FINDING
+A subsequent UDP-proxy call remained on Connecting beyond the 45-second test
+deadline and first connected about 160 seconds after answer. One peer lacked a
+local relay candidate during the delay. The underlying allocation delay is not
+diagnosed. It exposed an application retry gap: native ICE can remain new without
+emitting disconnected/failed. Source now starts bounded initial retries after
+15 seconds, and coalesces forced restart requests arriving during the two-second
+cooldown. Unit tests and the following native Android checks pass.
+The updated Android APK then passed both native cases: with the relay blocked
+during setup, both signaling generations reached 5 by 22 seconds; restoring
+access connected the peers after 398/407 ms and received packets advanced on
+both sides. Keeping it blocked ended the call after 72,653 ms. Both phones
+returned to the contact list, and the lab restored its baseline configuration.
+Updated test APK SHA-256:
+9b84261cd9c07e252b757c395742d523c380b247d0938a91570e0161ee496561
+
+IN PROGRESS / NOT A PASS
+- Credential refresh, repeatable speech recovery, full interruptions, TCP/TLS fallback,
+  remaining offline hangup combinations, repeatability/sample-size targets and
+  physical-device testing.
+
+GENERATED-SPEECH OUTAGE PILOT
+Eight initial attempts used the updated Android test APK identified above.
+Each direction was measured separately, with 12 seconds of generated speech
+before a complete UDP-relay drop and 20 seconds of capture after restoration.
+Outside the outage the lab added no bandwidth cap, delay, jitter or loss.
+
+Outage    A-to-B confirmation bound    B-to-A confirmation bound
+2 s       3.513 s                      Invalid input sample
+5 s       3.521 s                      3.519 s
+15 s      Not confirmed                Invalid input sample
+30 s      15.274 s                     Not confirmed
+
+Confirmation requires a complete two-second received waveform matching new
+reference speech from after restoration, at a fixed correlation threshold of
+0.35. Capture arrival time gives an observation upper bound, not exact recovery
+latency. The four confirmed samples had post-recovery STOI estimates of 0.914,
+0.907, 0.907 and 0.712 respectively, over 10/10/10/7.21 seconds. These are not
+word-understanding scores. There is no simultaneous two-way or N1/N2 outage
+result here, and the sample count cannot establish a reliability rate.
+
+The two invalid samples had silent output and no advancing sender microphone
+energy before the outage, despite a successful injection call. They are retained
+as invalid attempts. The 15-second A-to-B and 30-second B-to-A recordings were
+valid, but no post-outage waveform met the fixed threshold. Audio energy did
+return in the 15-second case; timing distortion versus app recovery remains to
+be diagnosed. These unconfirmed cases are not release passes or a proven lack
+of speech.
+
+The runner now restarts both AVDs before each direction to isolate a possible
+capture-to-injection lifecycle issue. This workaround still requires repeatability
+testing. The original eight attempts remain in the denominator and evidence.
+A fresh-pair repeat of the invalid two-second B-to-A case supplied valid input
+and confirmed new speech within 3.521 seconds, with post-recovery STOI 0.915
+over ten seconds. Across all nine attempts, seven recordings were valid and
+five confirmed recovery under this detector; these mixed cases are not a pooled
+success-rate estimate. Follow-up 15-second results are recorded below.
+Offline negative controls on both five-second recordings reject substituted
+silence and replayed pre-outage audio while accepting the original recordings.
+
+Private runs: recovery-2026-11-06T15-40-01.318Z and
+recovery-2026-11-06T15-44-37.720Z. The audit checks reference and source hashes,
+installed APK identity, actual profile changes/drops, selected UDP relay paths
+at both peers before/after the outage, and PCM formats. The first run retains
+a timestamped source-hash amendment made before measurement began.
+The isolated reverse repeat is recovery-2026-11-06T15-56-30.581Z, with matching
+measurement source hashes, unchanged APK, and verified paths before/after the drop.
+
+LONG-OUTAGE TIMING INVESTIGATION
+A fresh-pair 15-second B-to-A repeat on the original APK produced valid input
+but still did not confirm post-outage speech (recovery-2026-11-06T16-03-22.227Z).
+A diagnostic APK added native playout buffer/acceleration counters, without
+changing call behavior. Its buffered 15-second B-to-A repeat was also valid
+but unconfirmed (recovery-2026-11-06T16-13-32.318Z). The active receiver's
+18-second post-restoration observation interval had mean buffer delay 4174 ms
+and 212454 removed samples for acceleration. The target buffer delay was 120 ms.
+These counters describe receiver buffering, not total network latency or where
+packets accumulated before arrival. They do not establish physical-device behavior.
+
+A controlled realtime-injection comparison produced no valid input and is
+retained as invalid (recovery-2026-11-06T16-16-29.101Z). A candidate that paused
+RTP during disconnection caused the buffered injection to time out and failed
+the pre-outage speech check (recovery-2026-11-06T16-23-09.018Z). That behavior
+was removed. Its earlier setup attempt stopped before a call because an APK
+installation was unavailable after emulator restart; the helper now flushes
+device writes before stopping each dedicated AVD. None of these are passes.
+
+An experimental candidate limited the native audio jitter buffer to 50 packets
+and preserved that setting during credential refresh. This packet
+limit is not a fixed latency target. A valid 15-second B-to-A repeat confirmed
+new speech within 9.268 seconds; post-recovery STOI was 0.830 over ten seconds.
+The active receiver's 18-second post-restoration mean buffer delay was 262 ms,
+with 39460 removed samples for acceleration. The detector threshold was unchanged.
+This is one comparative observation, not a reliability rate or a release pass.
+Private run: recovery-2026-11-06T16-31-08.871Z.
+The same candidate's 30-second B-to-A test was valid and confirmed fresh speech
+within 13.518 seconds, with post-recovery STOI 0.759 over 8.97 seconds. The
+A-to-B attempt matched fresh speech but was invalid: one peer supplied no
+selected-path evidence after recovery. The missing diagnostics remain unexplained;
+that attempt is retained and does not count as a validated recovery.
+Private run: recovery-2026-11-06T16-41-10.141Z.
+
+The candidate was removed after the fixed-profile regression comparison.
+All four samples were valid: baseline STOI was 0.853/0.893 for A-to-B/B-to-A,
+while weak-link STOI fell to 0.410/0.407. A repeat with the diagnostic APK and
+default queue produced valid weak-link A-to-B STOI 0.744, close to the earlier
+0.730 pilot result. Reference audio and impairment settings were the same.
+Private runs: matrix-2026-11-06T16-47-44.975Z (candidate, baseline/weak subset)
+and matrix-2026-11-06T16-59-43.792Z (default queue, weak A-to-B only).
+An exploratory short-window alignment analysis suggests variable playout timing
+contributes to the lower whole-clip score, but it does not replace the original
+metric or establish that quality was preserved. The cause remains unresolved.
+No reduced queue setting or RTP-pause behavior remains in the app. The final
+app change only exposes additional counters in the isolated test build.
+The valid candidate 15-second recording also passed offline negative controls:
+substituted post-outage silence and replayed old speech were both rejected.
+Diagnostic APK SHA-256:
+cd3839c692ceb8d97305779c99de8dd5736f6feb9a3c7635cdbad5de79310cc7
+Queue-limit candidate APK SHA-256:
+89030b363b085f522c281623aed33f7f7c9289a694a6c664841598cb0eb75845
+
+WEAK-LINK OUTAGE PILOT AND INPUT-FIXTURE INVESTIGATION
+The outage runner now preserves the weak profile before and after a drop:
+64 kbps, 75 ms delay, 25 ms jitter and 1.51% random loss on each relay leg.
+Only loss changes to 100% during the planned interval. Reports verify the actual
+drops, restoration of the original profile, and selected paths at both peers.
+All samples below use the unchanged diagnostic APK cd3839c6 identified above;
+none changes the app's queue, retry policy, codec settings or recovery threshold.
+
+The initial four attempts used emulator 36.1.9.0 and buffered 48 kHz input:
+Outage    A-to-B confirmation bound    B-to-A confirmation bound
+2 s       3.762 s                      Invalid silent input
+5 s       Invalid silent input        Invalid silent input
+The valid two-second recording had post-recovery STOI 0.875 over ten seconds
+and median measured RTT 371 ms. The invalid attempts remain in the record.
+Private run: recovery-2026-11-06T17-14-25.364Z.
+
+A separate emulator 37.2.13 installation, with its matching generated protocol,
+also produced invalid silent input for two-second B-to-A at 48 kHz. Updating the
+emulator alone did not resolve the fixture. Native logs from before dialing and
+system-audio snapshots showed 8 kHz WebRTC microphone recording at both peers,
+with the microphone's API/switch/restriction/system mute states all false.
+Private run: recovery-2026-11-06T17-29-56.282Z.
+
+Using the same 37.2.13 toolchain with buffered 8 kHz synthetic input produced a
+valid two-second B-to-A sample, confirming new speech within 5.016 seconds;
+post-recovery STOI was 0.548 over ten seconds. The subsequent five-second A-to-B
+sample was valid and confirmed within 8.268 seconds, with post-recovery STOI
+0.814 over ten seconds and median RTT 384.5 ms. Input rate is now explicit in
+runner provenance. Scores from different input rates are not direct quality
+comparisons, and these observations do not establish a dependable fixture.
+Private runs: recovery-2026-11-06T17-34-21.333Z and
+recovery-2026-11-06T17-40-29.317Z.
+The latter run's B-to-A setup stopped before dialing: Android's System UI was
+unresponsive and its dialog covered the contacts screen. The failure screenshot
+and Maestro output are retained separately; no speech sample was attempted.
+A separate fresh-pair five-second B-to-A retry again had invalid silent input
+before the outage, despite using 8 kHz input. Changing the input rate therefore
+did not reliably fix the fixture. Private run: recovery-2026-11-06T17-46-00.662Z.
+Across this investigation, eight measurements and one pre-call setup failure
+are retained. Three measurements were valid and confirmed recovery; five had
+invalid input. Mixed settings and this small sample cannot estimate reliability.
+
+These are individual-direction pilot observations with mixed fixture settings,
+not simultaneous two-way tests, a reliability rate, or the full N1/N2 release
+matrix. Raw native logs and system-audio snapshots remain private. The detector
+threshold is unchanged; invalid input is never counted as a successful recovery.
+
+OFFLINE CALLER HANGUP — ONE ANDROID EMULATOR CASE PASSED
+On the restored diagnostic APK identified above, Maestro placed and answered a
+call. The caller's emulator Wi-Fi and mobile data were disabled, and Android
+reported no default network. Local hangup returned to the contacts screen while
+the server call remained accepted. Force-stopping and relaunching the app changed
+its process ID and still showed contacts; the server call remained accepted
+through that offline restart. After restoring connectivity, the persisted intent
+ended the remote call and removed both active-call leases. Maestro confirmed
+both phones returned to contacts. Original Wi-Fi/mobile-data settings were restored.
+The call was already ended at the first server check after a default network was
+observed; this does not measure precise replay or reconnection latency.
+Private evidence: offline-hangup-1793984600896. A prior preflight attempt refused
+to proceed because the AVD name parser retained a carriage return; it changed no
+network setting and placed no call. The parser now trims that response.
+This is one caller/process-restart case, not a pass for all J08/J09 combinations,
+callee hangup, media cleanup on physical hardware, or incoming background calls.
+
+MUTE DURING CONNECTION SETUP — FIXED AND CHECKED
+Previously, mute changed only an existing microphone track. A request made while
+credentials, permission or capture were pending could leave the eventual track
+enabled even while the UI showed Unmute. VoicePeer now keeps the latest mute
+intent and applies it before attaching microphone tracks. Calling passes the
+current mute state into a newly created peer and ignores mute events whose native
+session ID does not match the active call. The late-event guard is source-checked;
+it has not been exercised with a real delayed OS event.
+
+The Android standalone build passed a two-call Maestro check on API 36 emulators:
+mute while ringing; remain muted after answer; unmute; remute; hang up while
+muted; then make a new unmuted call. All seven phases matched Android's API and
+cached system microphone-mute states. The first reported JavaScript microphone
+track was disabled in the muted call and enabled in the following call. Both
+phones returned to contacts and system mute cleared after teardown.
+Private evidence: mute-1793987979442, including source/build/installed-APK hashes,
+private native logs, system-audio snapshots and a successful provenance audit.
+APK SHA-256:
+8e3ed299c6222b95e8591b756bbaea4e62804846f5173310e0842eca700d0e13
+
+This verifies control state, not silence in received audio, physical-device mute,
+cold-start CallKit state or iPhone behavior. No speech was injected during this
+check, and earlier speech matrices used the earlier APKs named in their sections.
+The mute fix is not established as a cause or solution for the intermittent
+silent emulator input observed in the weak-link investigation.
+
+NATIVE CALL RESTORATION AND STALE WORK
+Native call handling now restores the session's mute state, retains mute actions
+received while the durable hangup outbox is loading, and waits for native-session
+binding before starting media. Incoming answer requests must match the native
+session UUID returned by the lookup. If sessions change while a lookup is pending,
+the coordinator reads current native state again; ended calls and disposed account
+listeners cannot be adopted from an old result. Native hangup is handled without
+waiting behind storage restoration or an answer lookup. Its incoming server-call
+ID is also queued when the app has not yet loaded the Firestore call record.
+
+Peer callbacks and startup failures now check that they still belong to the
+current peer/call. Superseded Firestore callbacks and delayed active-call reads
+are ignored. These ownership guards are source-reviewed; the twelve controlled
+sequence tests exercise the native-event coordinator, not a real OS push or every
+React lifecycle interleaving. Physical incoming-call and cold-start gates remain.
+
+On the initial lifecycle APK below, the two-call mute check first failed because
+the call did not connect within the 45-second Maestro deadline. Both peers had
+local UDP relay candidates, but only one observed a remote candidate during the
+captured interval; the caller log did not show an applied answer. No JavaScript
+error was found. The connection failure is undiagnosed, not dismissed as a fixture
+error. Cleanup returned both phones to contacts. A separate retry passed all seven
+mute/control phases across two calls. Both attempts remain in the evidence.
+Private runs: mute-1793989530000 (failed) and mute-1793989709162 (passed).
+
+The extended offline-hangup runner then passed separately for callee and caller:
+disable both selected-phone networks; hang up locally; restart while offline;
+confirm the server remains accepted; restore connectivity; confirm ended status,
+both active-call leases removed, and both contact screens. Source/build hashes
+were audited and snapshots retained. These are two process-restart cases, not
+complete J08/J09, push, speech, or physical-device validation.
+Private runs: offline-hangup-1793989854361 (callee) and
+ offline-hangup-1793989941930 (caller).
+Initial lifecycle APK SHA-256:
+da3e9849a68eae66ab133c539fa7be034b5228b24bb5ea10637532986346232c
+
+STABLE CALL CONTROLS DURING RECONNECTION
+The next callee-offline attempt exposed a moving hangup target. Maestro selected
+End Call at [63,1453][1017,1595], but the longer reconnecting heading and subtitle
+moved it downward before the tap landed. The call stayed active until cleanup
+from the other phone. The failed case and its UI/log/source evidence are retained:
+offline-hangup-1793990283011, APK SHA-256
+64dc26c4755e06e978e3acfe0e36f3672f91c1e145043ff9a86697446d2cadbc.
+
+Call controls now occupy a separate bottom area inside the safe area. Contact,
+status, timer and error text scroll above it, so changing status text does not
+shift End Call. The offline runner compares the control's bounds while connected
+and reconnecting, saves both screens, and still requires local end, offline
+process restart and durable replay. Its first position-inspection attempt timed
+out in Android's uiautomator dump before changing the network; cleanup ended the
+call. That invalid harness attempt is retained as offline-hangup-1793991015706.
+Inspection now uses Maestro's hierarchy command.
+
+The rebuilt app passed separately for callee and caller, on 1080x1920 and
+1080x2400 Android emulator screens. End Call retained identical connected/offline
+bounds on each phone, and the reconnecting message was observed. Local hangup,
+offline process restart, server accepted state before reconnect, ended state
+after reconnect, both lease removals and both contact screens all passed. The
+screen captures were visually inspected and source/build/installed-APK evidence
+audited. These are control/lifecycle checks; no speech was injected.
+Private runs: offline-hangup-1793991269855 (callee) and
+offline-hangup-1793991373132 (caller).
+Stable-controls APK SHA-256:
+881a39e81a2a54daffd39c62d4ecd1f1969f0bcc0aec1a6ed3d5e2ae34bc46b3
+
+The same APK also passed the seven-phase, two-call mute check, including a muted
+first track after answer, unmute/remute, cleared system mute after hangup and an
+unmuted next call. Private run: mute-1793991458329. This checks UI, JavaScript
+track state and Android system flags, not received-audio silence or iPhone mute.
+
+CANCELLATION WHILE OUTGOING SETUP IS PENDING
+Outgoing attempts now own their request UUID before contacting the server.
+End Call updates the screen immediately and persists that ID even before a
+CallRecord exists. Late server/native completions cannot bind or navigate the
+cancelled attempt; a late native UUID is closed independently of any newer call.
+An uncertain create response also queues cleanup, since a timeout does not prove
+the server failed to create the call. A newer Firestore call state is preserved
+instead of being overwritten by an older callable response.
+
+The backend transaction records an end-before-create receipt under the caller's
+own user record. startCall reads it in the creation transaction. Other users'
+receipts cannot cancel a guessed request ID, and existing-call membership checks
+still apply. Receipts are server-only, expire with the 90-day history retention,
+and are removed by account deletion. A transactional deletion check prevents a
+concurrent deletion from being followed by a new receipt. Deployment must include
+the cancelledStarts TTL configuration; no production deployment was performed.
+
+The outbox now processes an end intent added during an existing delivery. Its
+previous single snapshot could leave that intent queued until another network
+event. The controlled regression delivered only the first intent on the old code
+and both intents with the fix. The final backend suite also verifies deletion of
+cancellation receipts and denial of the deleted identity.
+
+Three Android Maestro cases passed with controlled delays at before-request,
+after-response and after-native boundaries. Each showed Call cancelled promptly,
+returned to contacts, and remained there after releasing the delayed work.
+The before-request case created no server call; the other two ended their ringing
+records. No active-call lease remained, no cancelled attempt bound a native call,
+and the native session query after completion was empty or ended. Both phones
+returned to contacts. Private native logs, installed-APK hashes and source
+snapshots were audited. These are setup/control checks, not packet-loss, speech,
+background-push or physical-device measurements.
+Private runs:
+pending-cancel-before-request-1793992552017
+pending-cancel-after-response-1793992647413
+pending-cancel-after-native-1793992706540
+These three runs preceded the final transactional account-deletion check; their
+exact backend source and compiled hashes are retained in their snapshots.
+Android APK SHA-256:
+3f5213c2aecd3dab4bf5396c459f5d323d2cb91254199cac5b6e27a7fa7a697b
+
+After adding the transactional account-deletion guard, all eleven backend tests
+passed, including receipt deletion and stale-identity denial. The before-request
+Android case passed again with the rebuilt backend:
+pending-cancel-before-request-1793992795599. The same APK and final backend passed
+the seven-phase, two-call mute regression, mute-1793992871099. Source/build/native
+log provenance was audited. As above, mute evidence concerns control/track/system
+flags, not silence in received audio.
+
+The final caller-offline regression also passed: stable End Call bounds during
+reconnection, immediate local hangup, a changed process ID after restarting
+offline, accepted server state until reconnection, then ended state, both leases
+removed and both contact screens. Private run: offline-hangup-1793992988164.
+This repeats the caller case on the new APK/backend; callee offline evidence
+above belongs to its earlier, explicitly identified builds.
+
+MUTE BEFORE THE NATIVE CALL EXISTS
+A controlled before-request test on APK 3f5213c2 (identified above) found that the
+UI showed Unmute and the first/current microphone track was disabled, but
+Android's API and cached system microphone-mute flags were both false. This is a
+native/app state mismatch, not evidence that speech was transmitted while muted.
+The call connected, and cleanup returned both phones to contacts. Failed private
+run: pending-action-mute-before-request-1793993475211. Its source, logs and screen
+capture were retained and audited before changing the app.
+
+Calling now keeps the pending outgoing attempt's mute choice when attaching its
+Firestore watcher, even before a CallRecord has arrived. When the native UUID
+becomes available, an existing mute request is applied to that native session.
+Errors from a superseded native session cannot alter a newer call's error state.
+The before-request check holds both request and response boundaries and requires
+a Firestore snapshot with mute still set before releasing the response. This
+exercises the watcher ordering rather than relying on a timing sleep.
+
+The rebuilt APK passed all three mute stages: before-request, after-response,
+and after-native. The first/current microphone track stayed disabled, Android's
+API/system mute flags were true, both phones connected, and both returned to
+contacts with no active-call lease after hangup. The before-request case also
+observed mute still set in the Firestore callback before the delayed response was
+applied. Private runs, with source/build/native-log hashes audited:
+pending-action-mute-before-request-1793993747158
+pending-action-mute-after-response-1793993838883
+pending-action-mute-after-native-1793993929404
+APK SHA-256:
+cc94bd07a64c4ab4e443c0871e9b29b1aa9d70d5586e2158df2767b0c867c0ce
+These are control-state checks; they do not prove received-audio silence, rapid
+native/app toggle ordering, iPhone behavior, or a poor-network audio envelope.
+
+The early-answer case on this APK also passed. The callee accepted while the
+caller still held its ringing response; the caller UI showed Connecting before
+release, and the native-binding diagnostic retained status accepted afterward.
+Both phones connected and ended normally. The caller's first/current track was
+enabled and Android's mute flags were false, checking a new unmuted call after
+the muted cases. Source/build/log hashes and event ordering were audited.
+Private run: pending-action-early-answer-1793994002846.
+This establishes that controlled ordering, not a general call-success rate or
+an explanation for the earlier undiagnosed connection timeout.
+
+CURRENT-BUILD BASELINE AUDIO INVESTIGATION
+Two fresh-pair 30-second baseline measurements on APK cc94bd07 (above), emulator
+37.2.13 and buffered 8 kHz generated input both produced valid received speech.
+The requested/selected path was UDP relay; the shaper applied no loss, delay,
+jitter or bandwidth limit. Full-clip STOI was 0.389 A-to-B and 0.399 B-to-A.
+These low values remain recorded and are not accepted as a quality pass.
+
+The measured packet windows had no loss or concealed samples. Mean native
+receiver-buffer delay on the speech-bearing streams was approximately 66 and
+69 ms. Exploratory alignment of shorter recording windows suggests time-varying
+alignment; some correlations are weak, so this does not diagnose the cause or
+justify replacing the original full-clip scores. App audio, emulator injection
+and capture timing still require separation. The timing-counter analyzer now
+accepts fixed-profile reports, preserving per-peer/per-stream identities and
+excluding observations outside the selected call/measurement interval.
+
+Private run: matrix-2026-11-06T19-52-02.257Z. Source/build/reference/native-log
+hashes and capture lifetimes were verified. Original captures, full-clip reports,
+selected timing counters and exploratory alignment diagnostics are retained.
+Two valid inputs do not establish that the intermittent silent-input problem is
+resolved. Input-rate/toolchain differences prevent direct comparison with the
+earlier eight-sample pilot, and physical-device validation remains required.
+
+A comparison using the original 48 kHz generated-input rate kept the APK,
+emulator version and network profile unchanged, with another fresh pair for
+each direction. A-to-B was valid with full-clip STOI 0.876. B-to-A was invalid:
+both source-energy counters stayed unchanged despite advancing source duration,
+and capture contained only 2.163 seconds for the 30-second measurement. Android
+reported an active, unsilenced recorder and false microphone-mute flags. No gRPC
+error was reported; both peers still had the expected relay path and advancing
+packet counters. Thus the current app/control fixes have not eliminated the
+silent-input measurement failure. One higher score is not proof of a solution.
+
+Private run: matrix-2026-11-06T20-02-39.732Z, including the invalid direction;
+both source/build/reference/native-log provenance and selected peer paths were
+audited. An earlier comparison attempt, matrix-2026-11-06T20-00-54.081Z, failed
+before calling or injection because Maestro lost its ADB connection while
+launching the second app. Its driver log and empty measurement summary are
+retained separately; the cause of that transient disconnect is undiagnosed.
+These four measurements and one setup failure are not a reliability estimate.
+
+EMULATOR AUDIO PIPELINE DIAGNOSTICS
+Four additional B-to-A baseline calls used read-only debugger snapshots of the
+dedicated emulator's virtual microphone. All are excluded from speech-quality
+and latency results because inspection pauses execution. The first three
+paused before injection and again during it: the selected microphone was the
+active stream, and later probes found nonzero PCM through the emulator's
+conversion and guest-facing buffers, while WebRTC source energy stayed flat.
+Those pauses could themselves disrupt recording; these cases do not diagnose
+the earlier unpaused silent-input failures.
+
+The fourth call had no inspection pause before injection. Its retained counters
+from before the first attach show B's source energy increasing by 1.704 and A's
+received energy by 1.837 over about three seconds. Its final recording still
+contained only 2.258 seconds for a 30-second request and no measurable captured
+speech. This distinguishes a short output-recording symptom from absent source
+energy in that case; energy counters alone do not establish intelligibility.
+It does not explain every earlier input failure or prove a specific emulator
+defect. No app audio workaround was introduced from these observations.
+
+Private diagnostic folders: matrix-2026-11-06T20-16-23.847Z,
+matrix-2026-11-06T20-20-49.377Z, matrix-2026-11-06T20-24-12.509Z and
+matrix-2026-11-06T20-29-38.989Z. Source snapshots, APK cc94bd07, reference and
+native-log hashes/lifetimes were audited; the fourth retains peer identities
+and counters captured before inspection. A separate no-early-pause attempt,
+matrix-2026-11-06T20-27-48.357Z, failed during the second app's Maestro launch
+with ADB device offline, before a call or injection. Its driver logs remain.
+
+The test runner now records independent input and output-capture sample rates.
+Output capture defaults to the existing 48 kHz; optional 8/16 kHz capture adjusts
+WAV metadata, sample positions and resampling consistently. Unexpected formats
+still invalidate the measurement. These settings affect the test recorder,
+not FamCall's codec or microphone configuration.
+
+A fresh, unpaused B-to-A baseline check kept APK cc94bd07, emulator 37.2.13 and
+48 kHz generated input, and requested 8 kHz output capture. It received 32.634
+seconds with the requested PCM format and enough audio for a full 30-second
+comparison, but its STOI was only 0.069. Source and receiver energy counters
+advanced. This passes the recording-format/duration checks, not voice quality;
+it does not establish a reliable fixture or justify changing app audio settings.
+Private folder: matrix-2026-11-06T20-34-34.408Z. Both actual UDP relay paths,
+installed APKs, source/reference hashes and native-log lifetimes were audited.
+Keep the differing capture rates explicit when comparing this with earlier runs.
+
+SUSTAINED MICROPHONE ACTIVITY
+Inspecting the complete timeline of that 8 kHz capture showed sound only near
+its beginning. B's source-energy counter stopped increasing by about five
+seconds after injection began, and A's received-energy counter then stayed flat.
+The generated reference contained sound throughout those intervals. An examined
+two-second early window matched locally, but most of the recording was silence.
+The retained full-clip score remains 0.069; local alignment is not a replacement
+score. This narrows that failure to missing sustained source activity and does
+not establish whether the cause is in FamCall, Android or emulator injection.
+
+The recorder now binds the explicit caller port and pre-dial timestamp to one
+new call and its two participant IDs before injection. A source-activity check
+requires the intended sender's energy/duration counters over the observed part
+of the generated interval, without combining peers, calls or source streams. Gaps, resets and
+missing counters fail closed. Intentional pauses in the reference are allowed.
+Energy presence alone cannot prove speech content or intelligibility, so the
+existing transport, capture, alignment and recovery checks remain necessary.
+
+Reanalysis preserved the five original reports and saved separate source-activity
+diagnostics with source/reference/report hashes and selected metrics. It rejects
+the 0.069 early-burst-then-silence sample and the already-invalid silent B-to-A
+48 kHz sample. The 0.876 A-to-B sample and both 0.389/0.399 samples retain sustained
+source activity. Passing this new check therefore does not turn low scores into
+quality passes. Five new unit cases cover stopped input, unrelated peers/calls,
+stream changes, missing/reset counters, observation gaps, deliberate reference
+pauses and caller/callee identity; the Python evidence suite now has 16 tests.
+
+A fresh live B-to-A baseline run verified the new participant binding and source
+check end to end with the unchanged APK. It used the same 48 kHz input and 8 kHz
+output-capture settings as the earlier stopped-input sample, observed sustained
+source activity across 27.004 seconds and recorded 32.629 seconds, with STOI
+0.861. Private folder: matrix-2026-11-06T20-49-06.357Z. The installed APK, complete
+measurement source set, reference, both UDP relay paths and native-log lifetimes
+were audited. This is one successful sample alongside retained failures; it
+does not establish repeatability or explain why the previous source stopped.
+
+ANDROID RECORDING-CALLBACK INVESTIGATION
+An opt-in, e2e-only config plugin adds JavaAudioDeviceModule recording callbacks
+with the usual audio settings. It reports aggregate PCM energy, peak, zero
+fraction, sample count and recording-session timestamps; the callback retains
+no PCM or speech files. Production configuration rejects the flag. A real
+prebuild on/off/on check verified removal of both the generated installation
+call and helper class when disabled. The standalone Android diagnostic build
+compiled, with APK SHA-256 54330e5d3113655dcda26ee8a85e06b1a755f1d32ae0483a2b02688d274da209.
+The packaged native library matches the inspected org.jitsi:webrtc:155.0.1 AAR.
+
+Two fresh-pair B-to-A baseline calls used API 36, emulator 37.2.13, buffered
+48 kHz generated input and 8 kHz output capture, without debugger pauses:
+- matrix-2026-11-06T21-03-38.303Z: invalid source activity and no measurable
+  received speech. Twenty-nine complete callback windows wholly within the
+  injection interval contained 29.39 seconds of exactly zero PCM. Android's
+  API/system mute flags were false, its recording configuration was not silenced,
+  and the app's microphone track was enabled. The recording thread continued
+  delivering samples from one session; it did not stop during the measurement.
+- matrix-2026-11-06T21-07-12.359Z: positive control with sustained source energy
+  and nonzero callback PCM. Its raw full-clip STOI was 0.900. This validates that
+  the diagnostic can observe nonzero input; it is not a production benchmark.
+
+Both cases retain actual relay paths, complete build/source/reference hashes,
+native-log hashes/lifetimes, recording-session identity and separate callback
+analysis. Device/host timestamp offsets varied by 10 ms and 2 ms respectively;
+comparison windows exclude callback records crossing source-stat boundaries.
+The bounded investigation stopped after the failed case and positive control.
+No third attempt was needed, and no success-rate estimate is made.
+
+For the failed case, silence was already present in the SDK recording buffer
+before media transmission. The callback is after Java microphone mute and
+Android audio effects; this does not isolate those stages from emulator injection
+or establish a physical-device defect. Callback overhead and earlier audio-module
+construction may affect timing. Both instrumented cases are excluded from
+release-quality evidence. Production audio behavior has not been changed.
+
+ANDROID 15 IMAGE COMPARISON
+A separate, clean API 35 Google Play phone image used the same emulator 37.2.13,
+diagnostic APK, Pixel 7 hardware profile, generated reference, buffered 48 kHz
+input, 8 kHz capture and baseline UDP proxy. The API 36 AVDs were preserved.
+New userdata and system services also differ, so this is not an isolated test
+of the Android version. One Pixel Launcher ANR dialog on each fresh phone
+interrupted initial signup; both screenshots and successful signup retries remain.
+
+- matrix-2026-11-06T21-23-26.460Z: sustained sender input, but the receiver process
+  stopped about nine seconds into measurement. Android's package-specific exit
+  record identifies PID 3822, reason 16 PACKAGE UPDATED, with the description
+  "stop com.google.android.gms due to installPackageLI". The receiver's Google
+  Play services update time matches this interruption. Only 13.028 seconds of
+  audio were captured and connection evidence disappeared; the measurement is
+  invalid. Its partial-recording score is not quality evidence.
+- matrix-2026-11-06T21-27-03.525Z: after both phones reported Play services
+  26.43.30, silent input reproduced. Twenty-eight complete recording-callback
+  windows inside injection contained 28.38 seconds of exactly zero PCM. The
+  sender's Android mute flags were false; both original app PIDs remained
+  present after measurement. The source-activity gate rejected the sample,
+  despite a complete output file and verified UDP relay paths.
+
+Both attempts retain source/build/reference hashes, actual device fingerprints,
+native-log lifetimes and recording-callback analyses. Both archives passed
+integrity checks; the first retains its failed path verification. The comparison
+stopped on the reproduced silent case, within its three-attempt maximum. This
+shows the symptom also occurs on this API 35 setup; changing the Android image
+did not resolve it. It does not establish the cause or a population failure rate.
+
+Native-log collection now saves a hashed process snapshot and package-specific
+Android exit history at stop. A controlled idle-app check force-stopped A while
+leaving B running: A was recorded as absent with the matching force-stop exit
+record, and B retained its original PID. This verifies diagnostic collection,
+not in-call recovery. An end snapshot is not continuous process monitoring.
+
+STANDALONE ANDROID RECORDER ISOLATION
+A separate local probe used Android AudioRecord directly, without WebRTC,
+Telecom, playout or a network permission. The probe APK contains no native
+libraries. It requested VOICE_COMMUNICATION, mono PCM16 at 8 kHz, a 1024-byte
+recording buffer and 160-byte reads, matching the basic recorder settings
+observed in the calling SDK. It recorded aggregate energy and sample counts,
+not PCM files. It does not reproduce the full calling app's routing or effects
+management and is not a production build.
+
+Two fresh API 36/emulator 37.2.13 attempts injected the same generated 48 kHz
+reference through buffered gRPC delivery, with one injection per incarnation:
+- direct-1794001066830: initial nonzero input followed by 25.34 seconds of
+  exactly zero samples inside the examined injection interval. The examined
+  windows also include 2.02 seconds of nonzero input. The recorder continued
+  producing samples; its original process stayed running and completed normally.
+- direct-1794001203710: nonzero control, with 28.37 seconds of active input and
+  no zero-only windows. This demonstrates that the same probe can receive
+  nonzero samples; aggregate energy does not verify the speech content.
+
+Both runs reported microphone mute false, hardware echo cancellation and noise
+suppression unavailable, and an unsilenced recording session in Android's
+system-audio history. The generated reference was non-silent in every examined
+window. Independent integrity checks verified the native source, installed APK,
+reference, aggregate-event hashes, sample accounting and device/host clock
+alignment. APK SHA-256: 8a4866ea92629b26c4fa2010a83b81a35df04aa8aad96884c12de5847b3b2c8b.
+The probe sources, APK and reports are retained in the private run archives.
+The investigation stopped after these two outcomes, within its three-attempt
+maximum; no reliability estimate or voice-quality score is derived from it.
+
+The silent-input symptom can therefore occur without WebRTC's Java mute path,
+FamCall signaling or call transport. This narrows the investigation to the
+shared emulator/Android input setup for these probe cases. It does not prove
+that every FamCall failure has the same cause or establish a physical-phone
+defect. Production audio settings remain unchanged.
+
+
+SOUND-CARD CONTENT CONTROL
+A follow-up standalone recorder retained generated PCM in the private emulator
+lab and checked content against the injected reference. With VirtioSndCard
+explicitly enabled, card-virtio-1794001939800 matched all fifteen non-overlapping
+two-second reference windows (30 seconds total). Window correlations ranged
+from .836 to .995. The full capture had about .84% clipped samples. Raw sample
+counts, RMS and zero fractions matched every native aggregate event. Known-offset
+synthetic input passed; silence and reversed-reference controls matched no windows.
+This confirms generated content reached that recorder in one attempt; it is not
+a voice-quality, latency, physical-device or repeatability result.
+
+The Intel HDA attempt, card-hda-1794002095046, reached the injection RPC deadline.
+It has no completed injection or validated content result. Its failure and
+partial recorder output are retained. Both source/build/reference archives and
+sound-card launch flags were checked. The original comparison completion rule
+was not met: further retries were stopped to prioritize newly available physical
+phones. The temporary recorder was removed and the default API 36 emulator
+configuration restored. FamCall production audio settings are unchanged.
+
+
+VOICE-ONLY IOS PERMISSION CONFIGURATION
+The WebRTC plugin was reintroducing a camera usage description after the local
+voice-only plugin removed it. The local plugin is now registered first so its
+Info.plist cleanup runs after the SDK mods. Full Expo introspection for both
+production and test configurations confirms the camera description is absent,
+with the microphone and contacts descriptions preserved. Android still removes
+the camera permission. The actual generated iOS test Info.plist was also checked.
+The before/after iOS plist comparison changed only the camera-description entry;
+this is a permission declaration correction, not an audio behavior change.
+
+HOSTED ANDROID/IPHONE SMOKE QUALIFICATION
+The owner requested provider-owned devices only. BrowserStack credentials are
+stored privately outside source control. Its API confirmed Free plan and five
+parallel slots; no subscription or paid upgrade was purchased. The trial's
+dashboard showed 94 free minutes remaining after these three completed runs.
+
+A normal-audio demo APK and development-signed demo IPA were built for
+bs-local.com from app source later committed as 360faa2158785457580939d560e493ac1231ac77. All 57 app/build source hashes match the inspected snapshots;
+both signatures and embedded demo project/package settings were verified.
+The final iPhone binary has no camera usage description, preserving microphone
+and contacts descriptions. Neither binary was installed on personal hardware.
+APK SHA-256: 71ef6afd1a123833bc41710c49bac5ed0a18eaac8967c71f2d1ddef9ef4ea65a
+IPA SHA-256: 891480b10d0b50ec5b3c70c51601be1aae52bd30b8fc58ddbad628fbaa942da6
+
+- Pixel 6 / Android 12: build bdf852cb96bc51ae60bf9a63c2a3022545f987b7 passed
+  fictional-number verification, contact saving and persistence after relaunch.
+  Backend records independently confirm identity 0101 and contact 0102. Its
+  command trace and native/Maestro logs are retained. The provider's screenshot
+  endpoint returned 404, so no screenshot is claimed for this first run.
+- iPhone 15 / iOS 17.4: build e305212df125898677c318a4596ccab6d6f413df failed
+  at contact saving after verification. Firebase Functions 13.1.1 refused to
+  attach authentication to a non-loopback HTTP emulator URL. Native Firestore
+  reported connection refused at 127.0.0.1:8080. A screenshot and both logs retain
+  this setup failure; the tunnel route is not qualified for the iPhone backend.
+  Maestro also warned that clearState is unsupported on real iOS devices.
+- The first flow's literal env values overrode the iPhone request's identity,
+  so it actually signed in as 0101. Defaults were removed and explicit distinct
+  fictional identities are now validated before launch. Pixel 6 build
+  39bca1f5e7958a116668fe098ecd2f09aea468d8 passed the revised suite with identity
+  0102, contact 0101 and name Cloud Family. The command/Maestro/native logs,
+  final screenshot and independent backend record agree. This verifies a second
+  identity in a separate Android run, not a concurrent two-endpoint test.
+
+The iPhone test HTTP exception is limited to the separate test bundle. During
+configuration verification, reusing a generated cloud-test plist initially left
+that exception in production configuration. A config plugin now removes the
+owned exception for production and other local hosts, even with --no-clean.
+Two regression tests plus actual prebuild/introspection verified cleanup and
+retention of unrelated transport settings. General insecure loads stay disabled.
+
+Private cloud-testing artifacts retain hashes, app/suite upload IDs, build/session
+responses, successful and failed logs, backend evidence and screenshots. Both
+Android runs and the iPhone run finished with zero reported crash logs. That is
+limited provider evidence, not a crash-free reliability estimate. No hosted call,
+audio injection, network impairment, background ringing or production attestation
+was tested. The iPhone needs a secure Functions endpoint and verified native
+Firestore route before retrying; Firebase transport protections remain enabled.
+
+INCOMING-CALL REGISTRATION RECOVERY
+A source review after the hosted tests found that a failed registerDevice upload
+had no timer or network/foreground retry. Incoming-call push could therefore
+remain unavailable after a brief outage until another token event or app restart.
+The client now retains the latest native token, serializes uploads, retries at
+5/15/30/60 seconds, and starts a fresh bounded attempt when connectivity returns
+or the app becomes active. It stops queued work when the account changes or the
+provider is disposed. It does not promise background execution while the OS has
+suspended the app.
+
+A persisted installation sequence orders token changes across restarts and
+concurrent preparations. The backend binds each upload to its originating account
+and ignores older sequences, preventing a delayed request from replacing newer
+registration state. APNs/FCM rejection cleanup compares the exact document
+version: an old rejection cannot remove a refreshed token. An invalidated record
+retains its sequence until normal expiry and removes the rejected token, so a
+late duplicate upload cannot resurrect it. This changes the registerDevice
+contract; the matching backend and app must ship together. No public app has
+been released with the earlier contract.
+
+Seven controller tests cover upload failure/recovery, bounded retries, token
+rotation during successful/failed uploads, missing token arrival, storage/native
+failures, account changes and disposal. Two storage tests verify serialized,
+persisted ordering, legacy installation reuse and write-failure recovery. Two
+Auth/Firestore callable integration cases verify account binding, late uploads,
+conflicting sequences, old rejection responses and invalidation/re-registration.
+All passed locally. These synthetic tokens and controlled failures validate the
+registration state machine, not actual APNs/FCM delivery or locked-screen ringing.
+
+The first local full run also discovered four private historical source snapshots,
+adding 28 duplicate core tests to its 98-test total. Vitest now excludes .local/
+while retaining its normal exclusions; discovery confirms 12 current test files.
+The current source has 70 JavaScript/TypeScript tests. The emulator log also retains
+NOT_FOUND errors when account-deletion workers outlive test-record cleanup; those
+are not new push-delivery evidence. The test command itself exited successfully.
+
+HOSTED ANDROID PAIRED CALL
+Two concurrent BrowserStack Pixel 6 / Android 12 sessions passed the new caller
+and callee Maestro flows. Caller build: 4799bbd5e21e4df6c24e6f40b46cf0e52d0fab85.
+Callee build: 627bba37e96ec0bb12ab12128a8bb6248f11b7ab. Both used fictional demo
+accounts, the authenticated Local tunnel for signaling and live Cloudflare TURN.
+The backend recorded acceptance then caller hangup after 20.782 seconds, with
+zero remaining active leases. Both phones returned to the people list.
+
+Six WebRTC samples per peer span fifteen seconds. Each selected transport's
+selectedCandidatePairId resolves to a succeeded, nominated pair whose local and
+remote candidates are relay/UDP; local relayProtocol is UDP. Final inbound RTP
+counts were 425 and 390, with outbound counts 394 and 421 respectively. Source
+and received totalAudioEnergy increased on both peers. This proves bidirectional
+media transport in this short foreground call. It does not prove speech
+intelligibility: no known microphone reference, silence control, echo check,
+network impairment or output-audio qualification was used.
+
+The APK is the previously verified artifact from source 360faa2158785457580939d560e493ac1231ac77.
+The backend's runtime hashes are retained separately: its compiled registration
+handler lacks the last APNs environment conflict check added in 4065490. This
+run therefore does not validate current push-registration changes; demo mode
+disables push registration. Rebuild the backend before future exact-source tests.
+The call-suite SHA-256 is 0a44323d02a5c0a553554366d3c6a85b8b7640633c66ee4b173d7740da8b496e.
+Private run: e81990ab-12db-4fb3-85b0-261b2da01dd2. Both command/native/Maestro
+logs and screenshots were saved and connected screenshots inspected. Provider
+crash-log counts were zero. Maestro video URLs returned 404 and the dashboard
+download timed out; the general session API subsequently supplied working signed
+video URLs. Both MP4 files and extracted PCM audio are retained privately. Their
+AAC tracks contain brief click-like pulses and long exact-silence intervals;
+zero-tolerance frame extraction confirms connected screens during sampled silent
+intervals. No known microphone signal was injected. Received-speech capture and
+intelligibility remain unqualified. History UI, background/push and iPhone calling were not
+tested in this run. The initial empty users/{uid}/history probe was the wrong
+collection: app history queries participant records in calls instead.
+
+The refreshed dashboard showed 89 free minutes remaining, with no paid upgrade.
+The provider reported zero running/queued sessions. The temporary tunnel,
+collector and emulators were stopped; ports 9099/8080/5001/8787 were closed.
+
+A separate bounded microphone-injection capability request was rejected before
+session creation with HTTP 422 / BROWSERSTACK_INVALID_ACTION_BY_GROUP: audio
+injection is not enabled for this account/framework. The account remained Free,
+with zero running/queued sessions immediately after rejection. Only a generated
+ten-second tone and a two-file capability suite were uploaded; no personal audio,
+backend access or production credentials were included. No vendor access request
+or paid upgrade was made. This is an account capability limit, not an app failure.
+
+HOSTED ANDROID HISTORY AND BLOCKING
+The seventeen-file lifecycle suite passed on two concurrent Pixel 6 / Android 12
+devices. Caller build 90205742a2ae8b2590d048c1d046d01f0992abfc and callee build
+9bfa3bcd5ac88f01926bc67d0039f75b0e8e94ed completed all commands. The recipient
+observed ringing before caller cancellation, saw Missed in Recents, and blocked
+that number from the history row. The caller's next attempt was refused. Backend
+snapshots confirmed the block existed during that attempt and no new call record
+was created. Unblocking removed the record. Both then connected and ended a
+second call; acceptance-to-hangup was 21.705 seconds. After restarting both apps,
+the caller retained two Outgoing rows and the recipient retained Incoming and
+Missed rows. Screenshots agree with the command assertions and backend records.
+The final two calls were cancelled/ended, with zero active leases.
+
+An earlier attempt is retained: the provider failed starting the caller session
+before test commands; the other phone passed signup then timed out waiting. No
+call was created. One bounded retry passed with unchanged app/suite inputs. These
+failures are not counted as passes or excluded from the experiment history.
+
+Private run: e4bb9181-e880-461a-bd50-906fe478a5c1. APK remains source 360faa2,
+SHA-256 71ef6afd1a123833bc41710c49bac5ed0a18eaac8967c71f2d1ddef9ef4ea65a.
+Suite SHA-256: 77713e79d240fcbd353fb136167e4591c200717083e306db5bf80c0fc22c3619.
+Backend was rebuilt from eacbbb4 before this run; its executed JS is archived,
+SHA-256 890d87d0fd6d01d1c0b7484d1d7917e1512c29dc5d04baa08e324bd5281e8aa6.
+The trial remained Free. No sessions were running/queued after completion, and
+the tunnel, collector and emulators were stopped with ports verified closed.
+The earlier 89-minute dashboard balance predates these four lifecycle sessions
+and is not a current balance. This run establishes foreground history/blocking
+behavior, not scheduled ring expiry, original signing, push, speech quality or
+poor-network recovery. No personal phones or paid upgrades were used.
+
+RELEASE GATES
+- Physical Android and iPhone calls, including cross-platform audio, screen
+  lock/background, incoming push after process reclamation, audio routes and
+  microphone permissions. Force-stop/force-quit behavior must be documented.
+- Production App Check, signing fingerprints, phone verification fallback,
+  Apple push credentials, and Google Play/TestFlight distribution.
+- Real-provider quota boundary/concurrency validation; routine tests sent no SMS.
+- Genuine store screenshots matching the tested release candidate and final
+  store privacy, age, content, encryption, and contact declarations.
+- Owner PR review, deployment approval, and store release approval.
+
+MEASUREMENT RULES
+The audio lab injects generated speech into the emulator microphone and captures
+the receiving emulator output. It never uses the computer's microphone. STOI is
+an intelligibility estimate, not a MOS score, human listening result, or proof of
+physical-device performance. Tests check the actual selected ICE candidate path.
+Per-leg impairment settings must not be reported as end-to-end loss/latency.
+Only completed, reproducible cases with valid source/capture signals count.
+
+ADDITIONAL SIMULATOR FINDING
+The iOS 26.5 simulator accepts reportNewIncomingCall, then its system call
+service ends the call almost immediately (disconnect reason 55 / generic error).
+Its logs also show failure to open the incoming-call system interface. This
+reproduces without an active iOS Maestro flow. It is not counted as an incoming
+call pass; validate the actual signed app on an iPhone before release.

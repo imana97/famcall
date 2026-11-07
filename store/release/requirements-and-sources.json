@@ -1,0 +1,190 @@
+{
+  "checked_on": "2026-11-06",
+  "purpose": "Source-backed preparation references; recheck before upload. These are not proof of store acceptance.",
+  "apple": {
+    "name_max_characters": 30,
+    "subtitle_max_characters": 30,
+    "promotional_text_max_characters": 170,
+    "description_max_characters": 4000,
+    "keywords_max_utf8_bytes": 100,
+    "screenshots_per_set": {
+      "min": 1,
+      "max": 10
+    },
+    "selected_iphone_portrait_export": {
+      "width": 1320,
+      "height": 2868,
+      "format": "PNG",
+      "alpha": false,
+      "slot": "6.9-inch"
+    },
+    "ipad_capture_required_if_app_supports_ipad": true,
+    "app_preview_optional": true,
+    "beta_channel": "TestFlight",
+    "external_beta_review": "May be required before external testing; verify build status.",
+    "sources": [
+      {
+        "topic": "Name, subtitle, privacy URL",
+        "url": "https://developer.apple.com/help/app-store-connect/reference/app-information/app-information/"
+      },
+      {
+        "topic": "Description, promotional text, keyword bytes, support URL, copyright",
+        "url": "https://developer.apple.com/help/app-store-connect/reference/app-information/platform-version-information/"
+      },
+      {
+        "topic": "Product-page presentation",
+        "url": "https://developer.apple.com/app-store/product-page/"
+      },
+      {
+        "topic": "Screenshot dimensions and transparency",
+        "url": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/"
+      },
+      {
+        "topic": "Screenshots show the app in use; accurate metadata",
+        "url": "https://developer.apple.com/app-store/review/guidelines/"
+      },
+      {
+        "topic": "TestFlight description and feedback email",
+        "url": "https://developer.apple.com/help/app-store-connect/test-a-beta-version/provide-test-information/"
+      },
+      {
+        "topic": "External tester invitation and beta review",
+        "url": "https://developer.apple.com/help/app-store-connect/test-a-beta-version/invite-external-testers/"
+      },
+      {
+        "topic": "App privacy answers include relevant SDK practices",
+        "url": "https://developer.apple.com/app-store/app-privacy-details/"
+      },
+      {
+        "topic": "In-app account deletion",
+        "url": "https://developer.apple.com/support/offering-account-deletion-in-your-app/"
+      }
+    ]
+  },
+  "google_play": {
+    "title_max_characters": 30,
+    "short_description_max_characters": 80,
+    "full_description_max_characters": 4000,
+    "release_notes_max_unicode_characters_per_language": 500,
+    "store_icon": {
+      "width": 512,
+      "height": 512,
+      "format": "32-bit PNG",
+      "color_space": "sRGB",
+      "max_file_size_kb": 1024,
+      "baked_rounded_corners": false,
+      "outer_shadow": false
+    },
+    "feature_graphic": {
+      "width": 1024,
+      "height": 500,
+      "format": "24-bit PNG or JPEG",
+      "alpha": false
+    },
+    "selected_phone_screenshot_export": {
+      "width": 1080,
+      "height": 1920,
+      "format": "24-bit PNG or JPEG",
+      "alpha": false,
+      "count": 5
+    },
+    "phone_screenshots": {
+      "minimum_across_device_types": 2,
+      "maximum_per_device_type": 8,
+      "min_dimension": 320,
+      "max_dimension": 3840,
+      "max_long_short_ratio": 2
+    },
+    "recommended_app_screenshot_set": "At least four 1080 x 1920 portrait or 1920 x 1080 landscape captures for relevant recommendation surfaces.",
+    "screenshot_tagline_guidance": "Keep additional tagline text to no more than 20% of the image; prioritize actual UI.",
+    "asset_alt_text_max_characters_recommended": 140,
+    "beta_channel": "Internal testing",
+    "internal_testers_max": 100,
+    "personal_account_conditional_production_gate": "For qualifying personal accounts created after 2023-11-13: a closed test with at least 12 testers opted in continuously for 14 days, then application for production access.",
+    "data_safety_internal_only_exemption": true,
+    "deletion": "Apps offering account creation need an in-app route and an accessible external account-deletion request resource.",
+    "sources": [
+      {
+        "topic": "Store listing text limits",
+        "url": "https://support.google.com/googleplay/android-developer/answer/9859152?hl=en"
+      },
+      {
+        "topic": "Listing content quality",
+        "url": "https://support.google.com/googleplay/android-developer/answer/13393723?hl=en"
+      },
+      {
+        "topic": "Graphics, screenshots, text and alt-text guidance",
+        "url": "https://support.google.com/googleplay/android-developer/answer/9866151?hl=en-GB"
+      },
+      {
+        "topic": "Store-icon shape, size, file format and color space",
+        "url": "https://developer.android.com/distribute/google-play/resources/icon-design-specifications"
+      },
+      {
+        "topic": "Internal testing and tester limits",
+        "url": "https://support.google.com/googleplay/android-developer/answer/9845334?hl=en"
+      },
+      {
+        "topic": "Conditional closed-test production requirement",
+        "url": "https://support.google.com/googleplay/android-developer/answer/14151465?hl=en"
+      },
+      {
+        "topic": "Release-note limit and factual update content",
+        "url": "https://support.google.com/googleplay/android-developer/answer/9859348?hl=en"
+      },
+      {
+        "topic": "Data safety and internal-only exemption",
+        "url": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en"
+      },
+      {
+        "topic": "User data and deletion requirements",
+        "url": "https://support.google.com/googleplay/android-developer/answer/10144311?hl=en"
+      }
+    ]
+  },
+  "firebase": {
+    "required_projectwide_sms_daily_cap": 50,
+    "actual_quota_id": "identitytoolkit.googleapis.com/send_verification_code",
+    "quota_reset_boundary": null,
+    "enforcement_verified": false,
+    "note": "Provider quota effectiveLimit and consumerOverride both verified at 50 after enabling phone authentication. No real SMS sent; concurrent 51st-request boundary remains untested.",
+    "sources": [
+      {
+        "topic": "Phone authentication limits",
+        "url": "https://firebase.google.com/docs/auth/limits"
+      },
+      {
+        "topic": "Project quota management",
+        "url": "https://docs.cloud.google.com/identity-platform/docs/quota-management"
+      },
+      {
+        "topic": "Android phone-auth app verification",
+        "url": "https://firebase.google.com/docs/auth/android/phone-auth"
+      },
+      {
+        "topic": "Apple phone-auth app verification",
+        "url": "https://firebase.google.com/docs/auth/ios/phone-auth"
+      },
+      {
+        "topic": "App Check Android provider",
+        "url": "https://firebase.google.com/docs/app-check/android/play-integrity-provider"
+      },
+      {
+        "topic": "Firebase API-key restrictions",
+        "url": "https://firebase.google.com/docs/projects/api-keys"
+      }
+    ],
+    "quota_unit": "1/d/{project}",
+    "effective_limit_verified": 50
+  },
+  "pending": [
+    "Measured weak-network behavior",
+    "Real screenshots matching the candidate build",
+    "Verified hosting URLs and final app privacy policy",
+    "Actual store data, content, age and encryption declarations",
+    "Private reviewer credentials and complete contact details",
+    "Store account enrollment and submission access",
+    "Production release candidate validation (UI approved; native simulator builds pass)",
+    "Physical-device deletion and external support-process verification"
+  ]
+}

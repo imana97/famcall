@@ -1,0 +1,92 @@
+{
+  "checked_on": "2026-11-06",
+  "result": "PASS",
+  "checks": [
+    {
+      "field": "apple.name",
+      "length": 27,
+      "limit": 30,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "apple.subtitle",
+      "length": 29,
+      "limit": 30,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "apple.promotional_text",
+      "length": 149,
+      "limit": 170,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "apple.keywords",
+      "length": 73,
+      "limit": 100,
+      "unit": "bytes",
+      "pass": true
+    },
+    {
+      "field": "apple.description",
+      "length": 1162,
+      "limit": 4000,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "google-play.title",
+      "length": 27,
+      "limit": 30,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "google-play.short_description",
+      "length": 70,
+      "limit": 80,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "google-play.full_description",
+      "length": 1162,
+      "limit": 4000,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "beta.testflight_description",
+      "length": 620,
+      "limit": 4000,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "beta.testflight_what_to_test",
+      "length": 1081,
+      "limit": 4000,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "beta.play_internal_release_notes",
+      "length": 284,
+      "limit": 500,
+      "unit": "characters",
+      "pass": true
+    },
+    {
+      "field": "beta.production_release_notes",
+      "length": 213,
+      "limit": 500,
+      "unit": "characters",
+      "pass": true
+    }
+  ],
+  "scope": "Text lengths and basic brand restrictions only; not store approval or functional validation.",
+  "brand_check": "PASS: location-neutral public copy; no unverified absolute reliability, price, or encryption promises."
+}

@@ -1,0 +1,22 @@
+{
+  "indexes": [
+    { "collectionGroup": "calls", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "participants", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "createdAtMs", "order": "DESCENDING" }
+    ] },
+    { "collectionGroup": "calls", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "ringExpiresAtMs", "order": "ASCENDING" }
+    ] },
+    { "collectionGroup": "calls", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "acceptedAtMs", "order": "ASCENDING" }
+    ] }
+  ],
+  "fieldOverrides": [
+    { "collectionGroup": "limits", "fieldPath": "expiresAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "devices", "fieldPath": "expiresAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "cancelledStarts", "fieldPath": "expiresAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "accountDeletions", "fieldPath": "expiresAt", "ttl": true, "indexes": [] }
+  ]
+}

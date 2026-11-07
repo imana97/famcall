@@ -1,0 +1,24 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- runFlow: signup-and-contacts.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: callee, STAGE: ready }
+- extendedWaitUntil:
+    visible: { id: answer-call }
+    timeout: 120000
+- tapOn: { id: answer-call }
+- runFlow: ../maestro/wait-connected.yaml
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: callee, STAGE: connected }
+- takeScreenshot: callee-connected
+- extendedWaitUntil:
+    visible: Call ended
+    timeout: 90000
+- tapOn: Done
+- assertVisible: Your people.
+- runScript:
+    file: call-event.js
+    env: { ACTION: mark, ROLE: callee, STAGE: finished }
+- takeScreenshot: callee-ended

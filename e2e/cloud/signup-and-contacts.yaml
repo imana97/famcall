@@ -1,0 +1,14 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- runScript: validate-inputs.js
+- runFlow: ../maestro/start-signin.yaml
+- runScript: read-emulator-code.js
+- runFlow:
+    file: ../maestro/verify.yaml
+    env:
+      OTP: ${output.verificationCode}
+- runFlow: ../maestro/add-person.yaml
+- stopApp
+- runFlow: ../maestro/open-people.yaml
+- assertVisible: Call ${CONTACT_NAME}
+- takeScreenshot: people-after-relaunch

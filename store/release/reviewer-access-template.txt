@@ -1,0 +1,56 @@
+FAMCALL — REVIEWER ACCESS
+DRAFT: fill in the pending fields and verify the instructions before submission.
+This is a preparation template, not working access information.
+
+APP SUMMARY
+FamCall provides one-to-one internet voice calls between registered FamCall users.
+Users verify a phone number, add contacts or enter a number manually, and call.
+There is no password-based login. Both participants require an internet connection.
+
+PUBLISHER CONTACT
+SilverGrid Technology LLC
+Email: info@silvergridtech.com
+Review contact name: PENDING
+Review contact phone: PENDING
+Availability for a review call if required: PENDING
+
+ACCESS SETUP — DO NOT SUBMIT UNTIL COMPLETE
+Review account A phone number: PENDING, privately supplied in the review console
+Review account A verification procedure/code: PENDING, privately supplied
+Review account B phone number: PENDING, privately supplied in the review console
+Review account B verification procedure/code: PENDING, privately supplied
+Reachable recipient or a clearly identified review-only audio-test contact: PENDING
+Supported build and environment: PENDING
+
+Supply stable, restricted review access without requiring the reviewer to own a
+particular SIM or wait for staff to relay a time-sensitive SMS. If Firebase
+fictional verification numbers are used, register deliberate reviewer accounts,
+confine their permissions, and provide the details only in the review console.
+They must not unlock other users' data or be hardcoded as a general authentication
+bypass. Keep all normal app functions available for review.
+
+The calling flow requires two endpoints. Supply a second reviewer account with
+instructions for a second device, or a reachable test endpoint whose limited
+purpose is explained accurately. Do not claim a person is available to answer
+unless that arrangement exists. Review instructions must not depend on access to
+real customer contacts.
+
+PROPOSED REVIEW STEPS — VERIFY AGAINST THE FINAL UI
+1. Open FamCall, enter review account A, and complete the supplied review sign-in.
+2. Decline contact access to exercise manual entry. Add review account B.
+3. On the second device, sign into review account B using the supplied procedure.
+4. Call B from A. Answer and check speech in both directions. End from either end.
+5. Lock the receiving device and repeat to review incoming calling integration.
+6. Confirm the microphone and notification permission paths are understandable.
+7. Open the implemented account-deletion path and confirm that the operation can
+   be initiated. Exact navigation and confirmation text: PENDING implementation.
+
+OTHER SUBMISSION FIELDS
+Live support URL: PENDING
+App-specific privacy policy URL: PENDING
+External account-deletion request URL: PENDING
+Export-compliance answer: PENDING review of final media/authentication stack
+Special hardware or environment needed: PENDING, expected two networked phones
+
+Do not copy this document's PENDING entries into a submission. Confirm access
+immediately before submission and keep the test service running during review.

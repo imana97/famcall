@@ -1,0 +1,42 @@
+require 'json'
+
+before_all do
+  UI.user_error!('Use the protected GitHub release workflow.') unless
+    ENV['GITHUB_REPOSITORY'] == 'silvergrid/famcall' &&
+    ENV['GITHUB_REF'] == 'refs/heads/main' &&
+    ENV['GITHUB_ACTOR'] == 'silvergrid' && ENV['GITHUB_TRIGGERING_ACTOR'] == 'silvergrid'
+end
+
+desc 'Promote the exact validated internal Android build to production review'
+lane :public_android do
+  candidate = JSON.parse(File.read('../store/release/candidate.json'))
+  upload_to_play_store(
+    package_name: 'com.silvergridtech.famcall',
+    json_key_data: ENV.fetch('FAMCALL_PLAY_API_KEY_JSON'),
+    track: 'internal',
+    version_code: candidate.fetch('androidBuildNumber').to_i,
+    track_promote_to: 'production',
+    track_promote_release_status: 'completed',
+    skip_upload_apk: true, skip_upload_aab: true,
+    skip_upload_metadata: true, skip_upload_changelogs: true,
+    skip_upload_images: true, skip_upload_screenshots: true
+  )
+end
+
+desc 'Submit the exact validated TestFlight build; publish after Apple approval'
+lane :public_ios do
+  candidate = JSON.parse(File.read('../store/release/candidate.json'))
+  credential = JSON.parse(ENV.fetch('FAMCALL_APPLE_API_KEY_JSON'))
+  api_key = app_store_connect_api_key(
+    key_id: credential.fetch('key_id'), issuer_id: credential.fetch('issuer_id'),
+    key_content: credential.fetch('key'), in_house: false
+  )
+  upload_to_app_store(
+    api_key: api_key, app_identifier: 'com.silvergridtech.famcall',
+    app_version: candidate.fetch('version'),
+    build_number: candidate.fetch('iosBuildNumber').to_s,
+    submit_for_review: true, automatic_release: true,
+    skip_binary_upload: true, skip_metadata: true, skip_screenshots: true,
+    force: true, precheck_include_in_app_purchases: false
+  )
+end

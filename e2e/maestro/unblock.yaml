@@ -1,0 +1,8 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- tapOn: Settings
+- tapOn: Blocked numbers
+- tapOn: Unblock
+- assertVisible: No blocked numbers.
+- back
+- tapOn: People

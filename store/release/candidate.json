@@ -1,0 +1,17 @@
+{
+  "status": "not-ready",
+  "version": "0.1.0",
+  "sourceCommit": null,
+  "androidBuildNumber": null,
+  "iosBuildNumber": null,
+  "checks": {
+    "twoWaySpeechAndPoorNetwork": null,
+    "interruptionAndRecovery": null,
+    "physicalAndroidAndIPhone": null,
+    "backgroundPushAndAudioRoutes": null,
+    "productionAuthAndAppCheck": null,
+    "smsDailyLimit": null,
+    "storePrivacyAndLegalDeclarations": null,
+    "releaseScreenshotsAndCopy": null
+  }
+}

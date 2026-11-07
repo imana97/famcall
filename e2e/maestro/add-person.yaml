@@ -1,0 +1,18 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- tapOn:
+    id: add-person
+- tapOn:
+    id: contact-name
+- inputText: ${CONTACT_NAME}
+- tapOn: Add a person
+- tapOn:
+    id: contact-number
+- inputText: ${CONTACT_PHONE}
+- tapOn: Add a person
+- tapOn:
+    id: save-contact
+- extendedWaitUntil:
+    visible: Your people.
+    timeout: 15000
+- assertVisible: Call ${CONTACT_NAME}

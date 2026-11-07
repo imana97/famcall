@@ -1,0 +1,335 @@
+FAMCALL — END-TO-END RELIABILITY TEST PLAN
+Release test plan • 6 November 2026 • Local tests are in progress; see verification-report.txt
+
+PURPOSE
+Prove that two people can sign up, find each other, receive a call, exchange
+understandable speech, and recover from short network interruptions. Test usable
+conversation and honest state reporting, not just a successful connection flag.
+Weak-network performance is a hypothesis to verify before public marketing.
+
+SCOPE AND DECISIONS
+Android and iPhone launch together. Distribution during testing is Google Play
+internal testing and TestFlight. One-time phone verification creates an account;
+users stay signed in afterward, subject to ordinary expiry/revocation/reinstall
+conditions. Phone numbers use a single international format. Contacts access is
+optional. Calls are one-to-one internet voice calls. A VPN may be used in initial
+field tests; record its presence as a test dimension, not as a brand promise.
+
+The media stack is native WebRTC/Opus with dedicated Cloudflare TURN. The
+supported network envelope and physical-device support matrix remain release
+gates. Calls use a 45-second ring timeout and three-minute renewable server
+leases. The targets below are provisional engineering acceptance targets. Lock them after
+the first connectivity prototype and user review; do not present them as results.
+
+TEST ENVIRONMENTS
+1. Local/staging service tests with Firebase test numbers and deterministic call
+   state fixtures. No real SMS in routine automated suites.
+2. Provider-operated real-device lab with two cloud phones and controllable
+   network conditions. The owner's personal phones must not be used.
+   Apply impairment independently to uplink and downlink at each endpoint. Measure
+   actual traffic and effective impairments; do not rely on a UI network label.
+3. Store-distributed release candidates using production-equivalent signing,
+   push notification delivery, authentication, API restrictions, and media paths.
+4. Provider-operated pairs across independently routed connections. No personal
+   phones or beta-user recruitment. Record network type, provider, route, device,
+   OS, app build, VPN state, and time in private evidence. A provider data-center
+   path does not establish performance on consumer mobile/home connections; keep
+   that coverage gap explicit until a suitable hosted device lab can exercise it.
+
+NETWORK MATRIX (TOTAL LINK RATE, INCLUDING PROTOCOL OVERHEAD)
+Rates below are in kbps per direction. Latency is round-trip. Jitter is the
+configured delay variation; record the distribution and realized measurement.
+Unless noted, apply settings to both sides, then repeat with only one side impaired.
+
+ID   Up/Down       RTT    Jitter   Random loss   Purpose
+N0   10000/10000    40ms   5ms      0%            Healthy reference
+N1   128/128       150ms  20ms     1%            Modest constrained link
+N2   64/64         300ms  50ms     3%            Proposed core weak-link target
+N3   32/64         600ms  100ms    5%            Asymmetric stress / characterize
+N4   32/32         800ms  150ms    10%           Severe stress / characterize
+N5   16/16         1200ms 250ms    20%           Failure boundary / characterize
+N6   64/256        300ms  50ms     3%            One weak uplink; reverse endpoints
+
+N0–N2 are the initial proposed support envelope. N3–N6 explore limits; they are
+not promises of usable speech. If the prototype cannot meet N2, adjust the design
+or explicitly narrow the supported envelope before approving the public claim.
+
+Add these dimensions in controlled runs rather than blindly multiplying every
+combination: 200ms and 1s loss bursts every 20s; 1% packet reordering; bandwidth
+steps 256 → 64 → 32 → 128; competing upload traffic; high queueing delay; IPv4,
+IPv6 and dual-stack; restrictive NAT; DNS timeout; captive portal; VPN on/off;
+VPN reconnect and changed exit path. Include off-peak and busy-hour field runs.
+
+PATH AND FAILURE MATRIX
+- Verify direct media, relayed media, and each supported transport fallback.
+  Force direct-path failure, UDP blocking, and an available TCP/TLS path. Record
+  which path is actually selected; a successful icon is not proof of the route.
+- Interrupt signaling while allowing media; interrupt media while allowing
+  signaling; interrupt both. Confirm the state displayed at both ends is accurate.
+- Drop the link for 2s, 5s, 15s, and 30s. Restore it and measure time to two-way
+  speech. Verify retry bounds, battery/network use, stale call cleanup, and the
+  user's ability to end a reconnecting call.
+- Change Wi-Fi ↔ mobile data, change IP/NAT, roam between access points, restart
+  the router, and reconnect a VPN. Test transitions during dialing, ringing,
+  immediately after answer, during speech, and immediately after hang-up.
+- Expire call credentials, fail one relay/service node, restart signaling, delay
+  push delivery, and fail a dependency. Check retry behavior and service recovery.
+
+DEVICE MATRIX
+Use provider-operated physical devices for push, microphone, audio routes, lifecycle, and store
+signing checks. Include a recent iPhone, an older iPhone on the minimum supported
+OS, a recent mainstream Android, and a low-memory Android on the minimum OS.
+Include at least one additional Android manufacturer with restrictive battery
+management. Confirm exact models and OS releases when the support policy is set.
+
+Every release candidate covers Android→Android, iPhone→iPhone, Android→iPhone,
+and iPhone→Android; reverse caller/recipient roles. Include same-network and
+different-network pairs. Simulators can complement the suite but cannot replace
+the physical-device media and background-calling tests.
+
+COMPLETE USER JOURNEYS
+J01 Fresh install → consent/permissions → verify → add contact → call → ring →
+    answer → two-way speech → hang up. Repeat in reverse direction.
+J02 Wrong, expired, reused, delayed, and out-of-order codes; resend countdown;
+    app restart during verification; interrupted browser verification fallback.
+J03 Restart, reboot, upgrade, token refresh, token revocation, reinstall, and
+    number change. Verify sign-in persistence where expected and safe reauth.
+    Interrupt incoming-call registration before/after the server receives it;
+    recover on a bounded timer, network return and foregrounding. Rotate the
+    native push token while its upload is pending and delay the old response.
+    The newest registration must remain stored. A provider rejection for an old
+    registration must not invalidate a refreshed one. After account change,
+    reject delayed work carrying the previous account ID. Repeat with actual
+    APNs/FCM and original store signing; local fake tokens prove only state logic.
+J04 Normalize + and international 00 notation into one canonical phone identity;
+    handle spaces, punctuation, pasted numbers, missing country code, invalid
+    length, duplicated contacts, and local-number ambiguity without silent guessing.
+J05 Allow, deny, revoke, and limit contacts permission; manual entry always works.
+    Empty address book, thousands of entries, duplicate names, and non-ASCII names.
+J06 Registered, unregistered, unreachable, deleted, and self contact. Avoid
+    confusing dialing states, accidental invitations, or an enumerable directory.
+J07 Answer, decline, missed call, caller cancellation, busy recipient, simultaneous
+    outgoing calls, late answer after cancel, duplicate push, and stale push.
+    Exactly one live call identity is used; stale notifications cannot resurrect it.
+J08 Hang up from either end during connecting, ringing, speech, or reconnecting.
+    Both ends clean up microphones, audio session, foreground service, and UI.
+J09 Phone locked, app backgrounded, process reclaimed by the OS, app removed from
+    recents, explicit user force-stop/force-quit, reboot, Do Not Disturb, disabled
+    notifications, and battery saver. Document platform limits separately:
+    explicit force-stop behavior is not equivalent to ordinary backgrounding.
+J10 Microphone denied/revoked; mute/unmute; speaker/earpiece; wired and Bluetooth
+    devices; route disconnect; another media app; incoming cellular call; headset
+    button; proximity sensor; accessibility text size and screen reader labels.
+J11 Call continuously for 30, 60, and 120 minutes on representative devices. Measure
+    memory, heat, battery, data, credential renewal, and eventual cleanup.
+J12 Delete an account from the app and through the external request process.
+    Verify ownership checks, active call termination, token invalidation, defined
+    data deletion, consent withdrawals, and honest retention status.
+
+AUTHENTICITY, AUTHORIZATION, AND SMS BUDGET
+Use safe test identities and isolated environments. Never include production
+phone numbers, credentials, verification codes, or contact books in test reports.
+
+- Validate Play internal-track signing, App Store/TestFlight identity, native
+  app-verification fallbacks, and App Check rules supported by the final setup.
+  Confirm a genuine release passes and disallowed/missing/expired attestations
+  fail at protected services. No debug provider or blanket exemption in production.
+- Verify service authorization independently of app authenticity: a valid user
+  must not read another user's contacts, ring unauthorized accounts, join an
+  unrelated call, replay an expired call token, or mint admin/relay credentials.
+- Exercise rate limits for number discovery, calling, and SMS requests. Direct
+  API requests must not bypass controls enforced only in the app interface.
+- The requirement is at most 50 actual verification SMS sent project-wide per
+  provider-defined day, including resends and all supported clients. Determine
+  the exact adjustable provider quota, scope, and reset boundary. Record evidence.
+- Model 0, 49, 50, and 51 send attempts and concurrent requests at the boundary.
+  Model retries after timeouts, duplicate requests, stale counters, service
+  restarts, multiple devices, and requests spanning the reset boundary.
+- Unit/integration tests use fake senders to assert that excess sends never reach
+  the provider. Test the real provider quota configuration in a dedicated test
+  project and verify its rejection behavior with a controlled, approved SMS
+  budget. Do not consume the entire production quota for routine CI.
+- Confirm error messages after quota exhaustion are useful and cannot trigger a
+  retry storm. Already signed-in users should continue calling when SMS is capped.
+- A lower frontend limit, budget alert, or per-IP quota does not prove a global
+  50-SMS daily cap. Treat inability to enforce the actual requirement as a blocker.
+
+AUDIO VERIFICATION
+Use consented lab devices and synthetic speech fixtures. Alternate speech from
+each endpoint, include double-talk, silence, short words, and quiet/background-noise
+samples. Play stimuli through an acoustic fixture when verifying the full physical
+microphone-to-speaker path. Automated markers at the receiver establish media
+arrival and timing; they do not alone establish intelligibility.
+
+Measure speech understanding using a fixed, balanced phrase set and blinded human
+word/phrase transcription in the lab. Avoid speaker-identifying or emotionally
+sensitive content. No private beta conversations should be recorded to validate
+reliability. Diagnostics should default to timing and counters rather than audio.
+
+METRICS AND DEFINITIONS
+Connection success: both endpoints have exchanged audible speech after answer.
+Time to ring: outgoing call request to recipient's actual audible/visible ring.
+Answer-to-audio: recipient accepts to confirmed speech at both ends.
+Recovery time: usable link restored to confirmed two-way speech again.
+Unplanned disconnect: call ends without either user's hang-up or a documented
+timeout after loss of connectivity. Separate auth/service failures from media loss.
+Speech score: percentage of known test words correctly understood by listeners.
+Data/minute: measured total uplink + downlink on each device, including relay,
+signaling, encryption, retransmission, and push-related overhead where measurable.
+Also record transport, codec settings, packet loss/jitter/RTT, audio gaps, battery,
+call-state transitions, permission state, and push delivery timing.
+
+PROVISIONAL RELEASE GATES — AGREE AFTER THE PROTOTYPE
+G1 Functional: all mandatory J01–J12 cases pass or have an explicit, user-visible
+   platform limitation accepted in the support policy. No open critical/high
+   defects, unauthorized access, stale calls, or leaked microphone sessions.
+G2 Connection: ≥99% successful two-way speech on N0 and ≥95% on N1–N2, measured
+   separately per platform pairing over at least 100 attempts per pairing/profile.
+   Report sample counts and confidence intervals, not just pooled averages.
+G3 Timing: for reachable, permission-enabled recipients, p95 time to ring ≤10s
+   on N0 and ≤15s on N1–N2; p95 answer-to-audio ≤5s on N0 and ≤8s on N1–N2.
+   Measure background/locked cases separately; do not average them away.
+G4 Recovery: ≥95% of calls recover without a redial after a 2s or 5s interruption
+   under N0–N2; p95 recovery ≤8s after the link becomes usable. Test at least
+   40 interruptions per pairing/profile. For 15s/30s outages, characterize the
+   boundary and verify a truthful state, bounded retry, and reliable hang-up.
+G5 Speech: ≥90% word understanding on the agreed lab phrase set for N1–N2 in
+   quiet conditions, assessed per direction and device pairing. No persistent
+   one-way audio or feedback. Background-noise cases have separately agreed goals.
+G6 Endurance: no crash, stuck audio, or accumulating resource leak in the 120-minute
+   call runs and 100 repeated short-call cycles per representative device.
+G7 Real routes: use provider-operated physical phones on at least two independent
+   internet connections and repeat all platform pairings in both caller directions.
+   Record devices, routes, attempts and failures. Do not use the owner's personal
+   phones or recruit beta users. Evidence must cover the conditions actually
+   claimed; a small cloud-lab sample cannot establish a population-wide success
+   rate. Keep unavailable network-route coverage open rather than treating it as
+   passed. Investigate one-way audio and ring failures before public claims.
+G8 SMS and privacy: demonstrable provider-enforced cap, tested authorization,
+   verified permission flows, and tested account/data-deletion behavior. Zero
+   known bypass of these release requirements.
+
+The sample counts above are a starting plan, not evidence of statistical certainty
+or a guarantee across all networks. Revise them based on pilot variance and risk.
+
+AUTOMATION AND CADENCE
+Every change: deterministic state-machine/auth/normalization tests and service
+authorization checks. UI smoke on both platforms with test numbers.
+Every candidate build: store-signed installation plus a two-physical-device smoke
+for registration, manual contact entry, locked-screen incoming call, speech both
+ways, mute/speaker, short interruption, and hang-up from each side.
+Nightly: controlled N0–N6 impairment suite, forced media paths, concurrency/races,
+permission/lifecycle cases, resource checks, and synthetic-audio measurements.
+Hosted real-device checks: different internet routes, low-end phones, long calls,
+and review of failure clusters. Consumer busy-hour coverage requires an appropriate
+provider route; a fixed data-center profile is not equivalent. No personal-phone
+use, beta recruitment or recurring surveys are part of this plan.
+Before public release: full locked matrix, privacy/access/deletion tests, store
+artwork parity, reviewer access, and signed-off provisional gate results.
+
+Maestro drives the native Expo development builds on both platforms. Coordinate
+two-device flows with the isolated relay impairment lab and backend evidence.
+The virtual-microphone harness requires a fresh emulator pair for each direction
+of each measurement. Use a provider acoustic fixture for the full physical media
+path, or distinguish device audio injection from acoustic-microphone coverage.
+UI automation alone cannot validate speech. See cloud-device-testing.txt for
+provider capabilities and outstanding qualification steps.
+
+EVIDENCE AND TRIAGE
+Each run records a reproducible case ID, app build, device/OS pair, network profile,
+actual route, time, call pseudonym, state timeline, speech result, and relevant
+redacted service/SDK metrics. Separate missing push, auth failure, signaling error,
+media establishment failure, one-way audio, and poor intelligibility. Include
+failed attempts in denominators and retain the prescribed privacy-safe evidence.
+Publish an internal summary of measured supported conditions and known limits.
+Only then approve store wording about weak-network behavior.
+
+CURRENT ANDROID AUDIO LAB
+The macOS emulator gRPC harness permits one audio injection per emulator process.
+A second injection is refused before opening the audio stream; restart the sender
+first. The matrix runner restarts both dedicated FamCall AVDs for each direction
+of each profile, isolating input injection from prior output capture. Buffered mode uses emulator flow
+control rather than real-time packet pacing. It never enables host microphone
+passthrough. The process guard also skips stale emulator discovery files.
+
+The UDP shaper accounts for payload plus 28 bytes of IPv4/UDP headers. Ethernet,
+radio and VPN overhead remain outside this estimate. Delay/loss/jitter are per
+endpoint relay leg; use measured RTT, interarrival jitter and packet loss from
+WebRTC for end-to-end observations. A valid sample is not a release-quality pass.
+
+scripts/measure-transport-outage.mjs records packet recovery after 5/15/30-second
+outages separately from audio. It samples at the app's three-second statistics
+cadence, so reported recovery time is an observation bound, not precise audio
+latency. Do not substitute the transport result for G4 or G5.
+
+The --outages mode of scripts/run-audio-matrix.mjs adds generated-speech cases
+for 2/5/15/30-second UDP-relay drops on a baseline link. It preserves received
+PCM, capture arrival times, exact profile history, packet drops, and source/APK
+hashes. It requires matched speech before the outage and new reference speech
+after restoration. The first complete two-second waveform match gives a
+conservative observation bound. A missing match is not automatically proof of
+missing speech: inspect resumed audio, timing drift, and input validity first.
+STOI, waveform matching, and returning packets do not replace listener scores,
+simultaneous two-way speech, the complete N1/N2 outage matrix, or physical-device G4/G5 evidence.
+Keep invalid attempts and unconfirmed recovery cases in the evidence record.
+
+FAMCALL_OUTAGE_PROFILE selects baseline, modest, weak or stress for the link
+surrounding an outage. Only packet loss changes during the drop; the initial
+bandwidth cap, delay, jitter and random-loss rate must return afterward. The
+actual selected profile and realized network statistics belong in every report.
+Do not equate a per-leg preset with an end-to-end N1/N2 result without checking
+the measured conditions. Each case retains private, PID-filtered native app logs
+and capture metadata to help diagnose missing statistics and native failures.
+
+Native test builds also collect playout buffer delay, emitted samples and
+acceleration/deceleration counters. scripts/analyze-audio-timing.py separates
+each stream and outage phase, rejects reset counter deltas, and preserves missing
+values. These diagnostics help distinguish delayed playback from missing input;
+they do not relax the speech detector or establish end-to-end latency. Preserve
+the exact input delivery mode when comparing experiments. The experimental
+realtime emulator injection mode has not supplied a valid comparative sample.
+
+scripts/test-offline-hangup.mjs accepts caller (default) or callee for a J08
+combination on the dedicated Android AVDs: disable both selected-phone networks,
+confirm the reconnecting message without moving the End Call control, end locally,
+restart the app while offline, then restore connectivity and verify durable
+server/recipient cleanup. It records installed APKs, source hashes, connected and
+offline screen bounds/screenshots, no-default-network observation, changed process
+identity and active-lease removal. Extend coverage to other call
+states, longer outages and physical devices; do not generalize these cases.
+
+scripts/test-mute.mjs covers part of J10 on the dedicated Android AVDs: the caller
+mutes while ringing, remains muted after answer, unmutes, remutes, then hangs up.
+A second call must start unmuted. Maestro checks the controls; private diagnostics
+check the first/current JavaScript track-enabled state and Android's API/system
+microphone mute state. Unit tests defer microphone capture to check pending mute
+and unmute intent before any track is attached. These controls do not measure
+transmitted silence, callee/system-UI actions, physical audio routes or iOS behavior.
+
+Native event sequence tests use controlled promises for storage/native lookups.
+They check that session mute is adopted before media starts, end actions are not
+blocked behind a lookup, mismatched answer IDs are rejected, and stale results
+cannot revive a finished call. The actual OS push and lifecycle matrix remains
+required: unit scheduling is not a substitute for cold-start tests on phones.
+
+scripts/test-pending-call-cancel.mjs takes before-request, after-response or
+after-native. The isolated demo build holds that setup boundary while Maestro
+cancels. Require immediate local cancellation, persistent server receipt/terminal
+state, no native binding or active lease after release, and both contact screens.
+The lab gate has a deadline and is disabled in production builds. These controlled
+application delays complement the network matrix; they do not simulate packet
+loss or prove a physical OS lifecycle. Backend tests separately serialize
+concurrent creation/cancellation and check caller isolation and account deletion.
+
+scripts/test-pending-call-actions.mjs takes mute-before-request,
+mute-after-response, mute-after-native or early-answer. Mute cases must keep the
+first/current microphone track disabled and match Android's API/system mute flags.
+The before-request case additionally holds the response until a Firestore call
+snapshot arrives, proving watcher attachment preserves the pending mute choice.
+The early-answer case requires the caller to observe acceptance before applying
+the delayed ringing response, then connect both phones. Retain the exact build,
+source hashes, stage events, native logs and screenshots. These checks establish
+control state, not received-audio silence or physical-device behavior.
+
+Emulator lifecycle investigation (used as a hypothesis, then checked locally):
+https://github.com/kaeawc/auto-mobile/issues/13634

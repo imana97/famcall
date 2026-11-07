@@ -1,0 +1,50 @@
+name: Build for internal testing and TestFlight
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        type: choice
+        description: Platform to build and submit
+        options: [all, android, ios]
+        default: all
+permissions:
+  contents: read
+concurrency:
+  group: famcall-store-build
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.repository == 'silvergrid/famcall' && github.ref == 'refs/heads/main' && github.actor == 'silvergrid' && github.triggering_actor == 'silvergrid'
+    environment: release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck && npm run lint
+      - name: Restore protected store submission access
+        env:
+          FAMCALL_PLATFORM: ${{ inputs.platform }}
+          FAMCALL_APPLE_API_KEY_JSON: ${{ secrets.FAMCALL_APPLE_API_KEY_JSON }}
+          FAMCALL_PLAY_API_KEY_JSON: ${{ secrets.FAMCALL_PLAY_API_KEY_JSON }}
+        run: node scripts/restore-store-access.mjs
+      - name: Restore protected Android signing files
+        if: inputs.platform != 'ios'
+        env:
+          FAMCALL_ANDROID_SIGNING_JSON: ${{ secrets.FAMCALL_ANDROID_SIGNING_JSON }}
+        run: node scripts/restore-android-signing.mjs
+      - name: Build and submit to testing channels
+        working-directory: apps/mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          FAMCALL_PLATFORM: ${{ inputs.platform }}
+        run: npx --yes eas-cli@27.5.0 build --platform "$FAMCALL_PLATFORM" --profile store --auto-submit-with-profile testing --non-interactive --wait
+      - name: Remove temporary signing files
+        if: always()
+        run: rm -f apps/mobile/credentials.json .local/android-signing/upload.jks .local/store-access/AuthKey.p8 .local/store-access/play-credentials.json

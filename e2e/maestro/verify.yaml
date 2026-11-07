@@ -1,0 +1,11 @@
+appId: com.silvergridtech.famcall.e2e
+---
+- tapOn:
+    id: verification-code
+- inputText: ${OTP}
+- tapOn: Check your messages.
+- tapOn:
+    id: verify-number
+- extendedWaitUntil:
+    visible: Your people.
+    timeout: 30000

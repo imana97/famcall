@@ -14,9 +14,15 @@ node_modules/
 *.apk
 .DS_Store
 coverage/
+__pycache__/
+*.pyc
+/fastlane/report.xml
+/fastlane/README.md
+/fastlane/Preview.html
 dist/
 .firebase/
-android/
-ios/
+/apps/mobile/android/
+/apps/mobile/ios/
+/backend/lib/
 service-account*.json
 *credentials*.json
