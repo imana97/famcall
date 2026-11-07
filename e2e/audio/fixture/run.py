@@ -24,6 +24,8 @@ RESULTS = WORK / "results"
 sys.path.insert(0, str(ROOT / "e2e/audio"))
 sys.path.insert(0, str(WORK / "proto"))
 from fixture_analysis import analyze
+from fixture_observation import (OBSERVER_CHANNELS, OBSERVER_RATE,
+                                 analyze_observer_pcm, observer_route)
 import emulator_controller_pb2 as pb
 import emulator_controller_pb2_grpc as rpc
 
@@ -78,13 +80,147 @@ def pulse_routes(env):
     result = {"at": int(time.time() * 1000)}
     fields = ("index", "source", "sink", "client", "corked", "mute", "sample_specification",
               "buffer_latency_usec", "source_latency_usec", "sink_latency_usec")
-    for kind in ("source-outputs", "sink-inputs"):
+    for kind in ("sources", "source-outputs", "sink-inputs"):
         streams = json.loads(command("pactl", "-f", "json", "list", kind, env=env, timeout=5).stdout)
         result[kind] = [{**{k: s[k] for k in fields if k in s},
+                         **({"name": s["name"]} if kind == "sources" else {}),
+                         "volume": {channel: {k: v[k] for k in ("value", "value_percent", "db") if k in v}
+                                    for channel, v in s.get("volume", {}).items() if isinstance(v, dict)},
                          "application": {k: s.get("properties", {}).get(k) for k in
                                          ("application.name", "application.process.id", "media.name")}}
                         for s in streams]
     return result
+
+
+class PulseObserver:
+    """One bounded observation of the private virtual source, never an input writer."""
+    def __init__(self, folder, env, source_id):
+        self.folder, self.env, self.source_id = folder, env, source_id
+        self.raw_path = WORK / (folder.name + "-pulse-observer.pcm")
+        self.process = None
+        self.output = None
+        self.owns_raw_file = False
+        self.timer = None
+        self.expired = threading.Event()
+        self.info = {"ready": False, "complete": False, "qualified": False,
+                     "scope": "Independent generated Pulse PCM observation; not an Android result"}
+
+    def _expire(self):
+        self.expired.set()
+        self._stop()
+
+    def _stop(self):
+        try:
+            if self.process and self.process.poll() is None:
+                self.process.terminate()
+                try:
+                    self.process.wait(timeout=3)
+                except subprocess.TimeoutExpired:
+                    self.process.kill()
+                    self.process.wait(timeout=3)
+        except ProcessLookupError:
+            pass
+        except Exception as error:
+            self.info["cleanupError"] = type(error).__name__
+
+    def start(self):
+        # This startup check happens before the 45-second Android recording,
+        # so an observer problem cannot consume the speech-injection window.
+        self.info["startedAt"] = int(time.time() * 1000)
+        try:
+            self.info["stage"] = "open-private-capture"
+            self.output = self.raw_path.open("xb")
+            self.owns_raw_file = True
+            self.raw_path.chmod(0o600)
+            self.info["stage"] = "start-observer"
+            self.process = subprocess.Popen(
+                ["parec", "--raw", "--format=s16le", "--rate=44100", "--channels=2",
+                 "--device=" + PULSE_INPUT, "--latency-msec=20"],
+                env=self.env, stdout=self.output, stderr=subprocess.DEVNULL)
+            self.info["pid"] = self.process.pid
+            self.timer = threading.Timer(75, self._expire)
+            self.timer.daemon = True
+            self.timer.start()
+            self.info["stage"] = "verify-source-route"
+            deadline = time.monotonic() + 3
+            while time.monotonic() < deadline:
+                if self.process.poll() is not None:
+                    raise RuntimeError("Observer exited before source verification")
+                try:
+                    route = observer_route(pulse_routes(self.env), self.process.pid, self.source_id)
+                    self.info.update(ready=True, readyAt=int(time.time() * 1000), initialRoute=route)
+                    self.info["stage"] = "observing"
+                    return
+                except ValueError:
+                    time.sleep(0.1)
+            raise RuntimeError("Observer source route was not verified before recording")
+        except Exception as error:
+            self.info["error"] = type(error).__name__
+            self._stop()
+
+    def observe(self, routes):
+        self.info["routeObservedAt"] = routes["at"]
+        try:
+            if not self.process or self.process.poll() is not None:
+                raise ValueError("Observer is no longer running")
+            self.info["duringRoute"] = observer_route(routes, self.process.pid, self.source_id)
+        except Exception as error:
+            self.info["routeError"] = type(error).__name__
+
+    def finish(self, reference):
+        try:
+            if self.timer:
+                self.timer.cancel()
+                self.timer.join(timeout=8)
+            early_exit = self.process is not None and self.process.poll() is not None
+            self._stop()
+            if self.output:
+                self.output.close()
+            self.info.update(finishedAt=int(time.time() * 1000),
+                             deadlineExpired=self.expired.is_set(), unexpectedEarlyExit=early_exit)
+            if self.process:
+                self.info["exitCode"] = self.process.returncode
+            self.info["completionStage"] = "read-capture"
+            if not self.owns_raw_file or not self.raw_path.exists():
+                raise ValueError("Observer capture unavailable")
+            size = self.raw_path.stat().st_size
+            self.info["byteCount"] = size
+            if size > 75 * OBSERVER_RATE * OBSERVER_CHANNELS * 2:
+                raise ValueError("Observer exceeded its bounded PCM size")
+            raw = self.raw_path.read_bytes()
+            self.info["pcmSha256"] = hashlib.sha256(raw).hexdigest()
+            if raw and len(raw) % (OBSERVER_CHANNELS * 2) == 0:
+                capture_path = self.folder / "pulse-source.wav"
+                with wave.open(str(capture_path), "wb") as wav:
+                    wav.setparams((OBSERVER_CHANNELS, 2, OBSERVER_RATE, 0, "NONE", "not compressed"))
+                    wav.writeframes(raw)
+                self.info["captureSha256"] = sha(capture_path)
+                self.info["completionStage"] = "analyze-capture"
+                self.info["content"] = analyze_observer_pcm(reference, raw)
+            else:
+                # Keep exact generated bytes if termination left a partial frame.
+                (self.folder / "pulse-source-partial.pcm").write_bytes(raw)
+                self.info["partialCaptureNotQualified"] = True
+                raise ValueError("Observer PCM is empty or incomplete")
+            self.info["complete"] = bool(self.info["ready"] and self.info.get("duringRoute")
+                                          and not self.info.get("error") and not self.info.get("routeError")
+                                          and not self.info.get("cleanupError")
+                                          and not self.expired.is_set() and not early_exit)
+            self.info["qualified"] = self.info["complete"] and self.info["content"]["contentMatched"]
+        except Exception as error:
+            self.info["completionError"] = type(error).__name__
+        finally:
+            self._stop()
+            try:
+                if self.output and not self.output.closed:
+                    self.output.close()
+                if self.owns_raw_file:
+                    self.raw_path.unlink(missing_ok=True)
+            except Exception as error:
+                self.info["cleanupError"] = type(error).__name__
+            if self.info.get("cleanupError"):
+                self.info.update(complete=False, qualified=False)
+        return self.info
 
 
 def read_json(name):
@@ -145,6 +281,7 @@ def one_run(index, pcm, reference, env, build):
     child = None
     channel = None
     route_timer = None
+    observer = None
     try:
         args = [EMULATOR, "-avd", "famcall_fixture", "-port", "5554", "-grpc", "8554",
                 "-grpc-use-token", "-no-snapshot", "-wipe-data",
@@ -236,6 +373,15 @@ def one_run(index, pcm, reference, env, build):
                 raise RuntimeError("Emulator refused synthetic host input")
             record["syntheticHostInputReadyAt"] = int(time.time() * 1000)
             record["pulseRoutesBeforeRecorder"] = pulse_routes(env)
+            observer = PulseObserver(folder, env, record["virtualAudio"]["sourceIds"][PULSE_INPUT])
+            try:
+                # Match the normal emulator's actual host format, not only the
+                # value observed in an earlier pilot. No resampling setting changes.
+                observer.info["emulatorRoute"] = observer_route(
+                    record["pulseRoutesBeforeRecorder"], child.pid, observer.source_id)
+                observer.start()
+            except ValueError:
+                observer.info["error"] = "emulator-source-or-format-unverified"
         record["activityLaunchStartedAt"] = int(time.time() * 1000)
         record["activityLaunch"] = adb("shell", "am", "start", "-W", "-n", PACKAGE + "/.MainActivity", "--es", "runId", run_id).stdout
         record["stage"] = "wait-for-recorder"
@@ -269,8 +415,17 @@ def one_run(index, pcm, reference, env, build):
             record["pulseRoutes"] = {"before": pulse_routes(env)}
 
             def observe_route():
+                # Read, never toggle, the existing gate while generated speech is
+                # flowing. A missing observation is unknown, not an enabled gate.
+                record["microphoneGateDuring"] = {"at": int(time.time() * 1000), "known": False}
+                try:
+                    enabled = stub.getMicrophoneState(Empty(), metadata=metadata, timeout=3).realAudioEnabled
+                    record["microphoneGateDuring"].update(known=True, realAudioEnabled=enabled)
+                except Exception as error:
+                    record["microphoneGateDuring"]["error"] = type(error).__name__
                 try:
                     record["pulseRoutes"]["during"] = pulse_routes(env)
+                    observer.observe(record["pulseRoutes"]["during"])
                 except Exception as error:
                     record["pulseRoutes"]["error"] = type(error).__name__
 
@@ -342,12 +497,24 @@ def one_run(index, pcm, reference, env, build):
     finally:
         if route_timer:
             route_timer.cancel()
-            route_timer.join(timeout=15)
+            route_timer.join(timeout=22)
+        if observer:
+            record["pulseObserver"] = observer.finish(reference)
         if "deviceFingerprint" in record:
             try:
                 lifecycle = adb("shell", "run-as", PACKAGE, "cat", "files/" + run_id + "-lifecycle.jsonl", check=False)
                 if lifecycle.returncode == 0:
                     record["activityLifecycle"] = [json.loads(line) for line in lifecycle.stdout.splitlines()]
+            except Exception:
+                record["activityLifecycleUnavailable"] = True
+            try:
+                configurations = adb("shell", "run-as", PACKAGE, "cat",
+                                     "files/" + run_id + "-recording-config.jsonl", check=False)
+                if configurations.returncode == 0:
+                    record["recordingConfigurations"] = [json.loads(line) for line in configurations.stdout.splitlines()]
+            except Exception as error:
+                record["recordingConfigurationError"] = type(error).__name__
+            try:
                 # This disposable Android image has no signed-in user or backend.
                 # Keep only native audio errors, not full system or emulator logs.
                 errors = adb("logcat", "-d", "-v", "epoch", "AudioRecord:E", "AudioRecord-JNI:E",
@@ -357,6 +524,23 @@ def one_run(index, pcm, reference, env, build):
                 record["audioDiagnosticsSha256"] = sha(diagnostics)
             except Exception:
                 record["audioDiagnosticsUnavailable"] = True
+        if USE_PULSE:
+            unknown = []
+            if not record.get("pulseObserver", {}).get("complete"):
+                unknown.append("pulse-source-observation")
+            if not record.get("microphoneGateDuring", {}).get("known"):
+                unknown.append("microphone-gate-during-injection")
+            configurations = record.get("recordingConfigurations", [])
+            during_configs = [c for c in configurations
+                              if record.get("injectionStartedAt", float("inf")) <= c.get("at", 0)
+                              <= record.get("injectionFinishedAt", 0)]
+            if (not during_configs or any(not c.get("known") for c in during_configs) or
+                    not record.get("native", {}).get("observationThreadStopped") or
+                    record.get("native", {}).get("observationWriteFailures", 1) != 0):
+                unknown.append("native-recording-configuration")
+            record["pipelineObservation"] = {"complete": not unknown, "unknown": unknown,
+                "qualified": not unknown and record.get("pulseObserver", {}).get("qualified", False),
+                "scope": "Pulse source content plus observation availability; independent of Android passed/content"}
         if channel:
             channel.close()
         if child:
@@ -433,6 +617,7 @@ def main():
     shutil.copyfile(WORK / "build/provenance.json", RESULTS / "build-provenance.json")
     provenance = {"commit": os.environ.get("GITHUB_SHA"), "sourceSha256": sha(Path(__file__)),
                   "analysisSha256": sha(ROOT / "e2e/audio/fixture_analysis.py"),
+                  "observationSha256": sha(ROOT / "e2e/audio/fixture_observation.py"),
                   "referenceSha256": sha(source_path), "grpcVersion": grpc.__version__,
                   "host": platform.platform(), "attemptCount": ATTEMPTS,
                   "inputMethod": INPUT_METHOD,
@@ -447,6 +632,11 @@ def main():
     summary = {"passed": passed, "attempts": ATTEMPTS, "passes": sum(r["passed"] for r in records),
                "repeatabilityQualified": ATTEMPTS == 3 and passed,
                "reports": [r["runId"] + "/report.json" for r in records], "scope": provenance["scope"]}
+    if USE_PULSE:
+        summary["pipelineObservation"] = {
+            "completeAttempts": sum(r.get("pipelineObservation", {}).get("complete", False) for r in records),
+            "qualifiedAttempts": sum(r.get("pipelineObservation", {}).get("qualified", False) for r in records),
+            "scope": "Independent host-source observations; do not determine Android passes or repeatability"}
     (RESULTS / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     sys.exit(0 if passed else 1)
 

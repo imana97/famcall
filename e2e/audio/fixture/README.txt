@@ -43,6 +43,22 @@ The pulse-pipe variant feeds a private FIFO into module-pipe-source. It exposes
 an ordinary virtual input source, with no hardware devices, and supplies generated
 PCM at real-time speed. Pulse input/output stream snapshots identify the emulator's
 route before and during playback. The workflow currently runs this diagnostic.
+An independent parec observer reads the same private source in QEMU's verified
+44.1 kHz stereo format. Its PID, source ID and format are checked before Android
+recording starts, so observer startup does not consume the 45-second Android
+capture window. It stops after the measurement or at a 75-second deadline; owned
+temporary files/processes are cleaned and generated PCM is retained as a WAV.
+Each host channel is compared separately against the reference using the existing
+content thresholds. This changes no input, emulator, or Android audio settings.
+Pulse source/stream volume and mute fields, a read-only microphone-gate snapshot
+during injection, and Android's own recording configuration/silenced status are
+retained. Configuration snapshots run once per second on a separate observer
+thread; lifecycle events also identify resumed/paused state and window focus.
+Missing observations are explicitly unknown. pipelineObservation.complete reports
+whether source/gate/native configuration observations were available;
+pipelineObservation.qualified additionally requires matching generated host PCM.
+These fields never determine the Android passed/content result or the original
+repeatability result: a passing host observation cannot promote an Android failure.
 Virtual host input is enabled and verified before Android opens AudioRecord.
 Pulse controls use the normal emulator on a private Xvfb display and verify the
 running executable. The no-window launcher selects a headless executable whose
