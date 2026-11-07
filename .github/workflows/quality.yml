@@ -28,6 +28,8 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build:backend
+      - name: Test private event delivery permissions
+        run: python3 -m unittest discover -s infra -p 'test_*.py'
       - name: Test audio evidence validation
         run: |
           python3 -m venv .local/audio-tests

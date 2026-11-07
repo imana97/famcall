@@ -50,6 +50,10 @@ for role in ['cloudfunctions.admin', 'firebasehosting.admin', 'firebaserules.adm
     cloud('projects', 'add-iam-policy-binding', PROJECT, '--member=serviceAccount:' + DEPLOY, '--role=roles/' + role, '--condition=None')
 for role in ['datastore.user', 'firebaseauth.admin', 'firebasecloudmessaging.admin', 'logging.logWriter', 'eventarc.eventReceiver']:
     cloud('projects', 'add-iam-policy-binding', PROJECT, '--member=serviceAccount:' + RUNTIME, '--role=roles/' + role, '--condition=None')
+# Receiving an Eventarc event does not authorize invocation of its private target.
+# After deployment, backend.yml reconciles run.invoker on the two event target
+# services for this custom identity via ensure-event-invocation.py. Keep that
+# permission service-scoped rather than granting it across the project.
 cloud('iam', 'service-accounts', 'add-iam-policy-binding', RUNTIME, '--member=serviceAccount:' + DEPLOY, '--role=roles/iam.serviceAccountUser')
 # Firebase CLI checks the App Engine account before reading the v2 runtime config.
 cloud('iam', 'service-accounts', 'add-iam-policy-binding', PROJECT + '@appspot.gserviceaccount.com',
