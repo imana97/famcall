@@ -4,8 +4,10 @@ FAMCALL — STORE PRIVACY REVIEW
 EVIDENCE
 The inspected store artifacts are iOS 0.1.0 (2), source 60d0406, and Android
 0.1.0 (3), source 0c92b91. SHA-256 identities and selected declarations are in
-ios-build-2-privacy.json and android-build-3-privacy.json. These are the delivered
-testing builds, not the final public candidate. Re-run after app/SDK changes.
+ios-build-2-privacy.json and android-build-3-privacy.json. These describe the
+earlier testing builds, not the current build 3/code 4 update or final public
+candidate. Delivery of the update from fecda429 is verified separately in
+testing-delivery-2026-11-07.json. Re-run privacy inspection after app/SDK changes.
 
 Reproduce from your private downloaded store artifacts:
   python3 scripts/inspect-ios-privacy.py <store.ipa> --output <report.json>
@@ -31,9 +33,10 @@ WHAT THE BUILD AUDIT ESTABLISHES
   selects Play Integrity. Availability is not proof of debug-provider activation.
 - Historical Android code 3 has unnecessary write-contact, shared-storage and
   overlay permissions. PR #7 removed them and verified a rebuilt native manifest;
-  the fix is merged. Workflow 42336889833 is building/submitting code 4 from
-  fecda429. Inspect that exact store AAB before marking its permissions verified.
-  Likewise, repeat the IPA inspection for build 3; retain these dated reports.
+  the fix is merged and delivered in code 4 from fecda429 by successful workflow
+  42336889833. Play received the expected bundle hash. That delivery check does
+  not extend the code 3 static audit to code 4. Inspect the final candidate AAB
+  and IPA before finalizing disclosures; retain these dated reports.
 
 PROPOSED APP STORE ANSWERS
 Data collected: Yes. No advertising, advertising measurement or data-broker

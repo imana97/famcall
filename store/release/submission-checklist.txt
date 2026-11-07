@@ -5,10 +5,11 @@ CURRENT STATE
 The approved UI is implemented. Native Android and iOS simulator builds and
 local automated checks pass as detailed in verification-report.txt. Store copy
 and screenshot captures remain drafts until the release candidate is validated.
-Android internal code 3 and TestFlight build 2 are available to the configured
-owner tester. Testing workflow 42336889833 is building/submitting iOS build 3
-and Android code 4 from fecda429; their availability and artifact checks await
-verification. Backend and website deployment succeeded. This checklist tracks
+Android internal code 4 and TestFlight build 3 from fecda429 are available to the
+configured owner tester. Testing workflow 42336889833 succeeded; store readbacks
+and the received Android bundle hash are recorded in testing-delivery-2026-11-07.json.
+Delivery does not establish production call behavior or final-candidate privacy
+review. Backend and website deployment succeeded. This checklist tracks
 remaining public-submission work; internal availability is not public approval.
 
 1. PUBLISHER AND APP RECORDS
@@ -23,7 +24,8 @@ remaining public-submission work; internal availability is not public approval.
   any current declarations from the real product. Do not infer an age rating
   or children-directed audience from the word "Fam" or family photography.
 - The owner approved no France distribution for now, and Apple's standard-
-  encryption declaration was saved for build 2. Revisit it before changing
+  encryption declaration was saved for build 2 and reused for build 3; see
+  encryption-answer.txt. Revisit it before changing
   encryption or offering the app in France. Public-release review remains open.
 
 2. PHONE AUTHENTICATION AND SERVICE READINESS

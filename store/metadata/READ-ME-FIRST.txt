@@ -2,13 +2,15 @@ FAMCALL — STORE COPY PACK
 Updated 7 November 2026 UTC
 
 Status: PUBLIC LISTING DRAFT. The approved app is implemented and available through
-Android internal testing (code 3) and owner-only TestFlight (build 2). English
+Android internal testing (code 4) and owner-only TestFlight (build 3). English
 TestFlight description, feedback address and test instructions are saved and
 read-back verified. Actual development screenshots exist; final release captures
-and the full network/speech qualification remain open. Testing workflow
-42336889833 is building/submitting the iOS build 3 and Android code 4 update from
-fecda429; its store availability and signed-artifact checks are not yet verified
-in this record. No public store launch.
+and the full network/speech qualification remain open. Protected testing workflow
+42336889833 succeeded for source fecda429. The 7 November 2026 04:27 UTC readback
+confirms iOS build 3 IN_BETA_TESTING in the owner group and Android code 4 in the
+completed internal release; Play received the expected bundle hash. This proves
+delivery, not installation of the update or successful production calls. See
+release/testing-delivery-2026-11-07.json. No public store launch.
 
 Publisher: SilverGrid Technology LLC
 Support: info@silvergridtech.com

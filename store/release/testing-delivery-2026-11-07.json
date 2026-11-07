@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-11-07T04:27:35.747873+00:00",
+  "scope": "Verified testing delivery only; not installation of the latest update, production-auth/push/call validation, final-candidate privacy audit, or public-store approval.",
+  "source_commit": "fecda4296f7c1e64576b172d8d170e0883ad958b",
+  "workflow": {
+    "run": 42336889833,
+    "url": "https://github.com/silvergrid/famcall/actions/runs/42336889833",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "ios": {
+    "version": "0.1.0",
+    "build": "3",
+    "apple_build_id": "f337269a-64b4-4670-b5c1-d750a348a4b1",
+    "processing_state": "VALID",
+    "internal_build_state": "IN_BETA_TESTING",
+    "owner_group_assigned": true,
+    "owner_testing_access": "already accepted",
+    "latest_build_installation": "not verified",
+    "test_notes_readback_matched": true,
+    "eas_build_id": "392aadf5-74b1-46c6-bc6c-5c23ef428fd6",
+    "submission_id": "8399aa1a-df67-4340-b987-6549a6eea3d8",
+    "submission_status": "FINISHED"
+  },
+  "android": {
+    "version": "0.1.0",
+    "version_code": "4",
+    "track": "internal",
+    "release_status": "completed",
+    "owner_tester_list": "configured",
+    "opt_in_url": "https://play.google.com/apps/internaltest/4700744436494600533",
+    "eas_build_id": "5fda715c-09d2-4a43-b273-8d610b6e0931",
+    "submission_id": "487fff26-8318-418f-8371-1d17f78009a5",
+    "submission_status": "FINISHED",
+    "bundle_sha256": "5b416134ac643ee98f5005d5b1d1fef4c6df70b64888268cbf7e58348c3b12bb",
+    "play_received_bundle_hash_matches": true
+  },
+  "changes_in_this_build": [
+    "PR #6 native iOS phone verification",
+    "PR #7 Android permission cleanup"
+  ],
+  "historical_privacy_reports": [
+    "ios-build-2-privacy.json",
+    "android-build-3-privacy.json"
+  ],
+  "privacy_report_limit": "The historical reports keep their original artifact identities; store delivery does not extend them to the new archives. Inspect the final candidate archives before completing disclosures.",
+  "public_release": "not performed; candidate.json remains not-ready"
+}

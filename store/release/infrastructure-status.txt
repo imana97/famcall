@@ -63,19 +63,21 @@ CONFIGURED
 - Play Integrity linked to FamCall Cloud project 635297130023 after owner
   acceptance of Google's terms. The console confirms a 10,000/day integrity
   request allowance; this is separate from the 50/day verification-SMS quota.
-- Owner-only internal testing groups configured in Play Console and TestFlight.
-  Android version 0.1.0, code 3 is available to internal testers after protected
-  workflow 42320459512 succeeded. TestFlight version 0.1.0, build 2 is available
-  in the owner-only group. English test description, feedback address and
-  testing instructions are saved in App Store Connect and read-back verified.
-- PR #6 (iOS native phone verification) and PR #7 (Android permission cleanup)
-  are merged. Protected testing workflow 42336889833 is building/submitting
-  iOS build 3 and Android code 4 from exact source fecda429. Their store
-  availability and signed-artifact checks are pending verification in this
-  record. Existing build 2/code 3 privacy reports remain historical evidence.
+- Owner-only internal testing groups are configured in both stores. Protected
+  workflow 42336889833 succeeded for source fecda429 with PR #6 (iOS native
+  phone verification) and PR #7 (Android permission cleanup). The 7 November
+  2026 04:27 UTC readback confirms iOS 0.1.0 (3) VALID/IN_BETA_TESTING in the
+  owner group, and Android 0.1.0 code 4 in the completed internal release.
+  Google Play's received bundle SHA-256 matches the submitted artifact.
+  Updated TestFlight test notes were saved and read-back verified. The owner
+  already has testing access; installation of build 3 is not verified.
+  See testing-delivery-2026-11-07.json for exact delivery identities and limits.
+  Existing build 2/code 3 privacy reports remain historical evidence; repeat
+  privacy inspection on the final candidate rather than reusing those results.
 - The owner explicitly approved Apple's standard-encryption declaration and no
-  France distribution for now. It was saved for iOS build 2; Apple cleared Missing
-  Compliance. Reassess the declaration before any France distribution or change
+  France distribution for now. It was saved for iOS build 2, clearing Missing
+  Compliance, and reused for build 3. See encryption-answer.txt. Reassess the
+  declaration before any France distribution or change
   in encryption. This does not approve a public release or all legal obligations.
 - Play Integrity currently requires Play-recognized app, not Play licensing;
   this supports Play plus off-Play distribution after Play recognizes the same

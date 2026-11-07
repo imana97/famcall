@@ -1,7 +1,19 @@
 FAMCALL — VERIFICATION RECORD
 7 November 2026 UTC. Development/internal-testing evidence, not public release approval.
 
-VERIFIED TESTING DELIVERY AND PENDING UPDATE
+CURRENT VERIFIED TESTING DELIVERY — 7 NOVEMBER 2026 04:27 UTC
+- Protected workflow 42336889833 completed successfully for source fecda429.
+  iOS 0.1.0 (3) is VALID/IN_BETA_TESTING and assigned to the owner group.
+  Android 0.1.0 code 4 is in the completed internal release; Google Play's
+  bundle SHA-256 matches the submitted artifact. Both EAS submissions finished.
+- The update includes PR #6 native iOS phone verification and PR #7 Android
+  permission cleanup. Exact delivery identities and scope are recorded in
+  testing-delivery-2026-11-07.json. The owner already has testing access, but
+  installation of the latest iOS update and runtime behavior are not established
+  by store status. Preserve the older privacy reports as historical evidence;
+  inspect the final candidate archives before completing store disclosures.
+
+EARLIER TESTING DELIVERY AND DEPLOYMENT EVIDENCE
 - PR #4 exact source b873d7a passed 70 JS/TS tests and 16 Python tests, typecheck,
   lint, backend build and dependency audit (zero vulnerabilities). The owner
   delegated narrow testing-rollout approvals; automated delegated PR reviews are
@@ -10,7 +22,7 @@ VERIFIED TESTING DELIVERY AND PENDING UPDATE
   READY composite indexes. Three credential-free callable checks correctly
   returned HTTP 401 / UNAUTHENTICATED. Scheduled call expiry is running.
 - Android code 3 from 0c92b91 was built/uploaded by workflow 42320459512; Google
-  Play confirms it is available to the configured internal testers. Play signing
+  Play confirmed delivery to the configured internal testers. Play signing
   SHA-1/SHA-256 certificates were registered and read back from Firebase.
 - iOS build 1 uploaded successfully but Apple processing rejected ITMS-90683.
   The camera-purpose description required by bundled WebRTC APIs is restored
@@ -21,13 +33,9 @@ VERIFIED TESTING DELIVERY AND PENDING UPDATE
   internal state IN_BETA_TESTING, build 2 belongs to the owner-only group, and
   the configured owner tester is INSTALLED in the 7 November 2026 04:07 UTC
   readback. The owner approved the saved standard-encryption declaration and
-  no France distribution for now. Reassess before
-  France distribution or encryption changes. English TestFlight description,
+  no France distribution for now. Reassess before France distribution or
+  encryption changes. English TestFlight description,
   feedback address and test instructions were saved and read-back verified.
-- PR #6 and PR #7 are merged. Workflow 42336889833 is building/submitting iOS
-  build 3 and Android code 4 from fecda429. Availability and inspection of those
-  exact signed artifacts remain pending verification; the build 2/code 3 reports
-  below do not establish the update's permissions or privacy declarations.
 - https://famcall.web.app and privacy/terms/delete-account return HTTP 200 with
   bytes matching deployed source 336c6be from workflow 42322194542. The revised
   privacy/deletion notices in PR #5 await a protected website deployment after

@@ -82,7 +82,7 @@ metadata = {
     'schema_version': 1,
     'locale': 'en-US',
     'checked_on': DATE,
-    'status': 'PUBLIC LISTING DRAFT — Android internal code 3 and TestFlight build 2 are available; delivery of the build 3/code 4 update is pending verification. Release screenshots, production call reliability and public-store review remain pending',
+    'status': 'PUBLIC LISTING DRAFT — Android internal code 4 and TestFlight build 3 from fecda429 are available, verified 7 November 2026 04:27 UTC. Final-candidate privacy reports, release screenshots, production call reliability and public-store review remain pending',
     'publisher': 'SilverGrid Technology LLC',
     'support_email': 'info@silvergridtech.com',
     'brand': {'name': 'FamCall', 'headline': 'A little signal. A familiar voice.', 'positioning': 'Simple voice calls designed for weak and unstable internet connections.', 'geographic_targeting_in_public_copy': False},
@@ -117,7 +117,7 @@ metadata = {
             'encryption': 'Standard encryption outside or in addition to Apple OS encryption',
             'france_distribution': False,
             'owner_approved_and_saved_on': DATE,
-            'scope': 'Internal build 2 cleared Apple Missing Compliance. Reassess before France distribution or encryption changes; public-release compliance remains pending.'
+            'scope': 'Internal build 2 cleared Apple Missing Compliance; build 3 reused the same approved answer. See encryption-answer.txt. Reassess before France distribution or encryption changes; public-release compliance remains pending.'
         },
         'review_contact_name': None,
         'review_contact_phone': None,

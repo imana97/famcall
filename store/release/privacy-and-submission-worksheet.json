@@ -117,13 +117,13 @@
     "retention_periods": "Live TTL, logging and scheduled cleanup configuration inspected; see retention-configuration-evidence.json. Expiration eligibility is not instantaneous deletion.",
     "app_privacy_answers": "Proposed per-category answers in privacy-review-notes.txt; not entered or submitted",
     "data_safety_answers": "Proposed per-category answers and unresolved sharing/audio questions in privacy-review-notes.txt; not entered or submitted",
-    "encryption_export_answers": "Owner approved standard encryption with no France distribution for current TestFlight build 2; saved in App Store Connect. Reassess before France distribution or changed encryption.",
+    "encryption_export_answers": "Owner approved standard encryption with no France distribution for TestFlight build 2; build 3 reused that answer, as verified in App Store Connect. See encryption-answer.txt. Reassess before France distribution or changed encryption; public-release compliance remains pending.",
     "age_and_target_audience_answers": null,
     "ads_declaration": "No ads implemented; publisher to confirm final submission",
     "required_sdk_privacy_manifests": "40 privacy-manifest files inspected in store IPA 0.1.0 (2), including nested duplicate declarations. Four required-reason API categories. Repeat on the final approved candidate; manifests do not certify completeness.",
     "reviewer_accounts_and_access": null,
     "legal_contact_details_required_by_distribution_markets": null,
-    "android_permission_minimization": "Historical store code 3 includes unused WRITE_CONTACTS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE and SYSTEM_ALERT_WINDOW from dependencies. PR #7 removed them and verified a rebuilt native manifest; the fix is merged. Workflow 42336889833 is building/submitting code 4 from fecda429; inspect that exact store AAB before marking its permissions verified."
+    "android_permission_minimization": "Historical store code 3 includes unused WRITE_CONTACTS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE and SYSTEM_ALERT_WINDOW from dependencies. PR #7 removed them and verified a rebuilt native manifest. Code 4 from fecda429 is delivered through workflow 42336889833, and Play received the expected bundle hash. The historical code 3 report does not describe code 4; retain a fresh manifest/privacy audit for the final candidate."
   },
   "deletion_acceptance_checks": [
     "A signed-in user can find and initiate account deletion in the app.",
@@ -147,6 +147,7 @@
     "ios-build-2-privacy.json",
     "android-build-3-privacy.json",
     "retention-configuration-evidence.json",
-    "privacy-review-notes.txt"
+    "privacy-review-notes.txt",
+    "testing-delivery-2026-11-07.json"
   ]
 }
