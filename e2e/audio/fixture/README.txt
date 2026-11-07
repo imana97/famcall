@@ -21,11 +21,18 @@ boots three fresh API 36 x86_64 AVD processes. Each receives one injection only.
 All outcomes are retained, including failures. No automatic retry replaces them.
 The Android app also refuses hardware other than ranchu/goldfish emulators.
 
-The controller starts emulators with -no-audio so host microphone passthrough is
-disabled. The gRPC injection temporarily supplies synthetic microphone input.
+The grpc method starts emulators with -no-audio and temporarily injects generated
+microphone input through gRPC. The pulse method instead starts a private audio
+server with exactly two virtual null sinks and no physical-device detection. Its
+only microphone sources are their virtual monitors. It verifies the source/module
+list before enabling emulator input and plays generated PCM into the input sink.
+The server uses a private Unix socket, never a network listener. No host hardware
+microphone is used by either method. FAMCALL_FIXTURE_INPUT selects grpc or pulse;
+the workflow currently evaluates pulse after the grpc control failed qualification.
 Only disposable emulator recordings and allowlisted JSON reports are uploaded.
 Debug keystores, discovery bearer tokens, raw emulator logs, and APKs are excluded.
 Artifacts expire after seven days; preserve evidence needed for a release audit.
+Partial recordings from unsuccessful runs are retained explicitly as unqualified.
 
 The whole 30-second reference must correlate at least 0.75 with the Android PCM.
 At least 90% of active two-second windows must independently correlate at least
