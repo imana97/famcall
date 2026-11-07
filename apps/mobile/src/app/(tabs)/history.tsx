@@ -1,26 +1,34 @@
-import { Alert, Pressable, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, View } from "react-native";
 import { router } from "expo-router";
 import { ArrowDownLeft, ArrowUpRight, PhoneMissed } from "lucide-react-native";
 import { displayPhone, historyKind } from "@famcall/core";
 import {
   Avatar,
   Card,
+  ErrorBanner,
   Heading,
   Label,
   Page,
   useTheme,
 } from "../../components/ui";
 import { useSession } from "../../state/Session";
-import { t } from "../../i18n";
+import { locale, t } from "../../i18n";
 import { api } from "../../services/firebase";
 import { errorMessage } from "../../services/errors";
 export default function History() {
   const c = useTheme();
-  const { history, user, people, blocked } = useSession();
+  const { history, historyLoaded, historyError, error, refresh, user, people, blocked } = useSession();
   return (
-    <Page>
+    <Page safeBottom={false}>
       <Heading title={t("history")} />
-      {!history.length && (
+      <ErrorBanner message={historyError ?? error} retry={refresh} />
+      {!historyLoaded && !historyError && (
+        <View accessibilityLiveRegion="polite" style={{ gap: 12, alignItems: "center" }}>
+          <ActivityIndicator color={c.primary} />
+          <Label muted>{t("loadingHistory")}</Label>
+        </View>
+      )}
+      {historyLoaded && !historyError && !history.length && (
         <Card>
           <Label style={{ fontSize: 20 }}>{t("emptyHistory")}</Label>
           <Label muted>{t("emptyHistoryBody")}</Label>
@@ -32,6 +40,12 @@ export default function History() {
         const name =
           people.find((p) => p.phone === phone)?.name ?? displayPhone(phone);
         const kind = historyKind(call, user!.uid);
+        const when = new Intl.DateTimeFormat(locale, {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        }).format(call.createdAtMs);
         const Icon =
           kind === "missed"
             ? PhoneMissed
@@ -44,7 +58,7 @@ export default function History() {
             testID={"history-" + call.id}
             accessibilityRole="button"
             accessibilityLabel={
-              name + " " + t(kind === "incoming" ? "incomingHistory" : kind)
+              name + ", " + t(kind === "incoming" ? "incomingHistory" : kind) + ", " + when
             }
             onPress={() =>
               Alert.alert(name, displayPhone(phone), [
@@ -86,14 +100,15 @@ export default function History() {
                 { text: t("cancel"), style: "cancel" },
               ])
             }
-            style={{
+            style={({ pressed }) => ({
               flexDirection: "row",
               gap: 14,
               alignItems: "center",
               paddingVertical: 16,
               borderBottomWidth: 1,
               borderBottomColor: c.line,
-            }}
+              opacity: pressed ? 0.6 : 1,
+            })}
           >
             <Avatar name={name} />
             <View style={{ flex: 1, gap: 4 }}>
@@ -106,22 +121,15 @@ export default function History() {
                 {name}
               </Label>
               <View
-                style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
+                style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, alignItems: "center" }}
               >
                 <Icon size={14} color={c.muted} />
                 <Label muted style={{ fontSize: 13 }}>
                   {t(kind === "incoming" ? "incomingHistory" : kind)}
                 </Label>
               </View>
+              <Label muted style={{ fontSize: 12 }}>{when}</Label>
             </View>
-            <Label muted style={{ fontSize: 12 }}>
-              {new Intl.DateTimeFormat("en", {
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              }).format(call.createdAtMs)}
-            </Label>
           </Pressable>
         );
       })}

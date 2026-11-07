@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { onAuthStateChanged, type User } from "@react-native-firebase/auth";
 import {
   collection,
@@ -22,6 +22,12 @@ interface Session {
   people: Person[];
   history: CallRecord[];
   blocked: string[];
+  peopleLoaded: boolean;
+  historyLoaded: boolean;
+  blockedLoaded: boolean;
+  peopleError: string | null;
+  historyError: string | null;
+  blockedError: string | null;
   error: string | null;
   refresh: () => void;
 }
@@ -31,6 +37,12 @@ const Context = createContext<Session>({
   people: [],
   history: [],
   blocked: [],
+  peopleLoaded: false,
+  historyLoaded: false,
+  blockedLoaded: false,
+  peopleError: null,
+  historyError: null,
+  blockedError: null,
   error: null,
   refresh() {},
 });
@@ -41,7 +53,14 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
   const [history, setHistory] = useState<CallRecord[]>([]);
   const [blocked, setBlocked] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [peopleLoaded, setPeopleLoaded] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [blockedLoaded, setBlockedLoaded] = useState(false);
+  const [peopleError, setPeopleError] = useState<string | null>(null);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [blockedError, setBlockedError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const identity = useRef<string | null | undefined>(undefined);
   useEffect(() => {
     let alive = true;
     let unsubscribe: (() => void) | undefined;
@@ -49,9 +68,23 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
       .then(() => {
         if (!alive) return;
         unsubscribe = onAuthStateChanged(auth, (next) => {
-          setPeople([]);
-          setHistory([]);
-          setBlocked([]);
+          if (!alive) return;
+          // A retry can reattach Auth after cached snapshots have arrived.
+          // Keep those lists unless the signed-in identity actually changes.
+          const nextIdentity = next?.uid ?? null;
+          if (identity.current !== nextIdentity) {
+            identity.current = nextIdentity;
+            setPeople([]);
+            setHistory([]);
+            setBlocked([]);
+            setPeopleLoaded(false);
+            setHistoryLoaded(false);
+            setBlockedLoaded(false);
+            setPeopleError(null);
+            setHistoryError(null);
+            setBlockedError(null);
+            setError(null);
+          }
           setUser(next);
           setReady(true);
         });
@@ -70,24 +103,34 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
   useEffect(() => {
     if (!user) return;
     let active = true;
+    const isCurrent = () => active && identity.current === user.uid;
     const fail = (e: unknown) => {
-      if (active) setError(errorMessage(e));
+      if (isCurrent()) setError(errorMessage(e));
     };
     api("registerProfile")
       .then(() => {
-        if (active) setError(null);
+        if (isCurrent()) setError(null);
       })
       .catch(fail);
     const unsubscribers = [
       onSnapshot(
         collection(database, "users", user.uid, "contacts"),
-        (snap) =>
+        { includeMetadataChanges: true },
+        (snap) => {
+          if (!isCurrent()) return;
           setPeople(
             snap.docs
               .map((d) => d.data() as Person)
               .sort((a, b) => a.name.localeCompare(b.name)),
-          ),
-        fail,
+          );
+          // An empty first cache is not evidence of an empty account. Wait for
+          // the server before showing the empty state; cached people stay usable.
+          setPeopleLoaded((loaded) => loaded || !snap.metadata.fromCache || snap.size > 0);
+          setPeopleError(null);
+        },
+        (e) => {
+          if (isCurrent()) setPeopleError(errorMessage(e));
+        },
       ),
       onSnapshot(
         query(
@@ -96,13 +139,29 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
           orderBy("createdAtMs", "desc"),
           limit(100),
         ),
-        (snap) => setHistory(snap.docs.map((d) => d.data() as CallRecord)),
-        fail,
+        { includeMetadataChanges: true },
+        (snap) => {
+          if (!isCurrent()) return;
+          setHistory(snap.docs.map((d) => d.data() as CallRecord));
+          setHistoryLoaded((loaded) => loaded || !snap.metadata.fromCache || snap.size > 0);
+          setHistoryError(null);
+        },
+        (e) => {
+          if (isCurrent()) setHistoryError(errorMessage(e));
+        },
       ),
       onSnapshot(
         collection(database, "users", user.uid, "blocked"),
-        (snap) => setBlocked(snap.docs.map((d) => d.id)),
-        fail,
+        { includeMetadataChanges: true },
+        (snap) => {
+          if (!isCurrent()) return;
+          setBlocked(snap.docs.map((d) => d.id));
+          setBlockedLoaded((loaded) => loaded || !snap.metadata.fromCache || snap.size > 0);
+          setBlockedError(null);
+        },
+        (e) => {
+          if (isCurrent()) setBlockedError(errorMessage(e));
+        },
       ),
     ];
     return () => {
@@ -118,8 +177,19 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
         people,
         history,
         blocked,
+        peopleLoaded,
+        historyLoaded,
+        blockedLoaded,
+        peopleError,
+        historyError,
+        blockedError,
         error,
-        refresh: () => setAttempt((v) => v + 1),
+        refresh: () => {
+          setPeopleError(null);
+          setHistoryError(null);
+          setBlockedError(null);
+          setAttempt((v) => v + 1);
+        },
       }}
     >
       {children}

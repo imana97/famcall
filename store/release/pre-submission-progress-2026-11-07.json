@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-11-07T05:51:04.816377+00:00",
+  "scope": "Store preparation status only. No store form decisions, new testing submission, public launch or release-gate changes.",
+  "existing_testing_delivery": {
+    "record": "testing-delivery-2026-11-07.json",
+    "workflow_url": "https://github.com/silvergrid/famcall/actions/runs/42336889833",
+    "source_commit": "fecda4296f7c1e64576b172d8d170e0883ad958b",
+    "ios_version": "0.1.0",
+    "ios_build": "3",
+    "android_version": "0.1.0",
+    "android_version_code": "4",
+    "status_basis": "Previously verified delivery record; not a fresh store-console readback."
+  },
+  "hosting_recheck": {
+    "record": "website-delivery-2026-11-07.json",
+    "pages": [
+      {
+        "url": "https://famcall.web.app/",
+        "http_status": 200,
+        "sha256": "c71978c5a62ff300b8026b8ea56ac6bf88bd16702f89dd16d9f1affa2bba0e5a",
+        "matches_recorded_deployment": true
+      },
+      {
+        "url": "https://famcall.web.app/privacy",
+        "http_status": 200,
+        "sha256": "8e2020a60a0fb5217ac6d294661922b4c6e6ab07b41dbbccc5950fda3b22f293",
+        "matches_recorded_deployment": true
+      },
+      {
+        "url": "https://famcall.web.app/terms",
+        "http_status": 200,
+        "sha256": "43b4d4f113587e1a8a94cfef396c96c3f8f4911a42dcf008e71e564d43b8352b",
+        "matches_recorded_deployment": true
+      },
+      {
+        "url": "https://famcall.web.app/delete-account",
+        "http_status": 200,
+        "sha256": "c77996955618fbaf3bf3697844da44a446645cd016a7c06d0a450a83826c1b2e",
+        "matches_recorded_deployment": true
+      }
+    ]
+  },
+  "brand_preparation": {
+    "concept": "Signal bridge",
+    "local_source_commit": "b6204c032308d98f10eb3b97caeb36ccfa03f20b",
+    "master": "brand/famcall-glyph.svg",
+    "palette": [
+      "#183D34",
+      "#F5F4E9",
+      "#C5DF9E"
+    ],
+    "reference": "brand/concepts/signal-bridge-selected.png",
+    "apple_icon": {
+      "path": "store/assets/icons/apple-icon-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "format": "8-bit RGB PNG, opaque",
+      "bytes": 33712
+    },
+    "play_icon": {
+      "path": "store/assets/icons/google-play-icon-512.png",
+      "width": 512,
+      "height": 512,
+      "format": "8-bit RGBA PNG, opaque background",
+      "bytes": 17066
+    },
+    "feature_graphic": {
+      "path": "store/assets/google-play/feature-graphic-1024x500.png",
+      "width": 1024,
+      "height": 500,
+      "format": "8-bit RGB PNG, opaque",
+      "bytes": 57707
+    },
+    "checks": [
+      "Visual inspection of selected reference and vector recreation",
+      "Circle, rounded-square and squircle mask previews",
+      "Small-size previews from 64px to 16px",
+      "Adaptive visible radius 296.81px is inside the 312.89px guaranteed safe radius",
+      "Native monochrome notification and CallKit template previews",
+      "Required dimensions and PNG color types",
+      "Byte-identical regeneration of 18 assets/source files",
+      "Mobile lint and typecheck"
+    ],
+    "delivery_status": "Prepared in source only. The delivered test builds and deployed website above precede this icon."
+  },
+  "user_device_report": "user-reported-device-test-2026-11-07.json",
+  "calling_setup": {
+    "status": "Implemented and locally verified on Android and iPhone simulators; awaiting updated testing delivery.",
+    "planned_review_path": "After phone verification, complete Get ready to call. Allow Microphone on iPhone and Android. Android additionally offers optional Call alerts and Lock screen calls when shown; declining them must not prevent outgoing calls. iPhone uses its native call screen without ordinary notification permission. Contacts remain optional.",
+    "verification_required": "Final store-signed APNs/FCM lifecycle, audio-route and production verification remains required. See ui-review-2026-11-07/verification.txt for local permission/UI evidence."
+  },
+  "still_pending": [
+    "Final candidate build identity and archive audit",
+    "Private reviewer accounts, stable verification and reachable second endpoint",
+    "Reviewer contact name and phone",
+    "Final screenshot captures",
+    "Measured network and background/push/audio-route qualification",
+    "Final public-store privacy/legal declarations"
+  ],
+  "candidate_record_changed": false,
+  "ui_review": "ui-review-2026-11-07/verification.txt"
+}

@@ -1,8 +1,9 @@
 FAMCALL — SCREENSHOT STORYBOARD
-Design draft • 6 November 2026 • Five portrait panels per platform
+Design draft • Updated 7 November 2026 • Four current panels per platform
 
 CURRENT CAPTURES
-Actual development-build screenshots are in store/assets/screenshots-draft.
+Actual development-build screenshots from source b6204c0 are in store/assets/screenshots-draft.
+The icon, calling setup and navigation reflect the latest UI review.
 Android: people, recents, settings and add-person screens.
 iOS: people, recents, settings and add-person screens.
 The capture manifest records simulator/OS/version/locale and limitations.
@@ -66,12 +67,13 @@ masked test number. Do not show an unowned working phone number.
 Proof required: Permission-declined and manual-entry paths both work.
 
 EXPORT TARGETS
-Apple iPhone: 1320 x 2868 pixels portrait, opaque PNG, sRGB. This is one of the
-accepted 6.9-inch screenshot dimensions checked on 6 November 2026. Five images
-fit Apple's 1–10 screenshot range. If iPad support is enabled, add genuine iPad
+Apple iPhone: 1206 x 2622 pixels portrait for the required Dynamic Island medium
+display set, plus 1320 x 2868 for the large display set. Opaque PNG, sRGB. These
+sizes and the medium-display requirement were checked on 7 November 2026.
+Four current images per set fit Apple's 1–10 screenshot range. If iPad support is enabled, add genuine iPad
 captures at a currently accepted 13-inch dimension; do not stretch iPhone art.
 
-Google Play phone: 1080 x 1920 pixels portrait, opaque 24-bit PNG or JPEG. Five
+Google Play phone: 1080 x 1920 pixels portrait, opaque 24-bit PNG or JPEG. Four current
 images fit the 2–8 phone screenshot range. Keep exported images within the
 documented 320–3840 pixel bounds and the 2:1 maximum dimension relationship.
 

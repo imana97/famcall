@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-11-07",
+  "evidence_type": "user_report",
+  "source": "FamCall project conversation; app owner reported testing on a real iPhone and a real Android phone",
+  "reported_result": "The user reported great voice quality, including with a bad internet connection.",
+  "reported_platforms": [
+    "iPhone",
+    "Android"
+  ],
+  "exact_test_time": null,
+  "app_builds": null,
+  "phone_models": null,
+  "os_versions": null,
+  "network_type_and_provider": null,
+  "bandwidth_latency_jitter_loss_measurements": null,
+  "test_duration": null,
+  "vpn_usage": null,
+  "automated_measurements": false,
+  "unverified_in_this_report": [
+    "Locked-screen incoming ringing",
+    "Background or process-terminated delivery",
+    "Android Force Stop behavior",
+    "Silent mode and Focus/Do Not Disturb behavior",
+    "Audio routes and Bluetooth",
+    "Measured network interruption/recovery",
+    "Production authentication/App Check paths",
+    "Account deletion"
+  ],
+  "qualification_scope": "A positive real-device experience reported by the user. It does not identify a release candidate, prove the complete platform/network matrix, or close any candidate.json evidence gate.",
+  "candidate_record_changed": false
+}

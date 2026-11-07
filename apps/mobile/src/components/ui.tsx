@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -45,22 +46,49 @@ export function useTheme() {
 export function Page({
   children,
   scroll = true,
-}: React.PropsWithChildren<{ scroll?: boolean }>) {
+  safeBottom = true,
+  footer,
+}: React.PropsWithChildren<{
+  scroll?: boolean;
+  safeBottom?: boolean;
+  footer?: React.ReactNode;
+}>) {
   const c = useTheme();
   return (
     <SafeAreaView
-      edges={["top", "left", "right"]}
+      edges={
+        safeBottom ? ["top", "left", "right", "bottom"] : ["top", "left", "right"]
+      }
       style={{ flex: 1, backgroundColor: c.bg, direction: "ltr" }}
     >
       {scroll ? (
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.page}
-        >
-          {children}
-        </ScrollView>
+        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+          <ScrollView
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.page}
+          >
+            {children}
+          </ScrollView>
+        </KeyboardAvoidingView>
       ) : (
         <View style={[styles.page, { flex: 1 }]}>{children}</View>
+      )}
+      {footer && (
+        <View
+          style={{
+            flexShrink: 0,
+            paddingHorizontal: 24,
+            paddingTop: 12,
+            paddingBottom: 8,
+            gap: 8,
+            borderTopWidth: 1,
+            borderTopColor: c.line,
+            backgroundColor: c.bg,
+          }}
+        >
+          {footer}
+        </View>
       )}
     </SafeAreaView>
   );
@@ -69,14 +97,16 @@ export function Heading({
   title,
   subtitle,
   back = false,
+  bottomSpacing = 26,
 }: {
   title: string;
   subtitle?: string;
   back?: boolean;
+  bottomSpacing?: number;
 }) {
   const c = useTheme();
   return (
-    <View style={{ gap: 12, marginBottom: 26 }}>
+    <View style={{ gap: 12, marginBottom: bottomSpacing }}>
       {back && (
         <Pressable
           accessibilityRole="button"
@@ -188,7 +218,17 @@ export function Button({
       ) : (
         Icon && <Icon size={20} color={color} />
       )}
-      <Text style={{ fontSize: 16, fontWeight: "600", color }}>{title}</Text>
+      <Text
+        style={{
+          fontSize: 16,
+          fontWeight: "600",
+          color,
+          flexShrink: 1,
+          textAlign: "center",
+        }}
+      >
+        {title}
+      </Text>
     </Pressable>
   );
 }
@@ -198,6 +238,8 @@ export function Field({ label, ...props }: TextInputProps & { label: string }) {
     <View style={{ gap: 8 }}>
       <Label style={{ fontSize: 14, fontWeight: "500" }}>{label}</Label>
       <TextInput
+        returnKeyType="done"
+        inputAccessoryViewButtonLabel={t("done")}
         {...props}
         accessibilityLabel={label}
         placeholderTextColor={c.muted}

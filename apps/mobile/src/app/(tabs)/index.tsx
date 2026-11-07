@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 import { router } from "expo-router";
-import { AudioLines, Phone, Plus } from "lucide-react-native";
+import { Phone, Plus } from "lucide-react-native";
 import { displayPhone } from "@famcall/core";
 import {
   Avatar,
@@ -14,39 +14,66 @@ import {
   Page,
   useTheme,
 } from "../../components/ui";
+import { BrandMark } from "../../components/BrandMark";
 import { useSession } from "../../state/Session";
 import { t } from "../../i18n";
 export default function People() {
   const c = useTheme();
-  const { people, error, refresh } = useSession();
+  const { people, peopleLoaded, peopleError, error, refresh } = useSession();
   const [search, setSearch] = useState("");
   const filtered = people.filter((p) =>
     (p.name + " " + p.phone).toLowerCase().includes(search.toLowerCase()),
   );
   return (
-    <Page>
+    <Page safeBottom={false}>
       <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-        <AudioLines color={c.text} size={24} />
+        <BrandMark size={36} />
         <Label style={{ fontWeight: "600", fontSize: 20 }}>
           {t("appName")}
         </Label>
       </View>
       <Heading title={t("yourPeople")} subtitle={t("peopleSubtitle")} />
-      <ErrorBanner message={error} retry={refresh} />
+      <ErrorBanner message={peopleError ?? error} retry={refresh} />
+      {!peopleLoaded && !peopleError && (
+        <View
+          accessibilityLiveRegion="polite"
+          style={{ flexDirection: "row", gap: 12, alignItems: "center" }}
+        >
+          <ActivityIndicator color={c.primary} />
+          <Label muted style={{ flex: 1 }}>
+            {t("loadingPeople")}
+          </Label>
+        </View>
+      )}
       {people.length > 0 ? (
         <Field
           label={t("search")}
           placeholder={t("search")}
           value={search}
           onChangeText={setSearch}
+          autoCorrect={false}
           testID="contact-search"
         />
-      ) : (
+      ) : peopleLoaded && !peopleError ? (
         <Card>
           <Label style={{ fontSize: 20, fontWeight: "500" }}>
             {t("emptyPeople")}
           </Label>
           <Label muted>{t("emptyPeopleBody")}</Label>
+        </Card>
+      ) : null}
+      {people.length > 0 && filtered.length === 0 && (
+        <Card>
+          <Label style={{ fontSize: 20, fontWeight: "500" }}>
+            {t("noPeopleMatch")}
+          </Label>
+          <Label muted>{t("noPeopleMatchBody")}</Label>
+          <Button
+            testID="clear-contact-search"
+            title={t("clearSearch")}
+            secondary
+            onPress={() => setSearch("")}
+          />
         </Card>
       )}
       <View>

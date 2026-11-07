@@ -73,6 +73,14 @@ async function callApi(
   const body = await response.json();
   return { http: response.status, ...body };
 }
+function withAuthTime(identity: Awaited<ReturnType<typeof user>>, authTime: number) {
+  // The Auth emulator issues unsigned tokens. Never alter a production token.
+  const [header, payload] = identity.token.split(".");
+  if (JSON.parse(Buffer.from(header, "base64url").toString()).alg !== "none")
+    throw new Error("Expected an unsigned Auth emulator token.");
+  const claims = { ...JSON.parse(Buffer.from(payload, "base64url").toString()), auth_time: authTime };
+  return { ...identity, token: [header, Buffer.from(JSON.stringify(claims)).toString("base64url"), ""].join(".") };
+}
 async function start(
   caller: Awaited<ReturnType<typeof user>>,
   callee: Awaited<ReturnType<typeof user>>,
@@ -265,10 +273,15 @@ describe.skipIf(!enabled)(
       expect((await getFirestore(app!).doc("users/" + a.uid + "/cancelledStarts/" + cancelledId).get()).exists).toBe(true);
       const {result} = await start(a, b);
       expect((await callApi(a, "deleteAccount", {})).result?.accepted).toBe(true);
+      expect((await callApi(a, "deleteAccount", {})).result?.accepted).toBe(true);
       expect((await callApi(a, "registerProfile", {})).error?.status).toBe("PERMISSION_DENIED");
       const db = getFirestore(app!);
       await expect.poll(async () => (await db.doc("accountDeletions/" + a.uid).get()).data()?.status,
         {timeout: 20_000, interval: 300}).toBe("complete");
+      const completedJob = (await db.doc("accountDeletions/" + a.uid).get()).data();
+      const staleIdentity = withAuthTime(a, Math.floor(Date.now() / 1000) - 600);
+      expect((await callApi(staleIdentity, "deleteAccount", {})).result?.accepted).toBe(true);
+      expect((await db.doc("accountDeletions/" + a.uid).get()).data()).toEqual(completedJob);
       expect((await db.doc("users/" + a.uid).get()).exists).toBe(false);
       expect((await db.collection("users/" + a.uid + "/contacts").get()).empty).toBe(true);
       expect((await db.collection("users/" + a.uid + "/cancelledStarts").get()).empty).toBe(true);
@@ -276,6 +289,25 @@ describe.skipIf(!enabled)(
       expect((await db.doc("calls/" + result.id).get()).exists).toBe(false);
       expect((await db.doc("activeCalls/" + b.uid).get()).exists).toBe(false);
       expect((await start(b, a)).error?.status).toBe("UNAVAILABLE");
+    }, 30_000);
+    it("accepts concurrent account deletion requests through one durable job", async () => {
+      const a = await user();
+      const responses = await Promise.all(Array.from({ length: 4 }, () => callApi(a, "deleteAccount", {})));
+      expect(responses.map(response => response.result?.accepted)).toEqual([true, true, true, true]);
+      const job = getFirestore(app!).doc("accountDeletions/" + a.uid);
+      const requestedAt = (await job.get()).data()?.requestedAt;
+      expect(requestedAt).toBeDefined();
+      await expect.poll(async () => (await job.get()).data()?.status,
+        {timeout: 20_000, interval: 300}).toBe("complete");
+      expect((await job.get()).data()?.requestedAt).toEqual(requestedAt);
+      expect((await callApi(a, "registerProfile", {})).error?.status).toBe("PERMISSION_DENIED");
+    }, 30_000);
+    it("requires recent verified phone authentication for a new deletion job", async () => {
+      const a = await user();
+      const staleIdentity = withAuthTime(a, Math.floor(Date.now() / 1000) - 600);
+      expect((await callApi(staleIdentity, "deleteAccount", {})).error?.status).toBe("UNAUTHENTICATED");
+      expect((await getFirestore(app!).doc("accountDeletions/" + a.uid).get()).exists).toBe(false);
+      expect((await callApi(a, "registerProfile", {})).result?.phone).toBe(a.phone);
     }, 30_000);
   },
 );

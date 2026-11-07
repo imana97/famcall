@@ -1,6 +1,15 @@
 FAMCALL — VERIFICATION RECORD
 7 November 2026 UTC. Development/internal-testing evidence, not public release approval.
 
+LOCAL UI AND SETUP REVIEW — 7 NOVEMBER 2026
+Final application source b6204c0 has passed local native UI checks on Android and
+iPhone, including upfront microphone setup, denial/recovery, keyboard behavior,
+large text and dark appearance. Signal bridge branding is integrated. The exact
+scope, source identities, simulator native-call limitation and remaining real
+push qualification are recorded in ui-review-2026-11-07/verification.txt.
+Refreshed store screenshots remain development drafts, pending signed-candidate
+comparison. This evidence does not change the public release gate.
+
 CURRENT VERIFIED TESTING DELIVERY — 7 NOVEMBER 2026 04:27 UTC
 - Protected workflow 42336889833 completed successfully for source fecda429.
   iOS 0.1.0 (3) is VALID/IN_BETA_TESTING and assigned to the owner group.
@@ -19,6 +28,28 @@ VERIFIED WEBSITE DELIVERY — 7 NOVEMBER 2026 04:39 UTC
   that source. The revised privacy/deletion notices are live. Exact URLs and
   SHA-256 hashes are recorded in website-delivery-2026-11-07.json. This is
   hosting evidence, not a public-store release or a production-calling test.
+
+USER-REPORTED REAL-DEVICE EXPERIENCE — RECORDED 7 NOVEMBER 2026
+The owner reported successful calling between a real iPhone and a real Android
+phone, with great voice quality even on a bad internet connection. This is a
+user report, not an automated measurement. Exact builds, devices, OS versions,
+network conditions and duration were not supplied. It does not establish locked,
+background or terminated-app delivery, audio routes, recovery timing, or final
+candidate qualification. See user-reported-device-test-2026-11-07.json.
+
+CURRENT ICON AND STORE HANDOFF — 7 NOVEMBER 2026
+The approved Signal bridge mark is implemented in local source commit 96c0a65:
+a tilted ivory handset with two separated sage arcs on the original forest green.
+The palette and app theme are unchanged. App, adaptive/themed, notification,
+CallKit, splash, favicon, website and store artwork derive from one SVG master.
+Apple 1024px RGB and Play 512px RGBA icons, the opaque 1024x500 feature graphic,
+adaptive safe area, mask previews and 16–64px previews were checked. Mobile lint
+and typecheck pass; repeated rendering is byte-identical. These changes are not
+in the previously delivered test builds or live website yet.
+The four live website pages were rechecked and still match the recorded deployed
+bytes. Known URLs and current deletion navigation are in the reviewer template;
+reviewer identities, accounts, recipient and final build remain pending. Exact
+asset checks and URL results: pre-submission-progress-2026-11-07.json.
 
 EARLIER TESTING DELIVERY AND DEPLOYMENT EVIDENCE
 - PR #4 exact source b873d7a passed 70 JS/TS tests and 16 Python tests, typecheck,

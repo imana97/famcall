@@ -3,14 +3,10 @@
   <circle cx="925" cy="430" r="300" fill="#254D40"/>
   <circle cx="925" cy="430" r="211" fill="none" stroke="#A7C0A4" stroke-opacity=".2" stroke-width="2"/>
   <circle cx="925" cy="430" r="270" fill="none" stroke="#A7C0A4" stroke-opacity=".16" stroke-width="2"/>
-  <g stroke="#F6F3EA" stroke-width="10" stroke-linecap="round" transform="translate(70 70)">
-    <path d="M0 14v18M18 0v46M36 8v30M54 0v46M72 14v18"/>
-  </g>
+  <image href="famcall-glyph.svg" x="36" y="23" width="140" height="140"/>
   <text x="175" y="111" font-family="Arial,sans-serif" font-size="41" font-weight="700" fill="#F6F3EA">FamCall</text>
   <text x="70" y="230" font-family="Arial,sans-serif" font-size="63" font-weight="700" letter-spacing="-2" fill="#F6F3EA">A little signal.</text>
   <text x="70" y="306" font-family="Arial,sans-serif" font-size="63" font-weight="700" letter-spacing="-2" fill="#F6F3EA">A familiar voice.</text>
   <text x="73" y="390" font-family="Arial,sans-serif" font-size="24" fill="#CBDAC8">Simple voice calls. Designed for difficult connections.</text>
-  <g stroke="#A7C0A4" stroke-width="12" stroke-linecap="round" transform="translate(780 185)">
-    <path d="M0 44v30M24 24v70M48 0v118M72 24v70M96 44v30"/>
-  </g>
+  <image href="famcall-glyph.svg" x="680" y="100" width="320" height="320"/>
 </svg>

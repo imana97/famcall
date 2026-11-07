@@ -1,19 +1,34 @@
 import { Alert, Linking } from "react-native";
+import { nativeApplicationVersion, nativeBuildVersion } from "expo-application";
 import { router } from "expo-router";
 import { displayPhone } from "@famcall/core";
 import { Button, Card, Heading, Label, Page } from "../../components/ui";
 import { useSession } from "../../state/Session";
+import { useCallReadiness } from "../../state/CallReadiness";
 import { t } from "../../i18n";
 export default function Settings() {
   const { user } = useSession();
+  const { canCall } = useCallReadiness();
+  const version = (nativeApplicationVersion ?? "—") +
+    (nativeBuildVersion ? ` (${nativeBuildVersion})` : "");
   return (
-    <Page>
+    <Page safeBottom={false}>
       <Heading title={t("settings")} />
       <Card>
         <Label muted>{t("account")}</Label>
         <Label style={{ fontSize: 21 }}>
           {displayPhone(user?.phoneNumber ?? "")}
         </Label>
+      </Card>
+      <Card>
+        <Label style={{ fontWeight: "600" }}>{t("callingSetup")}</Label>
+        <Label muted>{t(canCall ? "callingReady" : "callingSetupNeeded")}</Label>
+        <Button
+          title={t("callingSetup")}
+          secondary
+          testID="calling-settings"
+          onPress={() => router.push("/calling-setup")}
+        />
       </Card>
       <Card>
         <Label muted>{t("language")}</Label>
@@ -49,7 +64,7 @@ export default function Settings() {
           Alert.alert(t("deleteTitle"), t("deleteBody"), [
             { text: t("cancel"), style: "cancel" },
             {
-              text: t("continue"),
+              text: t("reviewDeletion"),
               style: "destructive",
               onPress: () => router.push("/delete-account"),
             },
@@ -57,7 +72,7 @@ export default function Settings() {
         }
       />
       <Label muted style={{ fontSize: 12 }}>
-        {t("version", { version: "0.1.0" })}
+        {t("version", { version })}
       </Label>
     </Page>
   );

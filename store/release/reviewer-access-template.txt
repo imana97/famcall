@@ -1,6 +1,9 @@
 FAMCALL — REVIEWER ACCESS
 DRAFT: fill in the pending fields and verify the instructions before submission.
 This is a preparation template, not working access information.
+Known URLs and source navigation are filled in; private access and the final
+candidate build still need verification. Do not use the earlier testing-build
+numbers below as the final review build by default.
 
 APP SUMMARY
 FamCall provides one-to-one internet voice calls between registered FamCall users.
@@ -37,20 +40,52 @@ real customer contacts.
 
 PROPOSED REVIEW STEPS — VERIFY AGAINST THE FINAL UI
 1. Open FamCall, enter review account A, and complete the supplied review sign-in.
-2. Decline contact access to exercise manual entry. Add review account B.
-3. On the second device, sign into review account B using the supplied procedure.
-4. Call B from A. Answer and check speech in both directions. End from either end.
+2. Complete the candidate's calling setup before making the first call. The next
+   source version presents "Get ready to call.", with Microphone on iPhone.
+   Android also offers optional Call alerts and, on Android 14 or later, Lock
+   screen calls. Allow Microphone to exercise voice calling. Declining Android's
+   optional alert settings must not prevent outgoing calls. iPhone uses its
+   native incoming call screen and does not request ordinary notification access.
+   Verify these labels and all permission-denial paths against the submitted
+   build. This setup is not claimed for the earlier delivered builds below.
+3. Leave contact access declined to exercise manual entry. Add review account B
+   using its complete number, including country code. Contacts are optional.
+4. On the second device, sign into review account B using the supplied procedure
+   and complete its calling setup. Call B from A, answer and check speech in
+   both directions. End from either end; repeat in the opposite direction.
 5. Lock the receiving device and repeat to review incoming calling integration.
-6. Confirm the microphone and notification permission paths are understandable.
-7. Open the implemented account-deletion path and confirm that the operation can
-   be initiated. Exact navigation and confirmation text: PENDING implementation.
+   Check background delivery separately. These steps are review instructions,
+   not a claim that every background/system state has already been qualified.
+6. Open Settings > Delete account. The source flow shows "Delete your FamCall
+   account?" and explains that deletion removes the account, saved people,
+   blocked numbers and FamCall call history. Continue to number verification,
+   then use "Delete permanently". Confirm the final candidate's labels and
+   supplied review verification procedure before submission. Use a disposable
+   review account for the destructive step and restore working review access
+   afterward; opening the screen alone does not verify completed deletion.
 
 OTHER SUBMISSION FIELDS
-Live support URL: PENDING
-App-specific privacy policy URL: PENDING
-External account-deletion request URL: PENDING
-Export-compliance answer: PENDING review of final media/authentication stack
-Special hardware or environment needed: PENDING, expected two networked phones
+Live support URL: https://famcall.web.app/ (contains the support email link)
+App-specific privacy policy URL: https://famcall.web.app/privacy
+External account-deletion request URL: https://famcall.web.app/delete-account
+Export-compliance answer: the owner-approved standard-encryption answer, with
+no France distribution for now, cleared internal build 2 and was reused for
+build 3. See encryption-answer.txt. Public-release review remains PENDING;
+reassess if encryption or distribution changes.
+Special hardware or environment needed: two internet-connected supported phones
+for two-endpoint calling. Exact reviewer devices, OS support and any test-only
+endpoint instructions: PENDING verification against the final build.
+
+KNOWN TESTING DELIVERY — NOT THE FINAL REVIEW CANDIDATE
+TestFlight 0.1.0 (3), owner group, and Google Play internal 0.1.0 (4) were
+verified delivered from fecda429 by protected workflow 42336889833. See
+testing-delivery-2026-11-07.json. New icon and calling-setup work requires a new
+build. The Android tester opt-in link is
+https://play.google.com/apps/internaltest/4700744436494600533
+and requires the configured tester account. This is not public review access.
+The website/policy/deletion pages are live; recorded delivery is in
+website-delivery-2026-11-07.json and the latest read-only check is in
+pre-submission-progress-2026-11-07.json.
 
 Do not copy this document's PENDING entries into a submission. Confirm access
 immediately before submission and keep the test service running during review.

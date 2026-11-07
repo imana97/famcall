@@ -1,0 +1,76 @@
+FAMCALL — UI AND SETUP VERIFICATION
+7 November 2026. Local development evidence; not public-release qualification.
+
+Final application source: b6204c032308d98f10eb3b97caeb36ccfa03f20b
+The source includes the approved Signal bridge icon across launcher, splash,
+notification, native call screen, website and store assets. Existing colors and
+English-first, LTR translation catalog remain in place.
+
+AUTOMATED AND NATIVE CHECKS
+130 tests in 17 files passed against the isolated Firebase Auth, Firestore and
+Functions emulators, including rules, concurrent/idempotent account deletion,
+call preflight cancellation and permission readiness. Lint, typecheck and both
+native release-mode E2E builds passed. The final b6204c0 GitHub Quality run also
+passed: https://github.com/silvergrid/famcall/actions/runs/42347460402
+Later changes to setup footer, numeric keyboard test dismissal, tab sizing and
+permission-status copy were verified through native UI runs and fresh Quality.
+
+ANDROID
+Android 16 / API 36 emulator; 1080x1920 pixels, 360x640 dp. Denied microphone
+access returned calling to setup without a new prompt or a server call record.
+Granting it in setup enabled a foreground outgoing attempt. Denied optional
+notifications/full-screen access did not block that attempt; the local backend
+reached ringing, and ending the attempt recorded cancellation.
+Manual 00-prefixed entry stored the canonical + number. Keyboard dismissal,
+search no-match/clear, history, block/unblock and returning from Android's
+full-screen settings passed. Light/dark appearance and text scales 2.0 and 3.0
+were inspected. The tab-label clipping found during review was fixed and retested.
+Final b6204c0 passed the 30-step normal capture flow. Incoming and missed history
+rows include explicitly seeded fictional display fixtures, not real call proof.
+APK SHA-256: 32ab8229b927c6d29b582884b1308c1a5314c3269547600049a37e98f213fe29
+
+IPHONE
+iPhone SE (3rd generation), iOS 18.6, 750x1334, plus iPhone 17 Pro Max,
+iOS 26.5, 1320x2868, and a medium Dynamic Island simulator at 1206x2622.
+Phone signup used the local Auth emulator only.
+The native numeric-keyboard Done control dismisses the keyboard. Setup appears
+before calling and requests microphone access through the native prompt; it
+correctly does not request ordinary iOS notification permission.
+Denying the microphone still permits browsing and adding a contact. A subsequent
+call attempt returned to setup without creating a server call. A 00-prefixed
+manual contact was normalized. Re-enabling the microphone in native Settings
+was reflected after iOS relaunched the app. Settings and setup displayed the
+allowed state. Light/dark screens and the largest Dynamic Type size were
+inspected on the small display. The setup helper now scrolls and its primary
+action remains reachable; the tab bar grows and wraps labels at very large text.
+Final b6204c0 large/medium signup, native permission grant and capture flows passed.
+The local outgoing call after permission recovery was cancelled by iOS Simulator's
+missing native in-call UI host, not by microphone preflight. Exact native/service
+evidence is in ios-simulator-callkit.json. It is not a successful voice-call test.
+
+CAPTURE AND HARNESS NOTES
+Store drafts are captures of the running E2E app, with fictional identities.
+Where required, the fully opaque PNG alpha channel was removed without changing
+any pixel color, with equality verified. No app-interface content was edited.
+Android SystemUI and iOS status-bar overrides show consistent time/status icons;
+these are presentation settings, not measured connectivity or battery state.
+The capture manifest binds final screenshot files to source, dimensions and hashes.
+Native transition frames were excluded after visual review; captures were taken
+again after the interface settled.
+Early harness failures were corrected separately: iOS hideKeyboard missed the
+numeric keyboard; an unquoted 00 phone literal was interpreted as a YAML number;
+Maestro launchApp defaults altered simulator permission fixtures; an iOS Settings
+row tap did not toggle its switch; and a recovery assertion expected the old
+route after the OS relaunched the app. Those runs are not reported as app passes.
+
+LIMITS AND NEXT GATE
+No personal physical phones, real SMS or production services were used by these
+UI checks. They do not qualify two-way audio, measured network impairment,
+Bluetooth/earpiece routes, or locked/background/terminated push delivery.
+The user's earlier successful real-device audio report remains separate evidence.
+Before public submission, test the final store-signed builds with actual APNs/FCM
+calls, answer/decline, two-way audio, interruption/recovery and stale cancellation.
+Android Settings Force Stop remains an OS block until the user reopens the app;
+iOS VoIP relaunch must be tested rather than declared impossible. Permissions,
+sound/Focus settings and network availability must be respected.
+Public candidate.json remains not-ready. No public-store release is asserted.
