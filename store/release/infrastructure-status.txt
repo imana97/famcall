@@ -120,12 +120,15 @@ PREPARED / OWNER OR STORE ACTION NEEDED
   maintainer so the deployment identity does not need project IAM administration.
   Noninteractive deployment explicitly accepts the
   reviewed event-handler retry policies. Run 42322194542 attempt 3 succeeded:
-  all 13 functions are ACTIVE, all three composite indexes READY, and the website,
-  privacy, terms and account-deletion pages return HTTP 200 and match that
-  workflow's deployed source 336c6be. Revised privacy/deletion notices in PR #5
-  await a protected website deployment after review.
-  Credential-free requests to registerProfile, startCall and getIceServers return
-  UNAUTHENTICATED. This does not establish successful authenticated app calling.
+  the check found 13 ACTIVE functions, three READY composite indexes, and
+  website/policy pages returning HTTP 200 with bytes matching source 336c6be.
+  Credential-free requests to registerProfile, startCall and getIceServers
+  returned UNAUTHENTICATED. This does not establish authenticated app calling.
+- Website-only workflow 42339257054 subsequently deployed source 5ace4bb,
+  including the revised privacy and deletion notices. On 7 November 2026 at
+  04:39 UTC, all four live pages returned HTTP 200 and byte-matched that source.
+  See website-delivery-2026-11-07.json. This update did not redeploy functions
+  or publish a public-store release.
 - First owner-approved testing workflow started Android build 2, then failed
   during iOS preparation because the GitHub runner lacked the native Firebase
   plist during local entitlement resolution. Android continued on Expo, but no

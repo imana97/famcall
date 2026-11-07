@@ -108,8 +108,10 @@ REMAINING DECISIONS / EVIDENCE
 Publisher review of form categories and provider sharing; support retention and
 external ownership-verification procedure; provider IP/derived-location handling;
 actual production auth/App Check/push tests; final-candidate archives, privacy
-reports and screenshots. The proposed website clarifications must go through the
-protected website workflow after owner review. candidate.json remains not-ready.
+reports and screenshots. The revised website notices are live from source
+5ace4bb after protected workflow 42339257054; see website-delivery-2026-11-07.json.
+This hosting update does not resolve the remaining store-disclosure decisions.
+candidate.json remains not-ready.
 
 PRIMARY SOURCES (checked 7 November 2026 UTC)
 Apple definitions: https://developer.apple.com/app-store/app-privacy-details/
