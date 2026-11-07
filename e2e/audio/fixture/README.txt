@@ -30,12 +30,19 @@ The server uses a private Unix socket, never a network listener. No host hardwar
 microphone is used by either method. FAMCALL_FIXTURE_INPUT selects grpc or pulse;
 the workflow currently evaluates pulse after the grpc control failed qualification.
 Virtual host input is enabled and verified before Android opens AudioRecord.
+The pulse route explicitly sets QEMU_PA_SERVER/SOURCE/SINK and uses the emulator's
+-allow-host-audio flag, which otherwise zeroes host input even when the microphone
+state RPC is enabled. This flag is only used inside the isolated Linux runner
+after the virtual-only source guard succeeds; never add it to the Mac lab launcher.
 Selected Android audio error tags are retained to explain recorder failures;
 the disposable Android image contains no signed-in user or backend account.
 Only disposable emulator recordings and allowlisted JSON reports are uploaded.
 Debug keystores, discovery bearer tokens, raw emulator logs, and APKs are excluded.
 Artifacts expire after seven days; preserve evidence needed for a release audit.
 Partial recordings from unsuccessful runs are retained explicitly as unqualified.
+FAMCALL_FIXTURE_ATTEMPTS=1 selects a bounded diagnostic pilot while fixing setup.
+The default is three fresh processes. A single passing sample never sets
+repeatabilityQualified; rerun all three controls before advancing to call tests.
 
 The whole 30-second reference must correlate at least 0.75 with the Android PCM.
 At least 90% of active two-second windows must independently correlate at least

@@ -31,6 +31,7 @@ EMULATOR = SDK / "emulator/emulator"
 PACKAGE = "com.silvergridtech.famcall.audiofixture"
 SERIAL = "emulator-5554"
 INPUT_METHOD = os.environ.get("FAMCALL_FIXTURE_INPUT", "grpc")
+ATTEMPTS = int(os.environ.get("FAMCALL_FIXTURE_ATTEMPTS", "3"))
 
 
 def command(*args, check=True, binary=False, timeout=30, **kwargs):
@@ -109,7 +110,10 @@ def one_run(index, pcm, reference, env, build):
                 "-gpu", "swiftshader", "-memory", "2048", "-cores", "2"]
         if INPUT_METHOD == "pulse":
             record["virtualAudio"] = verify_virtual_audio(env)
-            args.extend(["-audio", "pa"])
+            # The emulator otherwise zeroes host input even when its microphone
+            # RPC reports enabled. Only our verified virtual monitors are exposed.
+            args.extend(["-audio", "pa", "-allow-host-audio"])
+            record["hostAudioGateEnabledForVirtualSource"] = True
         else:
             args.append("-no-audio")
         with log_path.open("w") as log:
@@ -139,6 +143,12 @@ def one_run(index, pcm, reference, env, build):
         if record["installedApkSha256"] != build["apkSha256"]:
             raise RuntimeError("Installed fixture differs from build")
         adb("shell", "pm", "grant", PACKAGE, "android.permission.RECORD_AUDIO")
+        # Finish package-install notifications before native audio validates the
+        # new app identity. The failed control reported NPC "unknown uid".
+        record["packageHandlers"] = [
+            adb("shell", "cmd", "package", handler, "--timeout", "20000").stdout.strip()
+            for handler in ("wait-for-handler", "wait-for-background-handler")
+        ]
         record["stage"] = "prepare-audio-input"
         channel, stub, metadata, version = grpc_client(log_path)
         record["emulatorVersion"] = version
@@ -269,6 +279,8 @@ def main():
     RESULTS.mkdir(parents=True)
     if INPUT_METHOD not in ("grpc", "pulse"):
         raise ValueError("Use grpc or pulse for fixture input")
+    if ATTEMPTS not in (1, 3):
+        raise ValueError("Use one diagnostic attempt or three qualification attempts")
     if "emulator-" in command(ADB, "devices").stdout:
         raise RuntimeError("Expected an empty disposable runner")
     env = dict(os.environ, ANDROID_AVD_HOME=str(WORK / "avd"), XDG_RUNTIME_DIR=str(WORK / "runtime"))
@@ -286,7 +298,8 @@ def main():
             "load-module module-null-sink sink_name=famcall_output rate=48000 channels=1\n"
             "set-default-source famcall_input.monitor\nset-default-sink famcall_output\n")
         env.update(PULSE_SERVER="unix:" + str(socket), PULSE_SOURCE="famcall_input.monitor",
-                   PULSE_SINK="famcall_output")
+                   PULSE_SINK="famcall_output", QEMU_PA_SERVER="unix:" + str(socket),
+                   QEMU_PA_SOURCE="famcall_input.monitor", QEMU_PA_SINK="famcall_output")
         command("pulseaudio", "-n", "--daemonize=yes", "--exit-idle-time=-1",
                 "--file=" + str(pulse_config), "--log-target=file:" + str(WORK / "pulse.log"), env=env)
         verify_virtual_audio(env)
@@ -312,17 +325,18 @@ def main():
     provenance = {"commit": os.environ.get("GITHUB_SHA"), "sourceSha256": sha(Path(__file__)),
                   "analysisSha256": sha(ROOT / "e2e/audio/fixture_analysis.py"),
                   "referenceSha256": sha(source_path), "grpcVersion": grpc.__version__,
-                  "host": platform.platform(), "attemptCount": 3,
+                  "host": platform.platform(), "attemptCount": ATTEMPTS,
                   "inputMethod": INPUT_METHOD,
                   "scope": "Fixture qualification only; not FamCall, network impairment, or physical audio"}
     (RESULTS / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
     try:
-        records = [one_run(index, pcm, reference, env, build) for index in range(1, 4)]
+        records = [one_run(index, pcm, reference, env, build) for index in range(1, ATTEMPTS + 1)]
     finally:
         if INPUT_METHOD == "pulse":
             command("pulseaudio", "--kill", env=env, check=False)
     passed = all(r["passed"] for r in records)
-    summary = {"passed": passed, "attempts": 3, "passes": sum(r["passed"] for r in records),
+    summary = {"passed": passed, "attempts": ATTEMPTS, "passes": sum(r["passed"] for r in records),
+               "repeatabilityQualified": ATTEMPTS == 3 and passed,
                "reports": [r["runId"] + "/report.json" for r in records], "scope": provenance["scope"]}
     (RESULTS / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     sys.exit(0 if passed else 1)

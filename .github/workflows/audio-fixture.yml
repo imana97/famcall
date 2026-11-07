@@ -39,9 +39,10 @@ jobs:
         run: |
           .local/fixture-venv/bin/python -m unittest discover -s e2e/audio -p test_fixture_analysis.py
           python3 e2e/audio/fixture/build.py
-      - name: Measure three fresh emulator processes
+      - name: Measure generated input on a fresh emulator
         env:
           FAMCALL_FIXTURE_INPUT: pulse
+          FAMCALL_FIXTURE_ATTEMPTS: '1'
         run: .local/fixture-venv/bin/python e2e/audio/fixture/run.py
       - name: Preserve synthetic recordings and reports
         if: always()
