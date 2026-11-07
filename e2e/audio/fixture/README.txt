@@ -96,3 +96,31 @@ ANDROID_HOME=/path/to/sdk JAVA_HOME=/path/to/jdk17 python3 e2e/audio/fixture/bui
 If all three controls pass, the next step is the actual two-emulator FamCall
 baseline, followed by constrained-link and interruption cases. Never count this
 standalone control toward those release gates.
+
+QEMU Pulse boundary observation (pulse-pipe diagnostic only)
+The optional libfamcall_pulse_observer.so records statistics from the actual
+QEMU process's pa_stream_peek/drop calls. It forwards the original arguments,
+return values, errno and PCM unchanged; it does not add a writer, move a stream,
+toggle the microphone or replace Pulse callbacks. Its fixed source is the
+guarded famcall_input pipe at the observed 44100Hz stereo S16LE QEMU boundary.
+It does not inspect other sources or formats. The normal Linux binary must
+import both Pulse symbols; runtime records also verify the next libpulse binding,
+constructor PID, source-output ID and source ID. Missing bindings/callbacks,
+route changes, lost observations or uninspected fragments are unknown evidence.
+
+prepare_observer(folder, shared_library, source_id) creates a mode-0600 JSONL
+file. Apply emulator_env(base_env) only to the guarded emulator subprocess.
+Call finish(qemu_pid, injection_started_at_ms=..., injection_finished_at_ms=...)
+after that process exits. observer_provenance(shared_library) hashes the C,
+Python helper and compiled observer. The workflow builds the shared library;
+no observer dependency is added to the production app.
+
+Statistics are limited to 600 seconds and 1024 rows, allowing the install/reboot
+period before recording. One-second rows describe the preceding interval;
+partial injection overlaps remain labeled separately. SIGTERM may skip final
+destructors, so any unflushed tail is unknown. complete means validated observed
+intervals, never full speech-window coverage. Positive nonzero peek/drop data
+only locates PCM at QEMU's Pulse boundary: startup also discards a fragment,
+and dropping data is not proof that Android received it. No native pass or
+speech threshold depends on these statistics. Only counters/peaks are retained,
+never an additional PCM recording or arbitrary process logs.
