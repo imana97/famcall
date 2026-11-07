@@ -1,7 +1,7 @@
 FAMCALL — VERIFICATION RECORD
 7 November 2026 UTC. Development/internal-testing evidence, not public release approval.
 
-LATEST TESTING DELIVERY
+VERIFIED TESTING DELIVERY AND PENDING UPDATE
 - PR #4 exact source b873d7a passed 70 JS/TS tests and 16 Python tests, typecheck,
   lint, backend build and dependency audit (zero vulnerabilities). The owner
   delegated narrow testing-rollout approvals; automated delegated PR reviews are
@@ -19,12 +19,19 @@ LATEST TESTING DELIVERY
   The signed binary contains the corrected purpose string, production push and
   App Attest entitlements, and get-task-allow=false. Apple processing is VALID,
   internal state IN_BETA_TESTING, build 2 belongs to the owner-only group, and
-  the configured owner tester is INVITED. The owner approved the saved standard-
-  encryption declaration and no France distribution for now. Reassess before
+  the configured owner tester is INSTALLED in the 7 November 2026 04:07 UTC
+  readback. The owner approved the saved standard-encryption declaration and
+  no France distribution for now. Reassess before
   France distribution or encryption changes. English TestFlight description,
   feedback address and test instructions were saved and read-back verified.
+- PR #6 and PR #7 are merged. Workflow 42336889833 is building/submitting iOS
+  build 3 and Android code 4 from fecda429. Availability and inspection of those
+  exact signed artifacts remain pending verification; the build 2/code 3 reports
+  below do not establish the update's permissions or privacy declarations.
 - https://famcall.web.app and privacy/terms/delete-account return HTTP 200 with
-  bytes matching the reviewed website sources; the live landing page was viewed.
+  bytes matching deployed source 336c6be from workflow 42322194542. The revised
+  privacy/deletion notices in PR #5 await a protected website deployment after
+  review; the live landing page was viewed.
 
 PASS
 - 25 automated local tests: 7 shared-logic tests, 7 Firestore isolation tests,

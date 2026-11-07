@@ -5,7 +5,10 @@ Status: PUBLIC LISTING DRAFT. The approved app is implemented and available thro
 Android internal testing (code 3) and owner-only TestFlight (build 2). English
 TestFlight description, feedback address and test instructions are saved and
 read-back verified. Actual development screenshots exist; final release captures
-and the full network/speech qualification remain open. No public store launch.
+and the full network/speech qualification remain open. Testing workflow
+42336889833 is building/submitting the iOS build 3 and Android code 4 update from
+fecda429; its store availability and signed-artifact checks are not yet verified
+in this record. No public store launch.
 
 Publisher: SilverGrid Technology LLC
 Support: info@silvergridtech.com
@@ -25,9 +28,11 @@ claims_requiring_release_evidence array before upload. The beta descriptions and
 release notes also require a matching working build before use.
 
 The website is live at https://famcall.web.app. Its homepage, app-specific privacy,
-terms and account-deletion pages returned HTTP 200 and matched reviewed source.
-The homepage provides the support email link. Public-store privacy declarations
-still need review against the actual app and SDK behavior.
+terms and account-deletion pages returned HTTP 200 and matched deployed source
+336c6be from protected workflow 42322194542. The revised privacy and deletion
+notices in PR #5 are not live; they require a protected website update after
+review. The homepage provides the support email link. Public-store privacy
+declarations still need review against the actual app and SDK behavior.
 
 No location-specific marketing is included. All public text uses the FamCall
 name and the weak-connection positioning. There are no claims about guaranteed

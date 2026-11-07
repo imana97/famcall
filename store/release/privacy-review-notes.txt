@@ -29,8 +29,11 @@ WHAT THE BUILD AUDIT ESTABLISHES
   A Firebase measurement connector is not proof that an Analytics feature runs.
   The debug App Check registrar is packaged by the dependency; production source
   selects Play Integrity. Availability is not proof of debug-provider activation.
-- Android code 3 has unnecessary write-contact, shared-storage and overlay
-  permissions. Reduce them before the public candidate and inspect the new AAB.
+- Historical Android code 3 has unnecessary write-contact, shared-storage and
+  overlay permissions. PR #7 removed them and verified a rebuilt native manifest;
+  the fix is merged. Workflow 42336889833 is building/submitting code 4 from
+  fecda429. Inspect that exact store AAB before marking its permissions verified.
+  Likewise, repeat the IPA inspection for build 3; retain these dated reports.
 
 PROPOSED APP STORE ANSWERS
 Data collected: Yes. No advertising, advertising measurement or data-broker

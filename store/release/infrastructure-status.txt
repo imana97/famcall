@@ -38,7 +38,8 @@ CONFIGURED
   42323018488 built and uploaded corrected build 2 from main commit 60d0406.
   Its actual signed binary has the required purpose string, production push and
   App Attest entitlements, and debugging disabled. Apple processing is VALID;
-  build 2 is IN_BETA_TESTING and the configured owner tester is INVITED.
+  build 2 is IN_BETA_TESTING. The 7 November 2026 04:07 UTC readback reports
+  the configured owner tester as INSTALLED.
   App Store Connect API credential stored in the protected GitHub release
   environment as FAMCALL_APPLE_API_KEY_JSON.
   Apple team ZGBBX2Y24U linked to the Firebase iOS app.
@@ -67,6 +68,11 @@ CONFIGURED
   workflow 42320459512 succeeded. TestFlight version 0.1.0, build 2 is available
   in the owner-only group. English test description, feedback address and
   testing instructions are saved in App Store Connect and read-back verified.
+- PR #6 (iOS native phone verification) and PR #7 (Android permission cleanup)
+  are merged. Protected testing workflow 42336889833 is building/submitting
+  iOS build 3 and Android code 4 from exact source fecda429. Their store
+  availability and signed-artifact checks are pending verification in this
+  record. Existing build 2/code 3 privacy reports remain historical evidence.
 - The owner explicitly approved Apple's standard-encryption declaration and no
   France distribution for now. It was saved for iOS build 2; Apple cleared Missing
   Compliance. Reassess the declaration before any France distribution or change
@@ -113,7 +119,9 @@ PREPARED / OWNER OR STORE ACTION NEEDED
   Noninteractive deployment explicitly accepts the
   reviewed event-handler retry policies. Run 42322194542 attempt 3 succeeded:
   all 13 functions are ACTIVE, all three composite indexes READY, and the website,
-  privacy, terms and account-deletion pages return HTTP 200 and match source.
+  privacy, terms and account-deletion pages return HTTP 200 and match that
+  workflow's deployed source 336c6be. Revised privacy/deletion notices in PR #5
+  await a protected website deployment after review.
   Credential-free requests to registerProfile, startCall and getIceServers return
   UNAUTHENTICATED. This does not establish successful authenticated app calling.
 - First owner-approved testing workflow started Android build 2, then failed

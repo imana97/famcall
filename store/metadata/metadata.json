@@ -2,7 +2,7 @@
   "schema_version": 1,
   "locale": "en-US",
   "checked_on": "2026-11-07",
-  "status": "PUBLIC LISTING DRAFT — Android internal code 3 and TestFlight build 2 are available; release screenshots, production call reliability and public-store review remain pending",
+  "status": "PUBLIC LISTING DRAFT — Android internal code 3 and TestFlight build 2 are available; delivery of the build 3/code 4 update is pending verification. Release screenshots, production call reliability and public-store review remain pending",
   "publisher": "SilverGrid Technology LLC",
   "support_email": "info@silvergridtech.com",
   "brand": {
@@ -39,7 +39,7 @@
     "support_url": "https://famcall.web.app",
     "privacy_policy_url": "https://famcall.web.app/privacy",
     "external_account_deletion_url": "https://famcall.web.app/delete-account",
-    "url_status": "Deployed through the protected backend workflow. Homepage, privacy, terms and deletion pages returned HTTP 200 and matched reviewed source on 7 November 2026 UTC. The homepage provides the support email link.",
+    "url_status": "Protected backend workflow 42322194542 deployed source 336c6be. Homepage, privacy, terms and deletion pages returned HTTP 200 and matched that source on 7 November 2026 UTC. Revised privacy and deletion notices in PR #5 are not deployed and require a protected website update after review. The homepage provides the support email link.",
     "apple_bundle_id": "com.silvergridtech.famcall",
     "android_application_id": "com.silvergridtech.famcall",
     "apple_sku": "famcall-ios",

@@ -107,13 +107,13 @@
     "Who receives it, where is it stored, how long is it kept, and what happens on deletion?"
   ],
   "must_resolve": {
-    "app_specific_privacy_policy_url": "https://famcall.web.app/privacy (live; proposed clarifications in this PR need protected website deployment after review)",
+    "app_specific_privacy_policy_url": "https://famcall.web.app/privacy (live from source 336c6be; proposed privacy/deletion clarifications in PR #5 need protected website deployment after review)",
     "terms_or_license_choice": "MIT source license; service terms draft at /terms",
     "in_app_deletion_path": "Settings → Delete account → recent phone verification → confirm",
     "external_account_deletion_url": "https://famcall.web.app/delete-account (live)",
     "deletion_verification_process": "Recent Firebase phone auth in app; ownership verification by support for external requests",
     "deletion_completion_window": "Asynchronous server retries; external support response time requires publisher policy",
-    "retained_data_and_reason": "Completion marker 30 days for retry safety; provider security/legal records per provider policy",
+    "retained_data_and_reason": "Completion marker becomes eligible for TTL removal 30 days after deletion completes, for retry safety; periodic cleanup can occur later. Ordinary log retention is 30 days; mandatory audit logs are 400 days. Provider records follow provider policy.",
     "retention_periods": "Live TTL, logging and scheduled cleanup configuration inspected; see retention-configuration-evidence.json. Expiration eligibility is not instantaneous deletion.",
     "app_privacy_answers": "Proposed per-category answers in privacy-review-notes.txt; not entered or submitted",
     "data_safety_answers": "Proposed per-category answers and unresolved sharing/audio questions in privacy-review-notes.txt; not entered or submitted",
@@ -123,7 +123,7 @@
     "required_sdk_privacy_manifests": "40 privacy-manifest files inspected in store IPA 0.1.0 (2), including nested duplicate declarations. Four required-reason API categories. Repeat on the final approved candidate; manifests do not certify completeness.",
     "reviewer_accounts_and_access": null,
     "legal_contact_details_required_by_distribution_markets": null,
-    "android_permission_minimization": "Shipped code 3 includes unused WRITE_CONTACTS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE and SYSTEM_ALERT_WINDOW from dependencies. A focused app fix and rebuilt manifest verification are pending."
+    "android_permission_minimization": "Historical store code 3 includes unused WRITE_CONTACTS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE and SYSTEM_ALERT_WINDOW from dependencies. PR #7 removed them and verified a rebuilt native manifest; the fix is merged. Workflow 42336889833 is building/submitting code 4 from fecda429; inspect that exact store AAB before marking its permissions verified."
   },
   "deletion_acceptance_checks": [
     "A signed-in user can find and initiate account deletion in the app.",

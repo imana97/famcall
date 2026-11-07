@@ -6,7 +6,9 @@ The approved UI is implemented. Native Android and iOS simulator builds and
 local automated checks pass as detailed in verification-report.txt. Store copy
 and screenshot captures remain drafts until the release candidate is validated.
 Android internal code 3 and TestFlight build 2 are available to the configured
-owner tester. Backend and website deployment succeeded. This checklist tracks
+owner tester. Testing workflow 42336889833 is building/submitting iOS build 3
+and Android code 4 from fecda429; their availability and artifact checks await
+verification. Backend and website deployment succeeded. This checklist tracks
 remaining public-submission work; internal availability is not public approval.
 
 1. PUBLISHER AND APP RECORDS
@@ -71,7 +73,9 @@ type; do not assume internal testing satisfies that separate requirement.
   stretch phone screenshots into tablet screenshots.
 - Set a live support page containing a working contact route, and confirm the
   marketing URL. The famcall.web.app site and policy/deletion pages are live and
-  verified against reviewed source; the homepage contains the support email link.
+  verified against deployed source 336c6be from workflow 42322194542; the
+  homepage contains the support email link. Revised privacy/deletion notices
+  in PR #5 still require a protected website deployment after review.
 
 5. PRIVACY, DELETION, AND DISCLOSURES
 - Inventory data processed by the app, servers, Firebase, the call provider,
