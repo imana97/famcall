@@ -5,7 +5,7 @@ on:
       scope:
         description: Reviewed deployment scope
         type: choice
-        options: [all, website, backend]
+        options: [all, website, backend, backend-permissions]
         default: all
         required: true
 permissions:
@@ -31,7 +31,9 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+        if: inputs.scope != 'backend-permissions'
       - run: npm run typecheck && npm run lint && npm run build:backend
+        if: inputs.scope != 'backend-permissions'
       - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -40,6 +42,7 @@ jobs:
         with:
           project_id: famcall
       - name: Deploy the reviewed main commit
+        if: inputs.scope != 'backend-permissions'
         env:
           DEPLOY_SCOPE: ${{ inputs.scope }}
         run: |
@@ -51,4 +54,10 @@ jobs:
           esac
           # Accept the reviewed event-handler retry policies in noninteractive CI.
           npx --yes firebase-tools@15.5.1 deploy --project famcall --only "$target" --non-interactive --force
+      - name: Reconcile private event target invocation permissions
+        if: inputs.scope != 'website'
+        run: python3 infra/ensure-event-invocation.py --project famcall --region us-east1 --apply
+      - name: Verify event target invocation permissions
+        if: inputs.scope != 'website'
+        run: python3 infra/ensure-event-invocation.py --project famcall --region us-east1
 
