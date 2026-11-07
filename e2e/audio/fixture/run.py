@@ -96,6 +96,20 @@ def read_json(name):
     return json.loads(result.stdout)
 
 
+def wait_for_boot(child, previous_boot_id=None):
+    deadline = time.monotonic() + 180
+    while time.monotonic() < deadline:
+        if child.poll() is not None:
+            raise RuntimeError("Emulator exited before boot")
+        state = adb("shell", "getprop", "sys.boot_completed", check=False, timeout=10)
+        if state.stdout.strip() == "1":
+            boot_id = adb("shell", "cat", "/proc/sys/kernel/random/boot_id", check=False).stdout.strip()
+            if re.fullmatch(r"[0-9a-f-]{36}", boot_id) and boot_id != previous_boot_id:
+                return boot_id
+        time.sleep(2)
+    raise RuntimeError("Emulator boot timed out")
+
+
 def grpc_client(log_path):
     # The emulator advertises its own discovery file; never print its bearer token.
     logs = log_path.read_text(errors="replace")
@@ -138,7 +152,7 @@ def one_run(index, pcm, reference, env, build):
         if USE_PULSE:
             record["virtualAudio"] = verify_virtual_audio(env)
             # The emulator otherwise zeroes host input even when its microphone
-            # RPC reports enabled. Only our verified virtual monitors are exposed.
+            # RPC reports enabled. Only our verified virtual sources are exposed.
             args.extend(["-audio", "pa", "-allow-host-audio"])
             record["hostAudioGateEnabledForVirtualSource"] = True
         else:
@@ -146,16 +160,7 @@ def one_run(index, pcm, reference, env, build):
         with log_path.open("w") as log:
             child = subprocess.Popen([str(x) for x in args], env=env, stdout=log, stderr=log)
         record["emulatorPid"] = child.pid
-        deadline = time.monotonic() + 180
-        while time.monotonic() < deadline:
-            if child.poll() is not None:
-                raise RuntimeError("Emulator exited before boot")
-            state = adb("shell", "getprop", "sys.boot_completed", check=False, timeout=10)
-            if state.stdout.strip() == "1":
-                break
-            time.sleep(2)
-        else:
-            raise RuntimeError("Emulator boot timed out")
+        first_boot_id = wait_for_boot(child)
         if adb("emu", "avd", "name").stdout.splitlines()[0] != "famcall_fixture":
             raise RuntimeError("Unexpected AVD; refusing to use this device")
         if adb("shell", "getprop", "ro.kernel.qemu").stdout.strip() != "1":
@@ -171,12 +176,44 @@ def one_run(index, pcm, reference, env, build):
         if record["installedApkSha256"] != build["apkSha256"]:
             raise RuntimeError("Installed fixture differs from build")
         adb("shell", "pm", "grant", PACKAGE, "android.permission.RECORD_AUDIO")
-        # Finish package-install notifications before native audio validates the
-        # new app identity. The failed control reported NPC "unknown uid".
+        # These package-manager queues do not fence AudioService's separate
+        # audioserver_lifecycle executor; retain their results as setup evidence.
         record["packageHandlers"] = [
             adb("shell", "cmd", "package", handler, "--timeout", "20000").stdout.strip()
             for handler in ("wait-for-handler", "wait-for-background-handler")
         ]
+        # AudioService initially populates native UID/package state from installed
+        # packages. Reboot once with this APK already present, avoiding reliance
+        # on the asynchronous package-added update. This is provisioning before
+        # the only measurement, not a retry after a failed recording.
+        record["stage"] = "reboot-after-install"
+        uid = adb("shell", "run-as", PACKAGE, "id", "-u").stdout.strip()
+        if not uid.isdigit():
+            raise RuntimeError("Fixture UID unavailable")
+        record["reboot"] = {"bootIdBefore": first_boot_id, "uidBefore": int(uid),
+                            "startedAt": int(time.time() * 1000)}
+        adb("reboot")
+        record["reboot"]["bootIdAfter"] = wait_for_boot(child, first_boot_id)
+        if (adb("emu", "avd", "name").stdout.splitlines()[0] != "famcall_fixture" or
+                adb("shell", "getprop", "ro.kernel.qemu").stdout.strip() != "1"):
+            raise RuntimeError("Unexpected device after reboot")
+        installed = adb("shell", "pm", "path", PACKAGE).stdout.strip().removeprefix("package:")
+        record["reboot"]["apkSha256After"] = adb("shell", "sha256sum", installed).stdout.split()[0]
+        record["reboot"]["uidAfter"] = int(adb("shell", "run-as", PACKAGE, "id", "-u").stdout.strip())
+        if (record["reboot"]["apkSha256After"] != build["apkSha256"] or
+                record["reboot"]["uidAfter"] != record["reboot"]["uidBefore"]):
+            raise RuntimeError("Fixture identity changed during reboot")
+        if adb("shell", "getprop", "ro.build.fingerprint").stdout.strip() != record["deviceFingerprint"]:
+            raise RuntimeError("Android image changed during reboot")
+        package_state = adb("shell", "dumpsys", "package", PACKAGE).stdout
+        record["reboot"]["microphonePermissionGranted"] = bool(re.search(
+            r"android\.permission\.RECORD_AUDIO: granted=true(?:,|\s|$)", package_state))
+        if not record["reboot"]["microphonePermissionGranted"]:
+            raise RuntimeError("Microphone permission did not survive reboot")
+        if adb("shell", "getprop", "init.svc.audioserver").stdout.strip() != "running":
+            raise RuntimeError("Android audio service unavailable after reboot")
+        adb("shell", "input", "keyevent", "82")
+        record["reboot"]["finishedAt"] = int(time.time() * 1000)
         record["stage"] = "prepare-audio-input"
         channel, stub, metadata, version = grpc_client(log_path)
         record["emulatorVersion"] = version

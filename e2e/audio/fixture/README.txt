@@ -1,8 +1,8 @@
 LINUX EMULATOR AUDIO CONTROL
 
 This is a diagnostic prerequisite for the FamCall call matrix. It sends generated
-speech through the Android emulator's authenticated microphone API into a separate
-Android AudioRecord app. It does not use FamCall, WebRTC, Firebase, TURN, personal
+speech through a controlled emulator input into a separate Android AudioRecord
+app. It does not use FamCall, WebRTC, Firebase, TURN, personal
 phones, or a host microphone. A pass establishes only that this input fixture
 captured matching speech for these three attempts. It is not a call-quality,
 physical-microphone, repeatability-population, or weak-network qualification.
@@ -17,9 +17,14 @@ which OS, emulator version, architecture, or timing difference caused it.
 The Audio fixture control workflow runs on a standard ubuntu-24.04 public-repo
 runner, without secrets or paid runner labels. It builds a network-free, separate
 debug APK using the Android SDK, generates nonrepeating speech with espeak-ng, and
-boots three fresh API 36 x86_64 AVD processes. Each receives one injection only.
+boots fresh API 36 x86_64 AVD processes. Each receives one injection only.
 All outcomes are retained, including failures. No automatic retry replaces them.
 The Android app also refuses hardware other than ranchu/goldfish emulators.
+After installation, each emulator reboots once before any measurement. This makes
+the fixture part of AudioService's initial native UID/package population instead
+of relying on its asynchronous package-added update, which package-manager queue
+waits do not fence. The controller verifies a new boot ID and unchanged APK/UID.
+No failed recording is retried. The previous unknown-UID failures remain failures.
 
 The grpc method starts emulators with -no-audio and temporarily injects generated
 microphone input through gRPC. The pulse method instead starts a private audio
@@ -27,8 +32,8 @@ server with exactly two virtual null sinks and no physical-device detection. Its
 only microphone sources are their virtual monitors. It verifies the source/module
 list before enabling emulator input and plays generated PCM into the input sink.
 The server uses a private Unix socket, never a network listener. No host hardware
-microphone is used by either method. FAMCALL_FIXTURE_INPUT selects grpc or pulse;
-the workflow currently evaluates pulse after the grpc control failed qualification.
+microphone is used by either method. FAMCALL_FIXTURE_INPUT selects grpc, pulse,
+or pulse-pipe.
 The pulse-pipe variant feeds a private FIFO into module-pipe-source. It exposes
 an ordinary virtual input source, with no hardware devices, and supplies generated
 PCM at real-time speed. Pulse input/output stream snapshots identify the emulator's
