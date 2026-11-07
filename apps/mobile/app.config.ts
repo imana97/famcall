@@ -52,6 +52,11 @@ const config: ExpoConfig = {
       "android.permission.CAMERA",
       "android.permission.READ_CALL_LOG",
       "android.permission.WRITE_CALL_LOG",
+      // FamCall reads a selected contact and uses app-private storage only.
+      "android.permission.WRITE_CONTACTS",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.SYSTEM_ALERT_WINDOW",
     ],
     adaptiveIcon: {
       foregroundImage: "./assets/android-icon-foreground.png",
