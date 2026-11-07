@@ -28,6 +28,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck && npm run lint
+      - name: Restore Firebase configuration for local Expo checks
+        env:
+          FAMCALL_FIREBASE_CONFIG_JSON: ${{ secrets.FAMCALL_FIREBASE_CONFIG_JSON }}
+        run: python3 scripts/restore-firebase-config.py
+      - name: Verify native app configuration before starting builds
+        working-directory: apps/mobile
+        run: npx expo config --type introspect --json > "$RUNNER_TEMP/famcall-native-config.json"
       - name: Restore protected store submission access
         env:
           FAMCALL_PLATFORM: ${{ inputs.platform }}
@@ -47,4 +54,4 @@ jobs:
         run: npx --yes eas-cli@27.5.0 build --platform "$FAMCALL_PLATFORM" --profile store --auto-submit-with-profile testing --non-interactive --wait
       - name: Remove temporary signing files
         if: always()
-        run: rm -f apps/mobile/credentials.json .local/android-signing/upload.jks .local/store-access/AuthKey.p8 .local/store-access/play-credentials.json
+        run: rm -f apps/mobile/credentials.json .local/android-signing/upload.jks .local/store-access/AuthKey.p8 .local/store-access/play-credentials.json .local/GoogleService-Info.plist .local/google-services.json "$RUNNER_TEMP/famcall-native-config.json"

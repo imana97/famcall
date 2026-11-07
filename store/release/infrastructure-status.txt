@@ -5,7 +5,8 @@ CONFIGURED
 - Public repository silvergrid/famcall; development fork imana97/famcall.
   Main requires quality checks, a code-owner review by silvergrid, and resolved
   conversations. Protected backend/release environments require silvergrid.
-- Draft implementation PR: https://github.com/silvergrid/famcall/pull/1
+- Implementation PR #1 approved by silvergrid and merged after the required
+  upstream quality check passed. Main commit d6d0e2e has the tested source tree.
 - Firebase/GCP project famcall; existing billing account; $10 monthly budget
   alerts. Alerts do not cap spending. Hosting site famcall.web.app reserved.
 - Phone authentication enabled. Provider daily send_verification_code effective
@@ -49,6 +50,11 @@ CONFIGURED
 - App Check App Attest and Play Integrity providers registered with one-hour
   tokens. Production callable functions require App Check in source. Firestore
   and Authentication enforcement require successful real-device validation.
+- Play Integrity linked to FamCall Cloud project 635297130023 after owner
+  acceptance of Google's terms. The console confirms a 10,000/day integrity
+  request allowance; this is separate from the 50/day verification-SMS quota.
+- Owner-only internal testing groups configured in Play Console and TestFlight.
+  First usable build and invitation/opt-in completion remain pending.
 - Play Integrity currently requires Play-recognized app, not Play licensing;
   this supports Play plus off-Play distribution after Play recognizes the same
   signed build. Do not promise an arbitrary unsigned/sideloaded build will pass.
@@ -72,18 +78,24 @@ CONFIGURED
 PREPARED / OWNER OR STORE ACTION NEEDED
 - Validate Firebase phone-auth APNs, DeviceCheck/App Attest, and production
   notification delivery on real devices.
-- Link Play Integrity to project famcall, register Play App Signing fingerprints,
-  configure testing recipients, and make
-  the first upload through the protected workflow. Play automatic protection
+- Register Play App Signing fingerprints and make the first upload through
+  the protected workflow. Play automatic protection
   is enabled; direct APK installation compatibility has not been validated.
-  The current Play Integrity settings page does not expose the documented
-  Link Cloud project control; no link has been confirmed.
 - Store legal identity/contact, age/audience, encryption, data safety and privacy
   declarations require publisher review. The owner confirmed Apple's account
   identity; public copy now consistently uses SilverGrid Technology LLC.
   Play's trader-status declaration requires the developer account owner.
-- Workflow files become available on the upstream repository after owner review
-  and merge. Backend workflow supports website-only deployment separately.
+- Workflows are now available on main. Backend workflow supports website-only
+  deployment separately; its first deployment awaits owner environment approval.
+- First owner-approved testing workflow started Android build 2, then failed
+  during iOS preparation because the GitHub runner lacked the native Firebase
+  plist during local entitlement resolution. Android continued on Expo, but no
+  submission was scheduled. The correction restores both native config
+  files from FAMCALL_FIREBASE_CONFIG_JSON in the protected release environment,
+  validates their project/app identities, and runs native config introspection
+  before starting builds. A clean checkout reproduced the missing-file error
+  and passed introspection after restoration. Remote Expo secret files remain
+  configured. No signing credential or Firebase config is committed.
 - Testing workflow builds Android/iOS through EAS and submits to internal testing
   and TestFlight once credentials are configured. public-release.yml promotes
   an explicit tested build using fastlane, after the candidate record contains

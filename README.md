@@ -62,6 +62,8 @@ The `backend` and `release` GitHub environments require `silvergrid` approval. C
 
 Android upload signing and iOS distribution signing are configured. The App Store listing is an unpublished draft; Play setup still needs publisher declarations. `testing-release.yml` builds and submits to the testing channels. `public-release.yml` promotes an explicit tested build only after the checked-in candidate record contains passing evidence and the owner approves the workflow. See `store/release/infrastructure-status.txt` for remaining account setup.
 
+The protected `release` environment also needs `FAMCALL_FIREBASE_CONFIG_JSON`, with an `ios` field containing the native Firebase plist text and an `android` field containing the parsed native Firebase JSON. The testing workflow restores these ignored files before Expo resolves native configuration and removes them during cleanup. Keep the matching `GOOGLE_SERVICE_INFO_PLIST` and `GOOGLE_SERVICES_JSON` secret file variables in Expo's production environment for the remote build; those remote-only files are unavailable during GitHub's initial configuration checks.
+
 ## Contributing
 
 Contributions are welcome through pull requests. The project owner, silvergrid, is the sole approving maintainer. Releases are published through protected GitHub workflows after owner approval. See [CONTRIBUTING.md](CONTRIBUTING.md).
