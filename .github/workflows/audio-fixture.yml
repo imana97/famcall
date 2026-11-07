@@ -1,0 +1,52 @@
+name: Audio fixture control
+on:
+  workflow_dispatch:
+  push:
+    branches: ['codex/qualify-linux-audio']
+    paths: ['e2e/audio/**', '.github/workflows/audio-fixture.yml']
+permissions:
+  contents: read
+concurrency:
+  group: audio-fixture-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  linux-control:
+    # Standard public-repository runners only; no paid runners or account secrets.
+    if: github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Prepare emulator and generated speech
+        run: |
+          sudo chmod a+rw /dev/kvm
+          sudo apt-get update -qq
+          sudo apt-get install -y espeak-ng ffmpeg
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;36.0.0' 'system-images;android-36;google_apis;x86_64' emulator
+          python3 -m venv .local/fixture-venv
+          .local/fixture-venv/bin/pip install -r e2e/audio/requirements.txt
+          mkdir -p .local/linux-audio-fixture/proto
+          .local/fixture-venv/bin/python -m grpc_tools.protoc -I "$ANDROID_HOME/emulator/lib" --python_out=.local/linux-audio-fixture/proto --grpc_python_out=.local/linux-audio-fixture/proto "$ANDROID_HOME/emulator/lib/emulator_controller.proto"
+          espeak-ng -s 130 -f e2e/audio/phrases.txt -w .local/linux-audio-fixture/speech.wav
+          ffmpeg -hide_banner -loglevel error -i .local/linux-audio-fixture/speech.wav -ar 48000 -ac 1 -c:a pcm_s16le .local/linux-audio-fixture/reference.wav
+      - name: Verify measurement logic and build isolated recorder
+        run: |
+          .local/fixture-venv/bin/python -m unittest discover -s e2e/audio -p test_fixture_analysis.py
+          python3 e2e/audio/fixture/build.py
+      - name: Measure three fresh emulator processes
+        run: .local/fixture-venv/bin/python e2e/audio/fixture/run.py
+      - name: Preserve synthetic recordings and reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: audio-fixture-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .local/linux-audio-fixture/results/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
