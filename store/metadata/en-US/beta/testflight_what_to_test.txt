@@ -1,12 +1,15 @@
-Use two test phones with this FamCall build installed.
+Updated in this build: the Signal bridge icon in FamCall's familiar colors, microphone setup before calling, clearer forms and search, and improved keyboard and large-text navigation.
 
-1. Verify your phone number and reopen the app. Check that you remain signed in.
-2. Add someone from contacts, then try adding a number manually with its country code. Try again with contact access declined.
-3. Call in both directions. Check that both people can hear and understand each other.
-4. Try an incoming call with the receiving phone locked and the app in the background.
-5. During a call, switch between Wi-Fi and mobile data. Briefly lose the connection, then restore it. Note whether speech returns and how long it takes.
-6. Try speakerphone, headphones, mute, declining a call, and hanging up from either end.
+Use two phones with this test build installed.
 
-Include the app build, phone model, OS version, approximate time and timezone, connection type at each end, whether a VPN was used, and the steps that caused the problem. If a diagnostic reference is shown, include it.
+1. Verify your number and complete Calling setup. Try denying microphone access: contacts and history should remain available, and a call attempt should return to setup without a surprise permission prompt. Allow the microphone from setup and retry. Android call alerts and lock-screen access are optional for outgoing calls.
+2. Reopen FamCall and check that you remain signed in. Add someone from contacts or manually with a country code. Try a 00 prefix and declined contact access. Check search, missed calls, blocking and unblocking.
+3. Check the new icon, light and dark appearance, and larger system text. Make sure navigation labels, buttons and form fields remain usable. Try dismissing the phone-number and verification-code keyboards.
+4. Call in both directions. Answer, speak both ways, use mute, speakerphone and headphones, and hang up from either end.
+5. Repeat incoming calls with the receiving phone locked, with FamCall in the background, and after swiping it away. Record each state separately, including whether it rings, how you answer and whether both people can hear.
+6. Cancel before answer, decline, let a call time out and briefly disconnect the receiver. Check for stale ringing screens.
+7. Switch between Wi-Fi and mobile data during a call. Briefly interrupt and restore the connection. Note whether speech returns and how long it takes.
 
-Do not include verification codes, passwords, other people's phone numbers, contact lists, or recordings of private conversations. Use the feedback address info@silvergridtech.com.
+Android Settings Force stop blocks incoming delivery until you reopen FamCall; it is a separate case from a recent-apps swipe. iPhone VoIP ringing after swiping the app away still needs testing on devices with this build. Record sound, Focus, notification and battery settings; FamCall must respect the phone's settings.
+
+Include the build number, phone model, OS version, approximate time and timezone, connection type at each end, whether a VPN was used, and reproduction steps. Include a diagnostic reference if shown. Do not send verification codes, passwords, other people's phone numbers, contact lists or recordings of private conversations. Send feedback through TestFlight or info@silvergridtech.com.

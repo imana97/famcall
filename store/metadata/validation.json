@@ -67,14 +67,14 @@
     },
     {
       "field": "beta.testflight_what_to_test",
-      "length": 1081,
+      "length": 2309,
       "limit": 4000,
       "unit": "characters",
       "pass": true
     },
     {
       "field": "beta.play_internal_release_notes",
-      "length": 284,
+      "length": 450,
       "limit": 500,
       "unit": "characters",
       "pass": true

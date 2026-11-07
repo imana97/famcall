@@ -3,8 +3,12 @@ Use the new TestFlight and Play internal versions recorded in the delivery file.
 Run these checks on two real phones with the app installed from those channels.
 This sheet is a pending checklist, not a completed test report.
 
+This build includes the approved Signal bridge icon in the existing colors,
+upfront microphone setup, and clearer forms, keyboards and large-text navigation.
+
 1. On a fresh setup, verify the phone number, then allow microphone access in
-   Calling setup. Android also offers optional call alerts and lock-screen access.
+   Calling setup. Android also offers optional call alerts and lock-screen access;
+   declining these optional choices must not block outgoing calls.
    Declining the microphone should leave contacts/history available and route
    any call attempt back to setup without opening a permission prompt mid-call.
 2. Call in both directions with both apps open. Answer, speak both ways, switch
@@ -12,8 +16,10 @@ This sheet is a pending checklist, not a completed test report.
 3. Repeat with the receiving phone locked, then with FamCall in the background.
    Verify native ringing, answer without unlocking unnecessarily, and two-way audio.
 4. Repeat after swiping FamCall away from the recent-apps view on each platform.
-   iOS VoIP push relaunch must be demonstrated. An Android recents swipe differs
-   from Settings Force Stop; that explicit Force Stop blocks delivery until reopen.
+   iOS VoIP push relaunch still needs device testing on this build. An Android
+   recents swipe differs from Settings Force Stop: explicit Force Stop blocks
+   delivery until FamCall is reopened. Test reopening and retry separately, and
+   record any device battery restrictions affecting the recents-swipe result.
 5. Cancel before answer, decline, let a call time out, and temporarily disconnect
    the receiver. Check that a delayed push does not leave a stale ringing screen.
 6. Check missed calls, returning calls, blocking from history, and unblocking.
@@ -22,6 +28,10 @@ This sheet is a pending checklist, not a completed test report.
    resumes automatically. Do not infer measured quality from signal-bar icons.
 8. Repeat with Bluetooth connected, sound/Focus settings changed, and microphone
    permission revoked then re-enabled. Respect the phone's user-controlled settings.
+9. Check the new icon on the home screen and in FamCall. Try light/dark appearance
+   and larger system text; confirm navigation labels and buttons stay readable.
+   Try phone-number and verification forms, dismiss their keyboards, and check
+   that country-code entry, search with no matches and clear-search stay usable.
 
 Record failures with platform, build number, foreground/background/locked state,
 time, observed screen and whether each person could hear the other. No recordings
