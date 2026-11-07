@@ -22,6 +22,7 @@ for (const check of ['twoWaySpeechAndPoorNetwork', 'interruptionAndRecovery', 'p
 execFileSync('git', ['merge-base', '--is-ancestor', candidate.sourceCommit, 'HEAD'], { cwd: root });
 execFileSync('git', ['diff', '--exit-code', candidate.sourceCommit, 'HEAD', '--',
   'apps', 'packages', 'backend', 'package.json', 'package-lock.json', '.nvmrc',
-  'firestore.rules', 'firestore.indexes.json', 'firebase.json', 'scripts/restore-android-signing.mjs'],
+  'firestore.rules', 'firestore.indexes.json', 'firebase.json', 'scripts/restore-android-signing.mjs',
+  'scripts/restore-firebase-config.py'],
 { cwd: root, stdio: 'pipe' });
 console.log(`Verified release record: ${platform} ${candidate.version}, build ${candidate[platform + 'BuildNumber']}.`);
