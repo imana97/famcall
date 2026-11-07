@@ -88,7 +88,7 @@ export const en = {
   setupRequestError: "Couldn’t open that permission. Please try again or check FamCall in your phone’s settings.",
   setupSaveError: "Couldn’t save your setup. Please try again.",
   callingSetup: "Calling setup",
-  callingReady: "Ready for calls",
+  callingReady: "Microphone allowed",
   callingSetupNeeded: "Finish setting up calls",
   errorContactName: "Add a name for this person.",
   calling: "Calling…",

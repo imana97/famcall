@@ -87,7 +87,7 @@
   "user_device_report": "user-reported-device-test-2026-11-07.json",
   "calling_setup": {
     "status": "Source implementation in progress; not included in delivered builds above",
-    "planned_review_path": "After phone verification, complete Get ready to call. Allow Microphone and Call alerts; on Android, review Lock screen calls when shown. Contacts remain optional.",
+    "planned_review_path": "After phone verification, complete Get ready to call. Allow Microphone on iPhone and Android. Android additionally offers optional Call alerts and Lock screen calls when shown; declining them must not prevent outgoing calls. iPhone uses its native call screen without ordinary notification permission. Contacts remain optional.",
     "verification_required": "Confirm the final candidate shows the documented setup, handles denial/re-enabling before calls, and presents the correct Android system settings."
   },
   "still_pending": [

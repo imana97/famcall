@@ -41,8 +41,11 @@ real customer contacts.
 PROPOSED REVIEW STEPS — VERIFY AGAINST THE FINAL UI
 1. Open FamCall, enter review account A, and complete the supplied review sign-in.
 2. Complete the candidate's calling setup before making the first call. The next
-   source version presents "Get ready to call.", with Microphone and Call alerts;
-   Android also shows Lock screen calls when system permission is required.
+   source version presents "Get ready to call.", with Microphone on iPhone.
+   Android also offers optional Call alerts and, on Android 14 or later, Lock
+   screen calls. Allow Microphone to exercise voice calling. Declining Android's
+   optional alert settings must not prevent outgoing calls. iPhone uses its
+   native incoming call screen and does not request ordinary notification access.
    Verify these labels and all permission-denial paths against the submitted
    build. This setup is not claimed for the earlier delivered builds below.
 3. Leave contact access declined to exercise manual entry. Add review account B
