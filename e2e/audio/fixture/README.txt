@@ -26,6 +26,10 @@ of relying on its asynchronous package-added update, which package-manager queue
 waits do not fence. The controller verifies a new boot ID and unchanged APK/UID,
 then grants and verifies microphone permission on the measuring boot.
 No failed recording is retried. The previous unknown-UID failures remain failures.
+The recorder uses FamCall's portrait/configuration handling so window/resource
+changes do not recreate it mid-capture. Lifecycle events are retained and a
+per-run claim prevents a recreated activity from starting a second recorder or
+overwriting PCM. A recreation remains an explicit failure, never a silent retry.
 
 The grpc method starts emulators with -no-audio and temporarily injects generated
 microphone input through gRPC. The pulse method instead starts a private audio

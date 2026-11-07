@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.content.res.Configuration;
 import android.media.AudioRecord;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -25,6 +26,20 @@ public class MainActivity extends Activity {
     runId = getIntent().getStringExtra("runId");
     if (!(Build.HARDWARE.equals("ranchu") || Build.HARDWARE.equals("goldfish")) ||
         runId == null || !runId.matches("[A-Za-z0-9_-]{1,60}")) {
+      finish();
+      return;
+    }
+    lifecycle("create");
+    try {
+      // A configuration recreation must not truncate the first recorder's PCM
+      // or launch a second capture with the same evidence identifiers.
+      if (!new File(getFilesDir(), runId + ".claim").createNewFile()) {
+        lifecycle("duplicate-refused");
+        finish();
+        return;
+      }
+    } catch (Exception error) {
+      lifecycle("claim-failed");
       finish();
       return;
     }
@@ -96,5 +111,23 @@ public class MainActivity extends Activity {
     if (!pending.renameTo(new File(getFilesDir(), name)))
       throw new IllegalStateException("Could not publish recorder status");
   }
-  @Override public void onDestroy() { active = false; super.onDestroy(); }
+  private void lifecycle(String event) {
+    if (runId == null || !runId.matches("[A-Za-z0-9_-]{1,60}")) return;
+    try (FileOutputStream file = new FileOutputStream(new File(getFilesDir(), runId + "-lifecycle.jsonl"), true)) {
+      JSONObject value = new JSONObject().put("event", event).put("at", System.currentTimeMillis())
+        .put("instance", System.identityHashCode(this)).put("pid", android.os.Process.myPid())
+        .put("isFinishing", isFinishing()).put("isChangingConfigurations", isChangingConfigurations())
+        .put("changingConfigurations", getChangingConfigurations());
+      file.write((value.toString() + "\n").getBytes(StandardCharsets.UTF_8));
+    } catch (Exception ignored) {}
+  }
+  @Override public void onConfigurationChanged(Configuration config) {
+    super.onConfigurationChanged(config);
+    lifecycle("configuration-changed");
+  }
+  @Override public void onDestroy() {
+    lifecycle("destroy");
+    active = false;
+    super.onDestroy();
+  }
 }

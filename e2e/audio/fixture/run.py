@@ -298,6 +298,11 @@ def one_run(index, pcm, reference, env, build):
         else:
             raise RuntimeError("Android recorder did not finish")
         record["native"] = native
+        lifecycle = adb("shell", "run-as", PACKAGE, "cat", "files/" + run_id + "-lifecycle.jsonl").stdout
+        record["activityLifecycle"] = [json.loads(line) for line in lifecycle.splitlines()]
+        if (sum(e["event"] == "create" for e in record["activityLifecycle"]) != 1 or
+                any(e["event"] in ("duplicate-refused", "claim-failed") for e in record["activityLifecycle"])):
+            raise RuntimeError("Recorder activity was recreated; capture is not qualified")
         if (native.get("error") or not native.get("completed") or native.get("microphoneMuted") or
                 native.get("pid") != started["pid"] or native.get("runId") != run_id):
             raise RuntimeError("Native recorder did not complete cleanly")
@@ -340,6 +345,9 @@ def one_run(index, pcm, reference, env, build):
             route_timer.join(timeout=15)
         if "deviceFingerprint" in record:
             try:
+                lifecycle = adb("shell", "run-as", PACKAGE, "cat", "files/" + run_id + "-lifecycle.jsonl", check=False)
+                if lifecycle.returncode == 0:
+                    record["activityLifecycle"] = [json.loads(line) for line in lifecycle.stdout.splitlines()]
                 # This disposable Android image has no signed-in user or backend.
                 # Keep only native audio errors, not full system or emulator logs.
                 errors = adb("logcat", "-d", "-v", "epoch", "AudioRecord:E", "AudioRecord-JNI:E",
