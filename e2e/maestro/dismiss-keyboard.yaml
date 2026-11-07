@@ -1,0 +1,14 @@
+appId: com.silvergridtech.famcall.e2e
+---
+# iOS hideKeyboard relies on a swipe that can miss on smaller number-pad screens.
+# Use FamCall's native Done control and keep Android's standard Back behavior.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "(?i)done"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard

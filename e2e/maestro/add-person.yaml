@@ -5,7 +5,7 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: contact-name
 - inputText: ${CONTACT_NAME}
-- hideKeyboard
+- runFlow: dismiss-keyboard.yaml
 - scrollUntilVisible:
     element:
       id: contact-number
@@ -13,7 +13,7 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: contact-number
 - inputText: ${CONTACT_PHONE}
-- hideKeyboard
+- runFlow: dismiss-keyboard.yaml
 - scrollUntilVisible:
     element:
       id: save-contact

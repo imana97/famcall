@@ -3,7 +3,7 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: verification-code
 - inputText: ${OTP}
-- hideKeyboard
+- runFlow: dismiss-keyboard.yaml
 - tapOn:
     id: verify-number
 - extendedWaitUntil:

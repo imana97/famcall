@@ -11,7 +11,7 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: phone-number
 - inputText: ${PHONE}
-- hideKeyboard
+- runFlow: dismiss-keyboard.yaml
 - scrollUntilVisible:
     element:
       id: send-code
