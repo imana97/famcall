@@ -1,5 +1,5 @@
 {
-  "status": "EVIDENCE-BASED DRAFT — store-signed archives and live retention settings inspected; publisher form review and remaining provider questions are still required",
+  "status": "EVIDENCE-BASED DRAFT — current TestFlight 0.1.0 (4) and Play internal 0.1.0 (5) archives from 5f72e339 inspected; publisher form review, runtime qualification and remaining provider questions are still required",
   "prepared_on": "2026-11-07",
   "publisher": "SilverGrid Technology LLC",
   "contact_email": "info@silvergridtech.com",
@@ -107,7 +107,7 @@
     "Who receives it, where is it stored, how long is it kept, and what happens on deletion?"
   ],
   "must_resolve": {
-    "app_specific_privacy_policy_url": "https://famcall.web.app/privacy (revised notice live from source 5ace4bb; protected website-only workflow 42339257054 succeeded and page bytes verified on 7 November 2026 at 04:39 UTC)",
+    "app_specific_privacy_policy_url": "https://famcall.web.app/privacy (current website/backend source 5f72e339; protected workflow 42348863699 succeeded, eight static files byte-match source and 13 functions are ACTIVE; see website-delivery-ui-refresh-2026-11-07.json. Earlier revised-notice deployment remains recorded in website-delivery-2026-11-07.json.)",
     "terms_or_license_choice": "MIT source license; service terms draft at /terms",
     "in_app_deletion_path": "Settings → Delete account → recent phone verification → confirm",
     "external_account_deletion_url": "https://famcall.web.app/delete-account (live)",
@@ -117,13 +117,13 @@
     "retention_periods": "Live TTL, logging and scheduled cleanup configuration inspected; see retention-configuration-evidence.json. Expiration eligibility is not instantaneous deletion.",
     "app_privacy_answers": "Proposed per-category answers in privacy-review-notes.txt; not entered or submitted",
     "data_safety_answers": "Proposed per-category answers and unresolved sharing/audio questions in privacy-review-notes.txt; not entered or submitted",
-    "encryption_export_answers": "Owner approved standard encryption with no France distribution for TestFlight build 2; build 3 reused that answer, as verified in App Store Connect. See encryption-answer.txt. Reassess before France distribution or changed encryption; public-release compliance remains pending.",
+    "encryption_export_answers": "Owner approved standard encryption with no France distribution for TestFlight build 2; build 3 reused that answer. Build 4 reused the existing answer automatically, with App Store Connect usesNonExemptEncryption=false. See encryption-answer.txt and testing-delivery-ui-refresh-2026-11-07.json. No new classification or distribution approval; reassess before France distribution or changed encryption. Public-release compliance remains pending.",
     "age_and_target_audience_answers": null,
     "ads_declaration": "No ads implemented; publisher to confirm final submission",
-    "required_sdk_privacy_manifests": "40 privacy-manifest files inspected in store IPA 0.1.0 (2), including nested duplicate declarations. Four required-reason API categories. Repeat on the final approved candidate; manifests do not certify completeness.",
+    "required_sdk_privacy_manifests": "Current store IPA 0.1.0 (4) contains 40 privacy-manifest files, including nested duplicates. Its collected-data declarations, tracking declarations, required-reason API union and inspected configuration are unchanged from build 2; no inspected manifest declares tracking or tracking domains. Four required-reason API categories. See ios-build-4-privacy.json; static declarations do not certify runtime behavior or completeness. Recheck the final approved candidate after changes.",
     "reviewer_accounts_and_access": null,
     "legal_contact_details_required_by_distribution_markets": null,
-    "android_permission_minimization": "Historical store code 3 includes unused WRITE_CONTACTS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE and SYSTEM_ALERT_WINDOW from dependencies. PR #7 removed them and verified a rebuilt native manifest. Code 4 from fecda429 is delivered through workflow 42336889833, and Play received the expected bundle hash. The historical code 3 report does not describe code 4; retain a fresh manifest/privacy audit for the final candidate."
+    "android_permission_minimization": "Historical store code 3 includes unused WRITE_CONTACTS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE and SYSTEM_ALERT_WINDOW. PR #7 removed them; earlier code 4 delivery from fecda429 remains recorded under workflow 42336889833. The fresh code 5 AAB audit confirms all four are absent, no permissions were added relative to code 3, and selected Firebase components/SDK metadata are unchanged. Play received the same SHA-256 as the audited code 5 AAB. See android-build-5-privacy.json and testing-delivery-ui-refresh-2026-11-07.json; runtime and final disclosure qualification remain pending."
   },
   "deletion_acceptance_checks": [
     "A signed-in user can find and initiate account deletion in the app.",
@@ -144,6 +144,10 @@
     "https://firebase.google.com/docs/firestore/ttl"
   ],
   "evidence_files": [
+    "ios-build-4-privacy.json",
+    "android-build-5-privacy.json",
+    "testing-delivery-ui-refresh-2026-11-07.json",
+    "website-delivery-ui-refresh-2026-11-07.json",
     "ios-build-2-privacy.json",
     "android-build-3-privacy.json",
     "retention-configuration-evidence.json",

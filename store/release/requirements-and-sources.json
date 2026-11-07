@@ -188,8 +188,8 @@
   },
   "pending": [
     "Measured weak-network and interruption/recovery results for the final candidate; the positive user report does not replace this matrix",
-    "Real screenshots matching the candidate build",
-    "Final-candidate privacy inventory, disclosures and consistency with the live policy",
+    "Signed-candidate comparison and final selection of the twelve refreshed development screenshot drafts",
+    "Runtime/provider privacy review, final disclosures and consistency with the live policy; refresh inventory if the public candidate changes",
     "Actual store data, content, age and public-release encryption declarations",
     "Private reviewer credentials, reachable second endpoint and complete contact details",
     "Recheck current store agreements and permissions before public submission; testing submission access is already demonstrated",
@@ -200,7 +200,7 @@
   "verified_preparation": {
     "hosting": {
       "status": "live",
-      "record": "website-delivery-2026-11-07.json",
+      "record": "website-delivery-ui-refresh-2026-11-07.json",
       "urls": [
         "https://famcall.web.app/",
         "https://famcall.web.app/privacy",
@@ -210,24 +210,32 @@
       "limit": "Hosting availability does not establish final-candidate privacy disclosures or completion of the support/deletion process."
     },
     "testing_submission_access": {
-      "status": "demonstrated by completed protected submissions",
-      "record": "testing-delivery-2026-11-07.json",
-      "source_commit": "fecda4296f7c1e64576b172d8d170e0883ad958b",
-      "ios": "TestFlight 0.1.0 (3), owner group, VALID/IN_BETA_TESTING",
-      "android": "Google Play internal 0.1.0 (4), completed",
-      "limit": "Earlier test builds; no new icon/setup build or public-store approval is established."
+      "status": "Verified updated protected submissions and store readback",
+      "record": "testing-delivery-ui-refresh-2026-11-07.json",
+      "source_commit": "5f72e33936aa5839b89ec8a5504a4e309888cab3",
+      "ios": "TestFlight 0.1.0 (4), owner group, VALID/IN_BETA_TESTING",
+      "android": "Google Play internal 0.1.0 (5), completed; received bundle hash matches",
+      "limit": "Testing delivery and static archive checks only; no latest installation, production call qualification or public-store approval."
     },
     "current_icon": {
       "concept": "Signal bridge",
-      "source_commit": "96c0a65",
+      "source_commit": "5f72e33936aa5839b89ec8a5504a4e309888cab3",
       "master": "brand/famcall-glyph.svg",
-      "status": "Prepared and locally validated; not yet delivered in a new testing build or deployed website",
-      "evidence": "pre-submission-progress-2026-11-07.json"
+      "status": "Delivered in iOS4/Android5 testing builds and live website; extracted native icons visually checked",
+      "evidence": "testing-delivery-ui-refresh-2026-11-07.json"
     },
     "user_device_report": {
       "status": "Positive user-reported call on real iPhone and Android under a reportedly poor connection",
       "record": "user-reported-device-test-2026-11-07.json",
       "limit": "Exact builds, phone models, operating systems and measured network conditions were not supplied; not an automated or complete background/push qualification."
+    },
+    "signed_archive_privacy": {
+      "status": "Current testing archives inventoried",
+      "reports": [
+        "ios-build-4-privacy.json",
+        "android-build-5-privacy.json"
+      ],
+      "limit": "Static inventory; runtime/provider review and store form decisions remain pending."
     }
   }
 }

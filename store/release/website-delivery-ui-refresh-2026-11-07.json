@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-11-07T06:56:27.115070+00:00",
+  "scope": "Successful backend/website workflow and exact live website asset verification. This establishes current Signal bridge website delivery, not production calling or public-store approval.",
+  "source_commit": "5f72e33936aa5839b89ec8a5504a4e309888cab3",
+  "workflow": {
+    "name": "backend.yml",
+    "run": 42348863699,
+    "url": "https://github.com/silvergrid/famcall/actions/runs/42348863699",
+    "deployment_scope": "all",
+    "conclusion": "success"
+  },
+  "pages_and_assets": [
+    {
+      "url": "https://famcall.web.app/",
+      "sourcePath": "website/index.html",
+      "httpStatus": 200,
+      "sha256": "c71978c5a62ff300b8026b8ea56ac6bf88bd16702f89dd16d9f1affa2bba0e5a",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/privacy",
+      "sourcePath": "website/privacy.html",
+      "httpStatus": 200,
+      "sha256": "8e2020a60a0fb5217ac6d294661922b4c6e6ab07b41dbbccc5950fda3b22f293",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/terms",
+      "sourcePath": "website/terms.html",
+      "httpStatus": 200,
+      "sha256": "43b4d4f113587e1a8a94cfef396c96c3f8f4911a42dcf008e71e564d43b8352b",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/delete-account",
+      "sourcePath": "website/delete-account.html",
+      "httpStatus": 200,
+      "sha256": "c77996955618fbaf3bf3697844da44a446645cd016a7c06d0a450a83826c1b2e",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/style.css",
+      "sourcePath": "website/style.css",
+      "httpStatus": 200,
+      "sha256": "9d3dcde7b39b3e493c5427d6daf8d418a70443867a31e15b61f43414cff64957",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/assets/icon.svg",
+      "sourcePath": "website/assets/icon.svg",
+      "httpStatus": 200,
+      "sha256": "bd0c5bab17a5ae138a922e3ba6b69a42c339655ddfce18a5fe39703a951101cd",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/assets/glyph.svg",
+      "sourcePath": "website/assets/glyph.svg",
+      "httpStatus": 200,
+      "sha256": "e902635acedaa44d8a2f64e2c4cdfbe770b7aa7228b6ae0ce41bbef259244ac4",
+      "matchesSource": true
+    },
+    {
+      "url": "https://famcall.web.app/assets/familiar-voices.webp",
+      "sourcePath": "website/assets/familiar-voices.webp",
+      "httpStatus": 200,
+      "sha256": "86f8ec8b326f11ab5fceb7727bfbeb780e465f5aaa06b387d2e2f83b6df0a9b8",
+      "matchesSource": true
+    }
+  ],
+  "brand": "Approved Signal bridge icon and glyph; original forest-green, cream and sage palette.",
+  "backend_readback": {
+    "checked_at": "2026-11-07T06:56:37.175562+00:00",
+    "function_count": 13,
+    "states": [
+      "ACTIVE"
+    ],
+    "latest_update_time": "2026-11-07T06:55:04.223075348Z"
+  }
+}

@@ -1,5 +1,8 @@
-Initial FamCall internal test build.
+New in this test build:
+- Signal bridge icon in FamCall's familiar colors.
+- Microphone setup before calling.
+- Clearer forms, keyboard behavior and navigation at larger text sizes.
 
-Includes phone-number verification, manual and device-contact entry, outgoing and incoming one-to-one voice calls, call controls, and reconnection after supported network interruptions.
+Please test incoming calls while locked, in the background and after swiping FamCall away. Android Settings Force stop blocks delivery until you reopen the app. iPhone calling after a swipe away still needs device testing.
 
-This version is intended for testing before public release.
+This is a test build, not a public release.

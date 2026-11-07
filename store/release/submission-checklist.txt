@@ -5,12 +5,17 @@ CURRENT STATE
 The approved UI is implemented. Native Android and iOS simulator builds and
 local automated checks pass as detailed in verification-report.txt. Store copy
 and screenshot captures remain drafts until the release candidate is validated.
-Android internal code 4 and TestFlight build 3 from fecda429 are available to the
-configured owner tester. Testing workflow 42336889833 succeeded; store readbacks
-and the received Android bundle hash are recorded in testing-delivery-2026-11-07.json.
-Delivery does not establish production call behavior or final-candidate privacy
-review. Backend and website deployment succeeded. This checklist tracks
-remaining public-submission work; internal availability is not public approval.
+Android internal code 5 and TestFlight build 4 from 5f72e339 are available to the
+configured owner tester. Protected testing workflow 42348865146 succeeded;
+TestFlight is VALID/IN_BETA_TESTING with notes read back, and Play internal is
+completed with the expected AAB hash. See
+testing-delivery-ui-refresh-2026-11-07.json. Fresh static archive reports are
+ios-build-4-privacy.json and android-build-5-privacy.json. No tester installation,
+store-installed push/audio behavior or final privacy-label qualification is
+established. Website/backend workflow 42348863699 also succeeded; eight static
+files byte-match source and 13 functions are ACTIVE. This checklist tracks
+remaining public-submission work; candidate.json remains not-ready. Historical
+build 3/code 4 delivery remains in testing-delivery-2026-11-07.json.
 
 1. PUBLISHER AND APP RECORDS
 - Use the developer account belonging to SilverGrid Technology LLC. Confirm
@@ -24,7 +29,8 @@ remaining public-submission work; internal availability is not public approval.
   any current declarations from the real product. Do not infer an age rating
   or children-directed audience from the word "Fam" or family photography.
 - The owner approved no France distribution for now, and Apple's standard-
-  encryption declaration was saved for build 2 and reused for build 3; see
+  encryption declaration was saved for build 2, reused for build 3 and reused
+  automatically for build 4 (usesNonExemptEncryption=false); see
   encryption-answer.txt. Revisit it before changing
   encryption or offering the app in France. Public-release review remains open.
 
@@ -75,9 +81,11 @@ type; do not assume internal testing satisfies that separate requirement.
   stretch phone screenshots into tablet screenshots.
 - Set a live support page containing a working contact route, and confirm the
   marketing URL. The famcall.web.app site and policy/deletion pages are live and
-  verified against deployed source 5ace4bb from website-only workflow
-  42339257054; the homepage contains the support email link. The revised
-  privacy/deletion notices are live. See website-delivery-2026-11-07.json.
+  byte-matched across eight static files to source 5f72e339 after protected
+  website/backend workflow 42348863699; the homepage contains the support email
+  link and the revised privacy/deletion notices remain live. See
+  website-delivery-ui-refresh-2026-11-07.json. The earlier revised-notice delivery
+  from 5ace4bb is retained in website-delivery-2026-11-07.json.
 
 5. PRIVACY, DELETION, AND DISCLOSURES
 - Inventory data processed by the app, servers, Firebase, the call provider,
