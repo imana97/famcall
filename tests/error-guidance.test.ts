@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { PhoneError } from "@famcall/core";
-import { errorMessage } from "../apps/mobile/src/services/errors";
+import { callStartError, errorMessage } from "../apps/mobile/src/services/errors";
 
 const generic = "Couldn’t finish that. Please try again.";
 
 describe("error guidance across app operations", () => {
   it.each([
     { code: "functions/permission-denied" }, // Expired call or account deletion.
+    { code: "permission-denied" }, // Native Firebase Functions 27 uses bare codes.
     { code: "firestore/permission-denied" }, // Reading history or contacts.
     { code: "functions/unauthenticated" }, // Auth/App Check validation.
     { code: "ERR_MISSING_PERMISSION" }, // Native contacts operation.
@@ -17,7 +18,7 @@ describe("error guidance across app operations", () => {
     expect(errorMessage(error)).toBe(generic);
   });
 
-  it.each(["functions/resource-exhausted", "firestore/resource-exhausted", "auth/too-many-requests"])(
+  it.each(["resource-exhausted", "functions/resource-exhausted", "firestore/resource-exhausted", "auth/too-many-requests"])(
     "explains throttling without claiming an SMS quota for %s", code => {
       expect(errorMessage({ code })).toBe("Too many attempts. Please wait before trying again.");
     },
@@ -39,18 +40,27 @@ describe("error guidance across app operations", () => {
       { code: "functions/unavailable", message: "blocked recipient", details: { phone: "+12025550101" } },
       { code: "functions/unavailable", message: "unregistered recipient" },
     ];
-    expect(responses.map(error => errorMessage(error, "call-start")))
+    expect(responses.map(error => errorMessage(callStartError(error))))
       .toEqual(Array(2).fill("Couldn’t connect right now. Please try again shortly."));
   });
 
-  it("limits busy-call guidance to a start-call conflict", () => {
-    const error = { code: "functions/failed-precondition" };
-    expect(errorMessage(error, "call-start")).toBe("Another call is in progress.");
-    expect(errorMessage(error)).toBe(generic); // A device registration can also use this code.
-    expect(errorMessage({ code: "firestore/failed-precondition" }, "call-start")).toBe(generic);
+  it.each(["failed-precondition", "functions/failed-precondition"])(
+    "limits busy-call guidance to the startCall API boundary: %s", code => {
+      const error = { code };
+      expect(errorMessage(callStartError(error))).toBe("Another call is in progress.");
+      expect(errorMessage(error)).toBe(generic); // A device registration can also use this code.
+      expect(errorMessage(callStartError({ code: "firestore/failed-precondition" }))).toBe(generic);
+    },
+  );
+
+  it("preserves other startCall failures without turning them into a busy conflict", () => {
+    const network = { code: "unavailable" };
+    expect(callStartError(network)).toBe(network);
+    expect(errorMessage(callStartError(network)))
+      .toBe("Couldn’t connect right now. Please try again shortly.");
   });
 
-  it.each(["auth/network-request-failed", "functions/deadline-exceeded", "firestore/deadline-exceeded"])(
+  it.each(["auth/network-request-failed", "deadline-exceeded", "functions/deadline-exceeded", "firestore/deadline-exceeded"])(
     "provides connection guidance for %s", code => {
       expect(errorMessage({ code })).toBe("Check your connection and try again.");
     },

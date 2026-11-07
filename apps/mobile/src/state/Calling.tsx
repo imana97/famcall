@@ -22,7 +22,7 @@ import { NativeCallCoordinator } from "../services/NativeCallCoordinator";
 import { OutgoingCallAttempt } from "../services/OutgoingCallAttempt";
 import { recordTestMetric, waitForTestCallStart } from "../services/e2eDiagnostics";
 import { VoicePeer, type VoiceState } from "../services/VoicePeer";
-import { errorMessage, type ErrorContext } from "../services/errors";
+import { callStartError, errorMessage } from "../services/errors";
 import {
   flushCallOutbox,
   hasEndedLocally,
@@ -82,7 +82,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     current.current = { ...current.current, ...patch };
     setView(current.current);
   };
-  const fail = (e: unknown, context?: ErrorContext) => update({ error: errorMessage(e, context) });
+  const fail = (e: unknown) => update({ error: errorMessage(e) });
   const applyMute = (muted: boolean) => {
     peer.current?.mute(muted);
     update({ muted });
@@ -208,7 +208,8 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       nativeEnded: systemId => endedNativeIds.current.has(systemId),
       create: async () => {
         await waitForTestCallStart("before-request", id);
-        const call = await api<CallRecord>("startCall", { phone, requestId: id });
+        const call = await api<CallRecord>("startCall", { phone, requestId: id })
+          .catch(error => { throw callStartError(error); });
         await waitForTestCallStart("after-response", id);
         return call;
       },
@@ -243,7 +244,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         const call = current.current.call;
         if (call?.id === id && !isTerminal(call.status))
           update({ call: { ...call, status: "failed", endedAtMs: Date.now() } });
-        fail(error, "call-start");
+        fail(error);
       },
     });
     outgoing.current = attempt;

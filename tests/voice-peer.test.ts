@@ -153,17 +153,19 @@ describe("microphone failure guidance", () => {
     },
   );
 
-  it("does not turn a relay authorization error into microphone guidance", async () => {
-    const denied = { code: "functions/permission-denied" };
-    mocks.api.mockImplementation(async (method: string) => {
-      if (method === "getIceServers") throw denied;
-      return { active: true };
-    });
-    const error = await voice.start().catch(error => error);
-    expect(error).toBe(denied);
-    expect(mocks.getUserMedia).not.toHaveBeenCalled();
-    expect(errorMessage(error)).toBe("Couldn’t finish that. Please try again.");
-  });
+  it.each(["permission-denied", "functions/permission-denied"])(
+    "does not turn relay authorization into microphone guidance: %s", async code => {
+      const denied = { code };
+      mocks.api.mockImplementation(async (method: string) => {
+        if (method === "getIceServers") throw denied;
+        return { active: true };
+      });
+      const error = await voice.start().catch(error => error);
+      expect(error).toBe(denied);
+      expect(mocks.getUserMedia).not.toHaveBeenCalled();
+      expect(errorMessage(error)).toBe("Couldn’t finish that. Please try again.");
+    },
+  );
 
   it("does not claim a permission problem for an unavailable audio device", async () => {
     const unavailable = { name: "NotReadableError", message: "Audio device unavailable" };

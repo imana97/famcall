@@ -8,16 +8,29 @@ export class MicrophonePermissionError extends Error {
   }
 }
 
-export type ErrorContext = "general" | "call-start";
+class CallBusyError extends Error {}
 
-export function errorMessage(error: unknown, context: ErrorContext = "general"): string {
+function errorCode(error: unknown): string {
+  const value = (error as { code?: unknown } | null)?.code;
+  return typeof value === "string" ? value : "";
+}
+
+/** Apply only to a rejected startCall request, before other native call setup. */
+export function callStartError(error: unknown): unknown {
+  const code = errorCode(error);
+  return code === "failed-precondition" || code === "functions/failed-precondition"
+    ? new CallBusyError("call-busy")
+    : error;
+}
+
+export function errorMessage(error: unknown): string {
   if (error instanceof MicrophonePermissionError) return t("errorPermission");
+  if (error instanceof CallBusyError) return t("errorBusy");
   if (error instanceof PhoneError)
     return t(
       error.code === "country-code-required" ? "errorCountry" : "errorNumber",
     );
-  const value = (error as { code?: unknown } | null)?.code;
-  const code = typeof value === "string" ? value : "";
+  const code = errorCode(error);
   if (/^auth\/(invalid-verification-code|invalid-verification-id|session-expired)$/.test(code))
     return t("errorCode");
   if (code === "auth/invalid-phone-number") return t("errorNumber");
@@ -26,10 +39,6 @@ export function errorMessage(error: unknown, context: ErrorContext = "general"):
     return t("errorRateLimit");
   if (/(^|\/)(network-request-failed|network-error|deadline-exceeded)$/.test(code))
     return t("errorNetwork");
-  // Only startCall uses this callable code for an active-call conflict.
-  // Registration, Firestore and other native failures need a neutral fallback.
-  if (context === "call-start" && code === "functions/failed-precondition")
-    return t("errorBusy");
   if (/(^|\/)unavailable$/.test(code)) return t("errorUnavailable");
   // Permission errors can come from contacts, App Check or backend access.
   // Only the getUserMedia boundary can identify microphone permission denial.
