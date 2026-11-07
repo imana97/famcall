@@ -139,6 +139,19 @@ def one_run(index, pcm, reference, env, build):
         if record["installedApkSha256"] != build["apkSha256"]:
             raise RuntimeError("Installed fixture differs from build")
         adb("shell", "pm", "grant", PACKAGE, "android.permission.RECORD_AUDIO")
+        record["stage"] = "prepare-audio-input"
+        channel, stub, metadata, version = grpc_client(log_path)
+        record["emulatorVersion"] = version
+        record["protoDescriptorSha256"] = hashlib.sha256(pb.DESCRIPTOR.serialized_pb).hexdigest()
+        if INPUT_METHOD == "pulse":
+            # Make the verified synthetic device available before Android opens
+            # AudioRecord, rather than enabling its input after the recorder opens.
+            record["virtualAudio"] = verify_virtual_audio(env)
+            stub.setMicrophoneState(pb.MicrophoneState(realAudioEnabled=True), metadata=metadata, timeout=5)
+            if not stub.getMicrophoneState(Empty(), metadata=metadata, timeout=5).realAudioEnabled:
+                raise RuntimeError("Emulator refused synthetic host input")
+            record["syntheticHostInputReadyAt"] = int(time.time() * 1000)
+        record["activityLaunchStartedAt"] = int(time.time() * 1000)
         record["activityLaunch"] = adb("shell", "am", "start", "-W", "-n", PACKAGE + "/.MainActivity", "--es", "runId", run_id).stdout
         record["stage"] = "wait-for-recorder"
         deadline = time.monotonic() + 15
@@ -156,16 +169,8 @@ def one_run(index, pcm, reference, env, build):
         if started.get("rate") != 8000 or started.get("source") != 7:
             raise RuntimeError("Unexpected Android recording format")
         record["stage"] = "inject"
-        channel, stub, metadata, version = grpc_client(log_path)
-        record["emulatorVersion"] = version
-        record["protoDescriptorSha256"] = hashlib.sha256(pb.DESCRIPTOR.serialized_pb).hexdigest()
         if INPUT_METHOD == "pulse":
-            # The private server has no hardware-detection module or real device.
-            # Enable only its verified synthetic monitor as emulator host input.
             record["virtualAudio"] = verify_virtual_audio(env)
-            stub.setMicrophoneState(pb.MicrophoneState(realAudioEnabled=True), metadata=metadata, timeout=5)
-            if not stub.getMicrophoneState(Empty(), metadata=metadata, timeout=5).realAudioEnabled:
-                raise RuntimeError("Emulator refused synthetic host input")
         fmt = pb.AudioFormat(samplingRate=48000, channels=pb.AudioFormat.Mono,
                              format=pb.AudioFormat.AUD_FMT_S16, mode=pb.AudioFormat.MODE_UNSPECIFIED)
 
@@ -229,6 +234,17 @@ def one_run(index, pcm, reference, env, build):
         except Exception:
             record["partialCaptureUnavailable"] = True
     finally:
+        if "deviceFingerprint" in record:
+            try:
+                # This disposable Android image has no signed-in user or backend.
+                # Keep only native audio errors, not full system or emulator logs.
+                errors = adb("logcat", "-d", "-v", "epoch", "AudioRecord:E", "AudioRecord-JNI:E",
+                             "AudioFlinger:E", "AudioPolicyManager:E", "AudioSystem:E", "*:S").stdout
+                diagnostics = folder / "android-audio-errors.txt"
+                diagnostics.write_text(errors)
+                record["audioDiagnosticsSha256"] = sha(diagnostics)
+            except Exception:
+                record["audioDiagnosticsUnavailable"] = True
         if channel:
             channel.close()
         if child:

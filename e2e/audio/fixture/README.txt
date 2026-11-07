@@ -29,6 +29,9 @@ list before enabling emulator input and plays generated PCM into the input sink.
 The server uses a private Unix socket, never a network listener. No host hardware
 microphone is used by either method. FAMCALL_FIXTURE_INPUT selects grpc or pulse;
 the workflow currently evaluates pulse after the grpc control failed qualification.
+Virtual host input is enabled and verified before Android opens AudioRecord.
+Selected Android audio error tags are retained to explain recorder failures;
+the disposable Android image contains no signed-in user or backend account.
 Only disposable emulator recordings and allowlisted JSON reports are uploaded.
 Debug keystores, discovery bearer tokens, raw emulator logs, and APKs are excluded.
 Artifacts expire after seven days; preserve evidence needed for a release audit.
