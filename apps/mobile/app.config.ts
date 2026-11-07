@@ -62,6 +62,7 @@ const config: ExpoConfig = {
   plugins: [
     // Info.plist mods run in reverse order; apply voice-only wording after SDK plugins.
     "./plugins/withAudioOnly",
+    "./plugins/withFirebasePhoneAuth",
     "./plugins/withTestBackend",
     "expo-router",
     ["expo-localization", { supportedLocales: ["en"], supportsRTL: false }],
@@ -72,7 +73,7 @@ const config: ExpoConfig = {
           "Choose someone from your contacts to add to FamCall.",
       },
     ],
-    "expo-notifications",
+    ["expo-notifications", { enableBackgroundRemoteNotifications: true }],
     [
       "expo-build-properties",
       {
