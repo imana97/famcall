@@ -1,24 +1,32 @@
 FAMCALL — RELEASE PREPARATION
-Planning document • Checked 6 November 2026
+Planning document • Updated 7 November 2026 UTC
 
 CURRENT STATE
 The approved UI is implemented. Native Android and iOS simulator builds and
 local automated checks pass as detailed in verification-report.txt. Store copy
 and screenshot captures remain drafts until the release candidate is validated.
-No mobile release has been uploaded. This checklist tracks remaining submission
-work; it is not evidence of approval.
+Android internal code 4 and TestFlight build 3 from fecda429 are available to the
+configured owner tester. Testing workflow 42336889833 succeeded; store readbacks
+and the received Android bundle hash are recorded in testing-delivery-2026-11-07.json.
+Delivery does not establish production call behavior or final-candidate privacy
+review. Backend and website deployment succeeded. This checklist tracks
+remaining public-submission work; internal availability is not public approval.
 
 1. PUBLISHER AND APP RECORDS
 - Use the developer account belonging to SilverGrid Technology LLC. Confirm
   its legal identity, enrollment, roles, agreements, and required business details.
 - Apple record created: app 6831551843, SKU famcall-ios, version 0.1.0.
   Both platform identifiers are com.silvergridtech.famcall. Apple signing is
-  configured; Play app creation still awaits publisher declarations.
+  configured; the Play app and owner-only internal tester list are configured.
 - iPhone and Android phones are configured; iPad support is disabled. Verify
   generated minimum OS versions against the candidate build.
 - Confirm pricing, audience, countries of distribution, ads, content rating, and
   any current declarations from the real product. Do not infer an age rating
   or children-directed audience from the word "Fam" or family photography.
+- The owner approved no France distribution for now, and Apple's standard-
+  encryption declaration was saved for build 2 and reused for build 3; see
+  encryption-answer.txt. Revisit it before changing
+  encryption or offering the app in France. Public-release review remains open.
 
 2. PHONE AUTHENTICATION AND SERVICE READINESS
 - Enable the chosen Firebase phone-verification configuration and appropriate
@@ -66,7 +74,10 @@ type; do not assume internal testing satisfies that separate requirement.
 - If supported, supply the additional device-specific screenshot sets. Do not
   stretch phone screenshots into tablet screenshots.
 - Set a live support page containing a working contact route, and confirm the
-  marketing URL. The famcall.web.app site is reserved; its pages await owner-approved deployment.
+  marketing URL. The famcall.web.app site and policy/deletion pages are live and
+  verified against deployed source 336c6be from workflow 42322194542; the
+  homepage contains the support email link. Revised privacy/deletion notices
+  in PR #5 still require a protected website deployment after review.
 
 5. PRIVACY, DELETION, AND DISCLOSURES
 - Inventory data processed by the app, servers, Firebase, the call provider,

@@ -57,8 +57,8 @@ cloud('iam', 'service-accounts', 'add-iam-policy-binding', PROJECT + '@appspot.g
 build = NUMBER + '-compute@developer.gserviceaccount.com'
 cloud('projects', 'add-iam-policy-binding', PROJECT, '--member=serviceAccount:' + build, '--role=roles/cloudbuild.builds.builder', '--condition=None')
 cloud('iam', 'service-accounts', 'add-iam-policy-binding', build, '--member=serviceAccount:' + DEPLOY, '--role=roles/iam.serviceAccountUser')
-# Firebase uses the default compute identity for event delivery even when the
-# function runtime has its own account. Preconfigure these as the maintainer;
+# Firebase CLI checks the default compute identity's event-delivery roles even
+# when functions specify their own account. Preconfigure these as the maintainer;
 # the deployment account intentionally cannot change project-wide IAM policies.
 for role in ['run.invoker', 'eventarc.eventReceiver']:
     cloud('projects', 'add-iam-policy-binding', PROJECT, '--member=serviceAccount:' + build,
