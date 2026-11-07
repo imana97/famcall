@@ -87,9 +87,10 @@ PREPARED / OWNER OR STORE ACTION NEEDED
   Play's trader-status declaration requires the developer account owner.
 - Workflows are now available on main. Backend workflow supports website-only
   deployment separately; its first deployment awaits owner environment approval.
-- First owner-approved testing workflow reached Expo but failed before build
-  creation because the GitHub runner lacked the native Firebase plist during
-  local entitlement resolution. The correction restores both native config
+- First owner-approved testing workflow started Android build 2, then failed
+  during iOS preparation because the GitHub runner lacked the native Firebase
+  plist during local entitlement resolution. Android continued on Expo, but no
+  submission was scheduled. The correction restores both native config
   files from FAMCALL_FIREBASE_CONFIG_JSON in the protected release environment,
   validates their project/app identities, and runs native config introspection
   before starting builds. A clean checkout reproduced the missing-file error
