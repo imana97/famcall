@@ -16,11 +16,12 @@
     "franceSelected": false,
     "macAndVisionDistribution": false,
     "privacyResponses": "Published in App Store Connect after the owner explicitly approved Apple privacy accuracy/update agreement in chat.",
-    "publicReviewSubmitted": false,
-    "observedSubmissionState": "PREPARE_FOR_SUBMISSION",
-    "observedReleaseType": "MANUAL; the authorized public iOS workflow requests automatic release when it submits.",
+    "publicReviewSubmitted": true,
+    "observedSubmissionState": "WAITING_FOR_REVIEW",
+    "observedReleaseType": "MANUAL; direct API readback found the metadata-skipping submission did not apply automatic release. Protected correction workflow is prepared.",
     "privacyPublishedAt": "2026-11-08T17:42:48.330Z",
-    "publicSubmissionAuthorization": "Owner requested autonomous public submission and specifically approved publishing Apple privacy responses."
+    "publicSubmissionAuthorization": "Owner requested autonomous public submission and specifically approved publishing Apple privacy responses.",
+    "publicSubmissionWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42506505019"
   },
   "googlePlay": {
     "internalVersionCodeToPromote": 7,
@@ -113,7 +114,7 @@
   "limits": [
     "Owner acceptance does not claim every individual physical-device/network matrix case was reported or reproduced for 0.3.0.",
     "Static signed-archive inventories describe declarations, not a runtime privacy audit.",
-    "Google review submission is confirmed; Apple privacy responses are published and its public submission is next. Approval and public availability are not asserted.",
+    "Google and Apple review submissions are confirmed. Approval and public availability are not asserted; Apple automatic-release correction is pending verified readback.",
     "The account-owner Google trader declaration remains a separate existing-account requirement due February 1, 2027; it did not block this review submission."
   ],
   "validation": {

@@ -1,10 +1,13 @@
 /** Save private reviewer access to the exact prepared Apple version; never log credentials. */
 import { sign } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { prepareAppleReleaseMode } from './apple-release-mode.mjs';
 if (process.env.GITHUB_REPOSITORY !== 'silvergrid/famcall' || process.env.GITHUB_REF !== 'refs/heads/main' ||
     process.env.GITHUB_ACTOR !== 'silvergrid' || process.env.GITHUB_TRIGGERING_ACTOR !== 'silvergrid')
   throw new Error('Use the protected owner workflow.');
 const candidate = JSON.parse(await readFile('store/release/candidate.json','utf8'));
+const modeOnly = process.env.FAMCALL_IOS_RELEASE_MODE_ONLY === 'true';
+if (modeOnly && process.env.FAMCALL_PLATFORM !== 'ios') throw new Error('Apple release mode applies only to iOS.');
 const credentials = JSON.parse(process.env.FAMCALL_APPLE_API_KEY_JSON ?? '{}');
 const access = JSON.parse(process.env.FAMCALL_REVIEW_ACCESS_JSON ?? '{}');
 const contact = access.publisherContact;
@@ -21,13 +24,11 @@ async function apple(path, method='GET', data) {
   if (!r.ok) throw new Error('Reviewer setup failed: '+method+' '+r.status);
   return r.status===204?{}:r.json();
 }
-const versions = (await apple('/v1/apps/6831551843/appStoreVersions?filter[platform]=IOS&limit=30')).data;
-const version = versions.find(v => v.attributes.versionString === candidate.version);
-if (!version || !['PREPARE_FOR_SUBMISSION','READY_FOR_REVIEW'].includes(version.attributes.appStoreState))
-  throw new Error('The exact release must still be an editable draft.');
-const build = (await apple('/v1/appStoreVersions/'+version.id+'/build')).data;
-if (build?.attributes.version !== String(candidate.iosBuildNumber) || build.attributes.processingState !== 'VALID')
-  throw new Error('The draft has a different or unprocessed build.');
+const version = await prepareAppleReleaseMode(apple, candidate, modeOnly);
+if (modeOnly) {
+  console.log(JSON.stringify({version:candidate.version,build:candidate.iosBuildNumber,releaseType:'AFTER_APPROVAL',reviewResubmitted:false}));
+  process.exit(0);
+}
 const [a,b] = access.accounts;
 const attributes = {
   contactFirstName:contact.firstName,contactLastName:contact.lastName,contactPhone:contact.phone,contactEmail:contact.email,
