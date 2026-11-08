@@ -1,96 +1,39 @@
-FAMCALL — SCREENSHOT STORYBOARD
-Design draft • Updated 7 November 2026 • Four current panels per platform
+FAMCALL — PUBLIC SCREENSHOT SET • 0.2.0 • ENGLISH ONLY
+Updated 8 November 2026
 
-CURRENT CAPTURES
-Actual development-build screenshots from source b6204c0 are in store/assets/screenshots-draft.
-The icon, calling setup and navigation reflect the latest UI review.
-Android: people, recents, settings and add-person screens.
-iOS: people, recents, settings and add-person screens.
-The capture manifest records simulator/OS/version/locale and limitations.
-These are genuine UI captures with fictional contacts, not release screenshots.
-Recapture the signed release candidate before submission. No incoming, connected-call or reconnection panel is included while those
-validation gates remain open. An attempted Android dialing capture had already
-ended and was excluded from store assets.
+1. A little signal. A familiar voice.
+   Actual people list. Simple voice calls for imperfect connections.
+2. No saved contact? Just dial.
+   Actual bottom-sheet keypad. Calls connect to another FamCall user.
+3. Recent calls. Right here.
+   Actual history with incoming, outgoing and missed display fixtures.
+4. Your people. One simple list.
+   Actual Add a person screen, optional chosen-contact access and manual entry.
+5. Light or dark. Always familiar.
+   Actual people list in the operating system's dark theme.
+6. English or Persian. Your choice.
+   Actual language picker. Store copy remains English only.
 
-FUTURE RELEASE PANELS
-The following storyboard is conditional on the corresponding behavior passing
-on the release candidate. Omit unverified panels. Never substitute a generated
-interface or a wireframe for an actual app capture.
+EXPORTS
+Apple: six opaque RGB PNGs, 1320×2868, APP_IPHONE_67 display set.
+Play: six opaque RGB PNGs, 1080×1920; 1024×500 feature graphic; 512×512 icon.
+Original approved Apple icon: 1024×1024. Store screenshots do not contain the
+photographic illustration. Raw UI is prominent, uncropped within each composition.
 
-VISUAL DIRECTION
-Warm ivory, deep green, generous spacing, large readable headings, and one clear
-benefit per panel. Keep the real app interface prominent. Use fictional contacts
-and demo avatars. Do not expose real numbers, verification codes, personal
-notifications, or call content. Do not add fabricated testimonials, rankings,
-download counts, store badges, network test scores, or unsupported guarantees.
-For Google Play exports, keep taglines within 20% of the composition and devote
-most of the image to real UI. Do not reduce the interface to a tiny phone mockup.
+CAPTURE PROVENANCE
+Native E2E variants compiled from the current 0.2.0 app UI source. iOS simulator:
+iPhone 17 Pro Max / iOS 26.5 / 1320×2868. Android: local arm64 emulator with a
+1080×2160 display. Demo Firebase services only; no real accounts, phone numbers,
+SMS, caller names or calls. The source app UI matches the delivered 0.2.0 release;
+these captures are not a signed-store-build test or a speech/network qualification.
 
-01 — THE PEOPLE YOU CALL
-Headline: Your people. One tap away.
-Supporting line: A simple contact list for everyday conversations.
-Capture: Actual contacts screen with a small set of fictional saved contacts and
-the control that starts a voice call. Capture both platforms separately.
-Proof required: Tapping the displayed contact starts the actual outgoing flow.
+No incoming-call, connected-call or reconnection claim is simulated in a screenshot.
+No UI is generated or manually painted. Small footer text identifies illustrative
+contact/history data. Inspect preview.png and full-size exports before reusing.
 
-02 — A FAMILIAR VOICE
-Headline: A little signal. A familiar voice.
-Supporting line: Voice calling designed for imperfect connections.
-Capture: Actual active call screen with the connected person's name, live call
-duration, and implemented call controls. No simulated quality indicator.
-Proof required: Two-way intelligible speech and measured weak-network behavior.
-
-03 — RECOVERY
-Headline: A pause. Then back to talking.
-Supporting line: FamCall tries to reconnect when the connection drops.
-Capture: Actual reconnecting state triggered by a controlled interruption, then
-an optional inset of the actual recovered call. Use only if the final interface
-has this behavior and the recovery tests pass.
-Proof required: Recovery is automatic under the supported test conditions. Avoid
-implying recovery during complete or indefinite loss of internet access.
-Fallback if not implemented: Omit this panel. Do not illustrate a future feature
-as though it exists in the current version.
-
-04 — AN INCOMING CALL
-Headline: Pick up a familiar voice.
-Supporting line: Answer a call from someone who matters.
-Capture: Actual incoming call UI from the app or native calling integration on
-the specific platform. Keep native platform UI intact and plausible. No invented
-lock-screen layout or cross-platform mix of controls.
-Proof required: Ringing, answer, and decline work in the documented app states.
-
-05 — ADD SOMEONE
-Headline: Add a number. Start a conversation.
-Supporting line: Use your contacts or enter a number with its country code.
-Capture: Actual add-contact screen. Show generic fictional information or a
-masked test number. Do not show an unowned working phone number.
-Proof required: Permission-declined and manual-entry paths both work.
-
-EXPORT TARGETS
-Apple iPhone: 1206 x 2622 pixels portrait for the required Dynamic Island medium
-display set, plus 1320 x 2868 for the large display set. Opaque PNG, sRGB. These
-sizes and the medium-display requirement were checked on 7 November 2026.
-Four current images per set fit Apple's 1–10 screenshot range. If iPad support is enabled, add genuine iPad
-captures at a currently accepted 13-inch dimension; do not stretch iPhone art.
-
-Google Play phone: 1080 x 1920 pixels portrait, opaque 24-bit PNG or JPEG. Four current
-images fit the 2–8 phone screenshot range. Keep exported images within the
-documented 320–3840 pixel bounds and the 2:1 maximum dimension relationship.
-
-CHECKS BEFORE UPLOAD
-Inspect at full resolution and at store thumbnail size. Read every line. Check
-cropping, contrast, actual UI consistency, fictional data, and asset order.
-Compare captures against the release candidate's build number. Record the device,
-OS, build, locale, and capture date in the release evidence. No alpha for Apple
-screenshots. No cross-platform store logos or unsupported availability badges.
-
-OPTIONAL VIDEO
-An app preview is not required for the initial listing. If produced later, use
-real app footage and the current platform specifications. A suggested sequence
-is contacts → tap to call → incoming call → conversation → hang up. Do not use
-generated UI footage as evidence of the working product.
-
-Sources:
-https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/
-https://developer.apple.com/app-store/review/guidelines/ (2.3.3)
+SPECIFICATIONS CHECKED
+https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
+https://developer.apple.com/help/app-store-connect/reference/app-information/app-store-localizations/
+https://developer.apple.com/app-store/product-page/
 https://support.google.com/googleplay/android-developer/answer/9866151?hl=en
+https://support.google.com/googleplay/android-developer/answer/9844778?hl=en

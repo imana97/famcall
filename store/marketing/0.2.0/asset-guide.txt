@@ -1,0 +1,55 @@
+FAMCALL — LAUNCH ASSET GUIDE
+Version 0.2.0 • English only • Prepared 8 November 2026
+
+VOICE
+Direct, warm, calm. Keep the focus on calling people you know when the internet
+is imperfect. Prefer short sentences and ordinary language. Avoid audience-age
+labels, geographic targeting, reliability guarantees or security claims that the
+release evidence does not establish.
+
+BRAND
+Use the approved Signal bridge icon with its tilted cream handset and interrupted
+sage signal arcs. Keep the existing forest-green, cream and sage palette. These
+materials use the app's approved icon, not a new identity. The display artwork
+uses Arial/Helvetica so it can be reproduced without a proprietary font download.
+
+CAMPAIGN
+A little signal. A familiar voice.
+Simple voice calls, built with weak and unstable internet in mind.
+
+FILES
+social-landscape-1200x630.png — link preview, launch announcement, press image.
+social-square-1080.png — square social post.
+social-portrait-1080x1350.png — portrait feed post.
+social-story-1080x1920.png — vertical story; keep platform stickers off the text.
+family-call-photo.png — AI-generated editorial source illustration. The pictured
+people are fictional; do not describe them as customers, reviewers or a testimonial.
+launch-copy.txt — campaign line, announcements, captions, product boilerplate,
+support details and usage notes. Copy is prepared, not automatically posted.
+
+STORE FILES
+../../assets/public-0.2.0/apple/en-US/iphone-67 — six 1320×2868 iPhone panels.
+../../assets/public-0.2.0/google-play/en-US/phone — six 1080×1920 Android panels.
+../../assets/public-0.2.0/google-play/en-US/feature-graphic-1024x500.png
+../../assets/public-0.2.0/icons — opaque 1024×1024 Apple and 512×512 Play icons.
+../../assets/public-0.2.0/preview.png — review contact sheet, not a store upload.
+../../assets/public-0.2.0/manifest.json — dimensions, hashes and capture provenance.
+../../metadata/en-US — paste-ready English listing fields.
+
+PUBLICATION
+The website and its Android APK are live. Public App Store/Google Play pages are
+not yet announced. Use famcall.web.app as the CTA until those public pages exist.
+Store drafts can be saved without submitting review. Review forms, privacy/Data
+Safety declarations, reviewer access and release qualification remain separate.
+
+FACTUAL CONTEXT
+Both people need FamCall and internet access. Calls connect FamCall users rather
+than ordinary phone lines. Conditions on both phones affect calling. Data charges
+may apply. No emergency calling. The app offers English and Persian while store
+listings and launch assets are English only.
+
+REPRODUCTION
+From the repository root: npm ci --prefix store/release/tools, then set CHROME_PATH
+if necessary and run node store/release/render-assets.cjs. Replace raw captures
+with current genuine app screens when UI changes. Do not paint over or generate
+app UI. Validate with node scripts/prepare-store-drafts.mjs.

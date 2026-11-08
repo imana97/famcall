@@ -1,8 +1,8 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "locale": "en-US",
-  "checked_on": "2026-11-07",
-  "status": "PUBLIC LISTING DRAFT — Android internal code 5 and TestFlight build 4 from 5f72e339 are available, verified 7 November 2026 07:14 UTC. Updated signed-archive privacy inventories are recorded; final runtime/push qualification, signed-candidate screenshot comparison, disclosure decisions and public-store review remain pending",
+  "checked_on": "2026-11-08",
+  "status": "Public listing preparation for 0.2.0. Store review and production publication have not been requested.",
   "publisher": "SilverGrid Technology LLC",
   "support_email": "info@silvergridtech.com",
   "brand": {
@@ -14,23 +14,23 @@
   "apple": {
     "name": "FamCall: Simple Voice Calls",
     "subtitle": "Voice calls for weak networks",
-    "promotional_text": "A little signal. A familiar voice. Simple voice calls designed for weak and unstable internet connections, so you can focus on the people who matter.",
-    "keywords": "family,friends,phone,audio,low bandwidth,unstable internet,stay connected",
-    "description": "A little signal. A familiar voice.\n\nFamCall is a simple way to call the people who matter, designed with weak and unstable internet connections in mind.\n\nJust voice. Just your people.\nOpen your contacts, choose someone, and start a one-to-one voice call. Both people use FamCall, so a familiar voice is only a few taps away.\n\nGet started with your phone number\nVerify your number and stay signed in. There is no password to remember. Add people from your contacts with your permission, or enter a phone number with its country code.\n\nMade for imperfect connections\nFamCall focuses on keeping conversation understandable when bandwidth is limited. If the connection is interrupted, it tries to reconnect and shows you what is happening.\n\nKeep it simple\nOne-to-one voice calls. A clear contact list. An easy way to answer, talk, and hang up. Recent and missed calls, with blocking when you need it.\n\nBoth people need FamCall and an internet connection. Call availability and performance depend on the connection at each end. Mobile data charges may apply.\n\nQuestions or feedback? Contact info@silvergridtech.com.\n\nFamCall is developed by SilverGrid Technology LLC.",
+    "promotional_text": "A little signal. A familiar voice. Call your people with a simple app designed with weak and unstable internet in mind. English and Persian included.",
+    "keywords": "family,friends,audio,phone,low bandwidth,unstable internet,contacts,international",
+    "description": "A little signal. A familiar voice.\n\nSome conversations are worth making time for, even when the internet has other plans. FamCall keeps voice calling simple, with weak and unstable connections in mind.\n\nYOUR PEOPLE, ONE SIMPLE LIST\nAdd a name and phone number, or choose someone from your phone’s contacts. Tap a person to call. Only the contacts you choose are added.\n\nJUST WANT TO DIAL?\nOpen the keypad, enter a number with its country code, and call another FamCall user. No need to save the number first.\n\nLESS TO THINK ABOUT\nVerify your phone number once and stay signed in. No password or meeting link to remember. Clear controls for mute, speaker and ending a call keep the conversation front and center.\n\nKEEP UP WITH YOUR CALLS\nSee recent and missed calls. Edit or remove saved people, block an unwanted number, and unblock it whenever you choose.\n\nFAMILIAR IN MORE WAYS\nChoose English or Persian. Enjoy a clear light or dark appearance that follows your phone’s theme.\n\nMADE WITH IMPERFECT CONNECTIONS IN MIND\nFamCall focuses on voice. If a connection is interrupted, it tries to reconnect and shows you what is happening.\n\nBoth people need FamCall and an internet connection. Calls are between FamCall users, not ordinary telephone lines. Availability and performance depend on both connections and phone settings. Mobile data charges may apply. FamCall does not support emergency calls.\n\nQuestions or feedback? info@silvergridtech.com\nPrivacy: https://famcall.web.app/privacy\n\nDeveloped by SilverGrid Technology LLC.",
     "copyright": "2026 SilverGrid Technology LLC"
   },
   "google_play": {
     "title": "FamCall: Simple Voice Calls",
-    "short_description": "Simple voice calls designed for weak and unstable internet connections",
-    "full_description": "A little signal. A familiar voice.\n\nFamCall is a simple way to call the people who matter, designed with weak and unstable internet connections in mind.\n\nJust voice. Just your people.\nOpen your contacts, choose someone, and start a one-to-one voice call. Both people use FamCall, so a familiar voice is only a few taps away.\n\nGet started with your phone number\nVerify your number and stay signed in. There is no password to remember. Add people from your contacts with your permission, or enter a phone number with its country code.\n\nMade for imperfect connections\nFamCall focuses on keeping conversation understandable when bandwidth is limited. If the connection is interrupted, it tries to reconnect and shows you what is happening.\n\nKeep it simple\nOne-to-one voice calls. A clear contact list. An easy way to answer, talk, and hang up. Recent and missed calls, with blocking when you need it.\n\nBoth people need FamCall and an internet connection. Call availability and performance depend on the connection at each end. Mobile data charges may apply.\n\nQuestions or feedback? Contact info@silvergridtech.com.\n\nFamCall is developed by SilverGrid Technology LLC.",
+    "short_description": "Simple voice calls, built with weak and unstable internet in mind.",
+    "full_description": "A little signal. A familiar voice.\n\nSome conversations are worth making time for, even when the internet has other plans. FamCall keeps voice calling simple, with weak and unstable connections in mind.\n\nYOUR PEOPLE, ONE SIMPLE LIST\nAdd a name and phone number, or choose someone from your phone’s contacts. Tap a person to call. Only the contacts you choose are added.\n\nJUST WANT TO DIAL?\nOpen the keypad, enter a number with its country code, and call another FamCall user. No need to save the number first.\n\nLESS TO THINK ABOUT\nVerify your phone number once and stay signed in. No password or meeting link to remember. Clear controls for mute, speaker and ending a call keep the conversation front and center.\n\nKEEP UP WITH YOUR CALLS\nSee recent and missed calls. Edit or remove saved people, block an unwanted number, and unblock it whenever you choose.\n\nFAMILIAR IN MORE WAYS\nChoose English or Persian. Enjoy a clear light or dark appearance that follows your phone’s theme.\n\nMADE WITH IMPERFECT CONNECTIONS IN MIND\nFamCall focuses on voice. If a connection is interrupted, it tries to reconnect and shows you what is happening.\n\nBoth people need FamCall and an internet connection. Calls are between FamCall users, not ordinary telephone lines. Availability and performance depend on both connections and phone settings. Mobile data charges may apply. FamCall does not support emergency calls.\n\nQuestions or feedback? info@silvergridtech.com\nPrivacy: https://famcall.web.app/privacy\n\nDeveloped by SilverGrid Technology LLC.",
     "developer_name": "SilverGrid Technology LLC",
     "support_email": "info@silvergridtech.com"
   },
   "beta": {
     "testflight_description": "FamCall is a simple voice-calling app designed with weak and unstable internet connections in mind.\n\nThis internal test version focuses on phone-number signup, adding contacts, incoming calls, two-way voice, and recovery after short connection interruptions. Both callers need the test app and internet access.\n\nHelp us find the moments when a call takes too long to ring, speech becomes hard to follow, or reconnection needs improvement. Send feedback through TestFlight or email info@silvergridtech.com.\n\nThis is an early test version from SilverGrid Technology LLC. Features and performance may change before release.",
-    "testflight_what_to_test": "Updated in this build: the Signal bridge icon in FamCall's familiar colors, microphone setup before calling, clearer forms and search, and improved keyboard and large-text navigation.\n\nUse two phones with this test build installed.\n\n1. Verify your number and complete Calling setup. Try denying microphone access: contacts and history should remain available, and a call attempt should return to setup without a surprise permission prompt. Allow the microphone from setup and retry. Android call alerts and lock-screen access are optional for outgoing calls.\n2. Reopen FamCall and check that you remain signed in. Add someone from contacts or manually with a country code. Try a 00 prefix and declined contact access. Check search, missed calls, blocking and unblocking.\n3. Check the new icon, light and dark appearance, and larger system text. Make sure navigation labels, buttons and form fields remain usable. Try dismissing the phone-number and verification-code keyboards.\n4. Call in both directions. Answer, speak both ways, use mute, speakerphone and headphones, and hang up from either end.\n5. Repeat incoming calls with the receiving phone locked, with FamCall in the background, and after swiping it away. Record each state separately, including whether it rings, how you answer and whether both people can hear.\n6. Cancel before answer, decline, let a call time out and briefly disconnect the receiver. Check for stale ringing screens.\n7. Switch between Wi-Fi and mobile data during a call. Briefly interrupt and restore the connection. Note whether speech returns and how long it takes.\n\nAndroid Settings Force stop blocks incoming delivery until you reopen FamCall; it is a separate case from a recent-apps swipe. iPhone VoIP ringing after swiping the app away still needs testing on devices with this build. Record sound, Focus, notification and battery settings; FamCall must respect the phone's settings.\n\nInclude the build number, phone model, OS version, approximate time and timezone, connection type at each end, whether a VPN was used, and reproduction steps. Include a diagnostic reference if shown. Do not send verification codes, passwords, other people's phone numbers, contact lists or recordings of private conversations. Send feedback through TestFlight or info@silvergridtech.com.",
+    "testflight_what_to_test": "FamCall 0.2.0\n\nThis update brings a simpler interface, direct dialing, English and Persian, and incoming-call fixes.\n\nPlease check:\n• People: search, add, swipe to edit/remove, and update a saved phone number.\n• Dial pad: the centered button opens a bottom sheet. Enter a number with + or 00 and its country code to call another FamCall user.\n• Calls: receive and answer with the phone locked or FamCall in the background; check mute, speaker and hangup.\n• Settings: switch between English and Persian. Both use the same left-to-right layout and your choice stays saved.\n• Log out and sign back in without deleting your account.\n• Account deletion: verification and clear confirmation before permanent deletion.\n\nThe other person also needs FamCall. Network and phone settings can affect delivery. FamCall does not support emergency calls.",
     "testflight_feedback_email": "info@silvergridtech.com",
-    "play_internal_release_notes": "New in this test build:\n- Signal bridge icon in FamCall's familiar colors.\n- Microphone setup before calling.\n- Clearer forms, keyboard behavior and navigation at larger text sizes.\n\nPlease test incoming calls while locked, in the background and after swiping FamCall away. Android Settings Force stop blocks delivery until you reopen the app. iPhone calling after a swipe away still needs device testing.\n\nThis is a test build, not a public release.",
+    "play_internal_release_notes": "FamCall 0.2.0\n- Simpler people list, settings, call history and calling screens.\n- Dial any FamCall number from the new bottom-sheet keypad.\n- Edit contact names and numbers, or swipe to remove a contact.\n- Log out without deleting your account.\n- English and Persian, with the same left-to-right layout.\n- Subtle haptic feedback and clearer account verification.\n- Incoming-call and session-recovery fixes.\n\nPlease test incoming calls with the phone locked and FamCall in the background, call controls, language switching and contact editing. Android Force stop prevents incoming calls until the app is reopened.",
     "production_release_notes": "Initial FamCall release with phone-number verification, optional device-contact access, manual contact entry, one-to-one voice calls, incoming-call controls, and reconnection after supported network interruptions."
   },
   "submission_configuration": {
@@ -39,12 +39,12 @@
     "support_url": "https://famcall.web.app",
     "privacy_policy_url": "https://famcall.web.app/privacy",
     "external_account_deletion_url": "https://famcall.web.app/delete-account",
-    "url_status": "Protected backend/website workflow 42348863699 deployed source 5f72e339, including the approved Signal bridge icon. All four pages, CSS, illustration and both brand SVGs returned HTTP 200 and byte-matched that source; see website-delivery-ui-refresh-2026-11-07.json. The homepage provides the support email link.",
+    "url_status": "Website and Android APK are live. Store listing materials are being refreshed for 0.2.0.",
     "apple_bundle_id": "com.silvergridtech.famcall",
     "android_application_id": "com.silvergridtech.famcall",
     "apple_sku": "famcall-ios",
     "apple_app_id": "6831551843",
-    "initial_version": "0.1.0",
+    "initial_version": "0.2.0",
     "apple_primary_category_proposed": "Social Networking",
     "google_play_category_proposed": "Communication",
     "pricing": null,
@@ -61,7 +61,7 @@
       "encryption": "Standard encryption outside or in addition to Apple OS encryption",
       "france_distribution": false,
       "owner_approved_and_saved_on": "2026-11-07",
-      "scope": "Internal build 2 cleared Apple Missing Compliance; builds 3 and 4 reused the same approved answer. See encryption-answer.txt. Reassess before France distribution or encryption changes; public-release compliance remains pending."
+      "scope": "Internal build 2 cleared Apple Missing Compliance; builds 3, 4 and 5 reused the same approved answer. See encryption-answer.txt. Reassess before France distribution or encryption changes; public-release compliance remains pending."
     },
     "review_contact_name": null,
     "review_contact_phone": null,
@@ -91,5 +91,9 @@
     "no data collected",
     "no tracking",
     "no recordings"
-  ]
+  ],
+  "localization_notes": {
+    "stores": "English (US) only, as requested.",
+    "app": "English default; Persian available in Settings. Both retain the approved left-to-right layout."
+  }
 }
