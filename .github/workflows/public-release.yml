@@ -1,4 +1,5 @@
-name: Submit tested build for public release
+name: Prepare or submit tested public release
+run-name: ${{ inputs.initial_android_draft && 'Prepare Android production draft' || 'Submit tested build for public review' }}
 on:
   workflow_dispatch:
     inputs:

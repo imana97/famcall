@@ -42,8 +42,11 @@
     "listingAndScreenshotHashesReadBack": true,
     "advertisingIdDeclaration": "Saved: does not use advertising ID.",
     "fullScreenIntentDeclaration": "Saved: making and receiving calls; opt-in requested for pre-grant at installation, subject to Google review.",
-    "foregroundServiceDeclaration": "VoIP/telecom selected; demonstration recorded and ready for website deployment before saving the video link.",
-    "phoneCallServiceEvidence": "store/release/phone-call-service-demo-2026-11-08.json"
+    "foregroundServiceDeclaration": "Saved: VoIP/telecom with the live demonstration video URL.",
+    "phoneCallServiceEvidence": "store/release/phone-call-service-demo-2026-11-08.json",
+    "appContentDeclarationsNeedingAttention": 0,
+    "phoneCallServiceVideoDeployment": "https://github.com/silvergrid/famcall/actions/runs/42498285751",
+    "initialDraftPreparation": "Allowed while declarations remain pending, solely to create an unsubmitted production draft. Public submission still requires ready status and complete store declarations."
   },
   "googleDataSafetyInterpretation": {
     "collectedNonEphemeral": [
@@ -91,9 +94,10 @@
   ],
   "validation": {
     "automatedChecks": {
-      "passed": 242,
+      "passed": 245,
       "skipped": 0,
-      "environment": "Local demo-famcall Auth/Firestore/Functions emulators"
+      "environment": "Local demo-famcall Auth/Firestore/Functions emulators",
+      "note": "All 245 tests passed with local Firebase emulators, including three additional cases proving draft preparation cannot enable final submission or bypass quota/assets."
     },
     "googleIcon": "32-bit RGBA PNG with fully opaque alpha; Console SHA-256 matches the manifest."
   }

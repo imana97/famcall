@@ -2,9 +2,13 @@
 export const runtimeChecks = ['twoWaySpeechAndPoorNetwork', 'interruptionAndRecovery', 'physicalAndroidAndIPhone',
   'backgroundPushAndAudioRoutes', 'productionAuthAndAppCheck'];
 export const requiredChecks = [...runtimeChecks, 'smsDailyLimit', 'storePrivacyAndLegalDeclarations', 'releaseScreenshotsAndCopy'];
-export function validateReleaseCandidate(candidate, platform, ownerReport) {
+export function validateReleaseCandidate(candidate, platform, ownerReport, { initialAndroidDraft = false } = {}) {
   if (!['android', 'ios'].includes(platform)) throw new Error('Choose one public store.');
-  if (candidate.status !== 'ready') throw new Error('Release evidence is not ready.');
+  if (initialAndroidDraft && platform !== 'android') throw new Error('Initial production drafts apply only to Google Play.');
+  // Preparing Google's first draft does not submit for review or publish it.
+  // Final submission still requires ready status and complete legal evidence.
+  if (candidate.status !== 'ready' && !(initialAndroidDraft && candidate.status === 'not-ready'))
+    throw new Error('Release evidence is not ready.');
   if (!/^[a-f0-9]{40}$/.test(candidate.sourceCommit ?? '')) throw new Error('A tested source commit is required.');
   if (!/^\d+\.\d+\.\d+$/.test(candidate.version ?? '')) throw new Error('Invalid release version.');
   for (const os of ['ios','android']) if (!/^[1-9]\d*$/.test(String(candidate[os+'BuildNumber'] ?? '')))
@@ -19,6 +23,7 @@ export function validateReleaseCandidate(candidate, platform, ownerReport) {
     const evidence = check === 'storePrivacyAndLegalDeclarations' && entry?.platforms ? entry.platforms[platform] : entry;
     if (typeof evidence?.reference !== 'string' || !evidence.reference.trim()) throw new Error('Missing release evidence: '+check);
     if (evidence.result === 'pass') continue;
+    if (initialAndroidDraft && check === 'storePrivacyAndLegalDeclarations' && evidence.result === 'pending') continue;
     if (runtimeChecks.includes(check) && evidence.result === 'owner-accepted' && ownerAccepted &&
         evidence.reference === candidate.ownerAcceptanceReference) continue;
     throw new Error('Unresolved release evidence: '+check);

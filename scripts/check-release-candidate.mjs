@@ -6,7 +6,8 @@ import { validateReleaseCandidate } from './release-candidate.mjs';
 const root = resolve(import.meta.dirname, '..');
 const candidate = JSON.parse(readFileSync(resolve(root, 'store/release/candidate.json')));
 const platform = process.env.FAMCALL_PLATFORM;
-if (process.env.FAMCALL_INITIAL_PUBLIC_DRAFT === 'true' && platform !== 'android')
+const initialAndroidDraft = process.env.FAMCALL_INITIAL_PUBLIC_DRAFT === 'true';
+if (initialAndroidDraft && platform !== 'android')
   throw new Error('Initial production drafts apply only to Google Play.');
 let ownerReport;
 if (candidate.ownerAcceptanceReference) {
@@ -14,7 +15,7 @@ if (candidate.ownerAcceptanceReference) {
   if (!evidenceFile.startsWith(root + '/store/release/')) throw new Error('Owner evidence must be in the release records.');
   ownerReport = JSON.parse(readFileSync(evidenceFile, 'utf8'));
 }
-validateReleaseCandidate(candidate, platform, ownerReport);
+validateReleaseCandidate(candidate, platform, ownerReport, { initialAndroidDraft });
 // Evidence can be committed after testing, but app/backend/build inputs must match.
 execFileSync('git', ['merge-base', '--is-ancestor', candidate.sourceCommit, 'HEAD'], { cwd: root });
 execFileSync('git', ['diff', '--exit-code', candidate.sourceCommit, 'HEAD', '--',
@@ -22,4 +23,4 @@ execFileSync('git', ['diff', '--exit-code', candidate.sourceCommit, 'HEAD', '--'
   'firestore.rules', 'firestore.indexes.json', 'firebase.json', 'scripts/restore-android-signing.mjs',
   'scripts/restore-firebase-config.py'],
 { cwd: root, stdio: 'pipe' });
-console.log(`Verified release record: ${platform} ${candidate.version}, build ${candidate[platform + 'BuildNumber']}.`);
+console.log(`Verified ${initialAndroidDraft ? 'unsubmitted production draft' : 'release'} record: ${platform} ${candidate.version}, build ${candidate[platform + 'BuildNumber']}.`);
