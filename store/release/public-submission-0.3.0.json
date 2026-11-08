@@ -15,10 +15,12 @@
     "selectedTerritoryCount": 174,
     "franceSelected": false,
     "macAndVisionDistribution": false,
-    "privacyResponses": "Prepared; awaiting the browser-required confirmation of Apple's accuracy/update agreement.",
+    "privacyResponses": "Published in App Store Connect after the owner explicitly approved Apple privacy accuracy/update agreement in chat.",
     "publicReviewSubmitted": false,
     "observedSubmissionState": "PREPARE_FOR_SUBMISSION",
-    "observedReleaseType": "MANUAL; the authorized public iOS workflow requests automatic release when it submits."
+    "observedReleaseType": "MANUAL; the authorized public iOS workflow requests automatic release when it submits.",
+    "privacyPublishedAt": "2026-11-08T17:42:48.330Z",
+    "publicSubmissionAuthorization": "Owner requested autonomous public submission and specifically approved publishing Apple privacy responses."
   },
   "googlePlay": {
     "internalVersionCodeToPromote": 7,
@@ -111,7 +113,7 @@
   "limits": [
     "Owner acceptance does not claim every individual physical-device/network matrix case was reported or reproduced for 0.3.0.",
     "Static signed-archive inventories describe declarations, not a runtime privacy audit.",
-    "Google review submission is confirmed; approval and public availability are not asserted. Apple submission awaits the requested privacy accuracy/update agreement confirmation.",
+    "Google review submission is confirmed; Apple privacy responses are published and its public submission is next. Approval and public availability are not asserted.",
     "The account-owner Google trader declaration remains a separate existing-account requirement due February 1, 2027; it did not block this review submission."
   ],
   "validation": {

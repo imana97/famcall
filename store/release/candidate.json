@@ -32,7 +32,7 @@
     "storePrivacyAndLegalDeclarations": {
       "platforms": {
         "ios": {
-          "result": "pending",
+          "result": "pass",
           "reference": "store/release/public-submission-0.3.0.json"
         },
         "android": {
