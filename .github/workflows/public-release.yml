@@ -1,5 +1,5 @@
 name: Prepare or submit tested public release
-run-name: ${{ inputs.initial_android_draft && 'Prepare Android production draft' || 'Submit tested build for public review' }}
+run-name: ${{ inputs.initial_android_draft && 'Validate first Android production draft' || 'Submit tested build for public review' }}
 on:
   workflow_dispatch:
     inputs:
@@ -10,7 +10,7 @@ on:
         required: true
       initial_android_draft:
         type: boolean
-        description: First Google Play release only — create the tested production draft, then complete the required Console review step
+        description: First Google Play release only — validate the tested production draft, then prepare and submit it in Console
         default: false
         required: false
 permissions:
