@@ -8,7 +8,7 @@
   "sourceAppCommit": "682a762d4157e7dbc35816b56674ae11f7934b2b",
   "captureQualification": "Native E2E variants with the same release UI and fictional local data; not signed-store-build or calling qualification.",
   "marketingPhotography": "AI-generated editorial illustration; not a customer testimonial.",
-  "draftUpload": "Use protected store-listing.yml; the run artifact records actual saved state and processing results.",
+  "draftUpload": "Apple saved and verified by the protected workflow. Play saved with Console Save as draft because API commits automatically request review. See public-listing-delivery-2026-11-08.json.",
   "submittedForReview": false,
   "productionTrackChanged": false,
   "remainingBeforePublicSubmission": [
