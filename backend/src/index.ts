@@ -252,6 +252,7 @@ export const startCall = onCall(secure, async (request) => {
     throw new HttpsError(
       "unavailable",
       "This person is not available on FamCall.",
+      { reason: "invite-to-famcall" },
     );
   const now = Date.now();
   const ref = db.doc("calls/" + data.requestId);
@@ -299,6 +300,7 @@ export const startCall = onCall(secure, async (request) => {
       throw new HttpsError(
         "unavailable",
         "This person is not available on FamCall.",
+        { reason: "invite-to-famcall" },
       );
     if (
       [callerActive, calleeActive].some(

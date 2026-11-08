@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSMicrophoneUsageDescription": "FamCall: ताकि दूसरे आपको सुन सकें। सिर्फ़ कॉल के दौरान इस्तेमाल होता है।",
+    "NSContactsUsageDescription": "FamCall में जोड़ने के लिए अपने संपर्कों में से किसी को चुनें।",
+    "NSCameraUsageDescription": "FamCall आपके कैमरे का इस्तेमाल नहीं करता। वॉइस कॉल के लिए कैमरे की अनुमति ज़रूरी नहीं है।"
+  }
+}

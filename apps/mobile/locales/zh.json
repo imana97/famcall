@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSMicrophoneUsageDescription": "FamCall: 让对方听见你。仅在通话期间使用。",
+    "NSContactsUsageDescription": "从通讯录中选择一人添加到 FamCall。",
+    "NSCameraUsageDescription": "FamCall 不使用摄像头。语音通话不需要摄像头权限。"
+  }
+}

@@ -1,10 +1,1 @@
-FamCall 0.2.0
-- Simpler people list, settings, call history and calling screens.
-- Dial any FamCall number from the new bottom-sheet keypad.
-- Edit contact names and numbers, or swipe to remove a contact.
-- Log out without deleting your account.
-- English and Persian, with the same left-to-right layout.
-- Subtle haptic feedback and clearer account verification.
-- Incoming-call and session-recovery fixes.
-
-Please test incoming calls with the phone locked and FamCall in the background, call controls, language switching and contact editing. Android Force stop prevents incoming calls until the app is reopened.
+Added ten languages alongside English and Persian, automatic phone-language selection, and an invitation button for people you cannot yet reach on FamCall. All layouts remain left-to-right.

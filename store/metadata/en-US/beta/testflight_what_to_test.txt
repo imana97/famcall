@@ -1,13 +1,9 @@
-FamCall 0.2.0
+FamCall 0.3.0
 
-This update brings a simpler interface, direct dialing, English and Persian, and incoming-call fixes.
+Check automatic phone-language selection and Settings > Language. English, Persian, Chinese, Hindi, Spanish, Arabic, French, Bengali, Portuguese, Russian, Indonesian and Urdu are available. All layouts stay left-to-right. A manual language choice should survive restarting the app.
 
-Please check:
-• People: search, add, swipe to edit/remove, and update a saved phone number.
-• Dial pad: the centered button opens a bottom sheet. Enter a number with + or 00 and its country code to call another FamCall user.
-• Calls: receive and answer with the phone locked or FamCall in the background; check mute, speaker and hangup.
-• Settings: switch between English and Persian. Both use the same left-to-right layout and your choice stays saved.
-• Log out and sign back in without deleting your account.
-• Account deletion: verification and clear confirmation before permanent deletion.
+Call an unregistered number: the call screen should offer Invite to FamCall instead of an error. Tap it and confirm that the text composer contains the right number and https://famcall.web.app. Cancel without sending if you only want to test the flow. On a device without SMS, a share sheet is offered.
 
-The other person also needs FamCall. Network and phone settings can affect delivery. FamCall does not support emergency calls.
+Also check ordinary calls between two FamCall users, locked-screen ringing and answering, mute, speaker, recent/missed calls, and recovery after a connection interruption. Both phones need internet.
+
+Feedback: info@silvergridtech.com

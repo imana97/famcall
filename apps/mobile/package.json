@@ -1,6 +1,6 @@
 {
   "name": "@famcall/mobile",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "index.ts",
   "dependencies": {
     "@config-plugins/react-native-webrtc": "^15.0.2",
@@ -25,6 +25,7 @@
     "expo-localization": "~58.0.5",
     "expo-notifications": "~58.1.8",
     "expo-router": "~58.0.30",
+    "expo-sms": "~58.0.2",
     "expo-splash-screen": "~58.0.13",
     "expo-status-bar": "~58.0.4",
     "expo-system-ui": "~58.0.7",

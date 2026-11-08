@@ -9,6 +9,7 @@ export class MicrophonePermissionError extends Error {
 }
 
 class CallBusyError extends Error {}
+export class CallInviteError extends Error {}
 
 function errorCode(error: unknown): string {
   const value = (error as { code?: unknown } | null)?.code;
@@ -18,6 +19,9 @@ function errorCode(error: unknown): string {
 /** Apply only to a rejected startCall request, before other native call setup. */
 export function callStartError(error: unknown): unknown {
   const code = errorCode(error);
+  const details = (error as { details?: { reason?: unknown } } | null)?.details;
+  if ((code === "unavailable" || code === "functions/unavailable") &&
+      details?.reason === "invite-to-famcall") return new CallInviteError("invite-to-famcall");
   return code === "failed-precondition" || code === "functions/failed-precondition"
     ? new CallBusyError("call-busy")
     : error;

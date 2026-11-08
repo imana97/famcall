@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSMicrophoneUsageDescription": "FamCall: برای شنیده شدن صدای شما؛ فقط هنگام تماس استفاده می‌شود.",
+    "NSContactsUsageDescription": "برای افزودن مخاطب به FamCall، او را از مخاطبان گوشی انتخاب کنید.",
+    "NSCameraUsageDescription": "FamCall از دوربین استفاده نمی‌کند. برای تماس صوتی به دسترسی دوربین نیازی نیست."
+  }
+}

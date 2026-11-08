@@ -1,5 +1,9 @@
 import type { ExpoConfig } from "expo/config";
 import path from "node:path";
+import { readdirSync } from "node:fs";
+
+const supportedLocales = readdirSync(path.join(__dirname, "locales"))
+  .filter(file => file.endsWith(".json")).map(file => file.slice(0, -5)).sort();
 
 const e2e = process.env.APP_VARIANT === "e2e";
 const emulatorHost = e2e
@@ -15,10 +19,11 @@ const config: ExpoConfig = {
   name: e2e ? "FamCall Test" : "FamCall",
   slug: "famcall",
   owner: "silvergrid",
-  version: "0.2.0",
+  version: "0.3.0",
   scheme: e2e ? "famcall-test" : "famcall",
   orientation: "portrait",
   userInterfaceStyle: "automatic",
+  locales: Object.fromEntries(supportedLocales.map(code => [code, `./locales/${code}.json`])),
   icon: "./assets/icon.png",
   ios: {
     bundleIdentifier: "com.silvergridtech.famcall" + (e2e ? ".e2e" : ""),
@@ -82,7 +87,7 @@ const config: ExpoConfig = {
         resizeMode: "contain",
       },
     ],
-    ["expo-localization", { supportedLocales: ["en", "fa"], supportsRTL: false }],
+    ["expo-localization", { supportedLocales, supportsRTL: false, forcesRTL: false }],
     [
       "expo-contacts",
       {

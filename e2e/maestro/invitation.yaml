@@ -1,0 +1,29 @@
+appId: com.silvergridtech.famcall.e2e
+---
+# Authenticated local demo account, English selected; no SMS is ever sent.
+- extendedWaitUntil:
+    visible:
+      id: contact-search
+    timeout: 30000
+- tapOn:
+    id: open-dial-pad
+- tapOn:
+    id: dial-number
+- inputText: '+12025550199'
+- scrollUntilVisible:
+    element:
+      id: dial-call
+    direction: DOWN
+- tapOn:
+    id: dial-call
+- extendedWaitUntil:
+    visible:
+      id: invite-to-famcall
+    timeout: 30000
+- assertVisible: Invite them to FamCall
+- assertNotVisible: Couldn’t connect right now.*
+- assertNotVisible: Couldn’t finish that.*
+- assertNotVisible:
+    id: end-call
+- assertNotVisible:
+    id: mute-call
