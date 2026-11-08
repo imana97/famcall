@@ -4,7 +4,7 @@ import { Alert, View } from "react-native";
 import { Redirect, router } from "expo-router";
 import { signOut } from "@react-native-firebase/auth";
 import { ArrowLeft } from "lucide-react-native";
-import { displayPhone } from "@famcall/core";
+import { displayPhone, normalizeDigits } from "@famcall/core";
 import {
   Button,
   ErrorBanner,
@@ -64,7 +64,7 @@ export default function DeleteAccount() {
       let outcome = accepted;
       if (!outcome) {
         if (!verified) {
-          await confirmation!.confirm(code);
+          await confirmation!.confirm(normalizeDigits(code));
           setVerified(true);
         }
         // A failed response may follow a successful durable deletion request.
@@ -131,7 +131,7 @@ export default function DeleteAccount() {
             label={t("code")}
             hideLabel
             value={code}
-            onChangeText={setCode}
+            onChangeText={value => setCode(normalizeDigits(value).replace(/\D/g, ""))}
             keyboardType="number-pad"
             textContentType="oneTimeCode"
             autoComplete="sms-otp"

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   normalizePhone,
+  normalizeDigits,
   nextCallStatus,
   tuneOpus,
   audioInterval,
@@ -12,9 +13,19 @@ describe("international usernames", () => {
       "+1 (202) 555-0101",
       "0012025550101",
       "+۱۲۰۲۵۵۵۰۱۰۱",
+      "+١٢٠٢٥٥٥٠١٠١",
+      "+१२०२५५५०१०१",
+      "+১২০২৫৫৫০১০১",
+      "+１２０２５５５０１０１",
     ]) {
       expect(normalizePhone(input)).toBe("+12025550101");
     }
+  });
+  it("normalizes verification codes without dropping localized digits", () => {
+    for (const input of ["123456", "١٢٣٤٥٦", "۱۲۳۴۵۶", "१२३४५६", "১২৩৪৫৬", "１２３４５６"]) {
+      expect(normalizeDigits(input)).toBe("123456");
+    }
+    expect(normalizeDigits("code १२३४५६")).toBe("code 123456");
   });
   it("rejects local numbers, extensions, embedded text and invalid country codes", () => {
     for (const input of [
