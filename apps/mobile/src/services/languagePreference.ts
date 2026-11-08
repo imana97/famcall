@@ -1,14 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { isLocale, languageStorageKey, setLocale, type Locale } from "../i18n";
+import { languageStorageKey, setLocale } from "../i18n";
+import { isLanguagePreference, type LanguagePreference } from "../i18n/languages";
 
-export async function readLanguagePreference(): Promise<Locale> {
+export async function readLanguagePreference(): Promise<LanguagePreference> {
   try {
     const saved = await AsyncStorage.getItem(languageStorageKey);
-    return isLocale(saved) ? saved : "en";
-  } catch { return "en"; }
+    return isLanguagePreference(saved) ? saved : "system";
+  } catch { return "system"; }
 }
 
-export async function saveLanguagePreference(language: Locale): Promise<void> {
+export async function saveLanguagePreference(language: LanguagePreference): Promise<void> {
   await AsyncStorage.setItem(languageStorageKey, language);
-  setLocale(language);
+  if (language !== "system") setLocale(language);
 }

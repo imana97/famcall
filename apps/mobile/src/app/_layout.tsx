@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { LocaleProvider, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SessionProvider } from "../state/Session";
 import { CallingProvider } from "../state/Calling";
@@ -6,7 +6,7 @@ import { CallReadinessProvider } from "../state/CallReadiness";
 import { useTheme } from "../components/ui";
 import { LanguageProvider } from "../state/Language";
 export default function RootLayout() {
-  return <LanguageProvider><AppLayout /></LanguageProvider>;
+  return <LanguageProvider><LocaleProvider direction="ltr"><AppLayout /></LocaleProvider></LanguageProvider>;
 }
 function AppLayout() {
   const c = useTheme();

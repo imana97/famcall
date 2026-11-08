@@ -28,7 +28,8 @@ The approved icon and forest-green, cream and sage palette are preserved.
 
 DISTRIBUTION STATUS
 0.2.0 is already delivered to TestFlight build 5, Android internal version code 6,
-and https://famcall.web.app/downloads/famcall.apk. This pack prepares the public
+and formerly through the website APK (now retired in the 0.3.0 website update).
+This 0.2.0 pack prepares the public
 listings. It does not request review, promote a production track or publish stores.
 The protected store-listing workflow saves and verifies the Apple draft. Play
 requires Console Save as draft because its API sends edits for review automatically

@@ -6,7 +6,7 @@ import {
   signInWithPhoneNumber,
   type ConfirmationResult,
 } from "@react-native-firebase/auth";
-import { normalizePhone } from "@famcall/core";
+import { normalizeDigits, normalizePhone } from "@famcall/core";
 import {
   Button,
   ErrorBanner,
@@ -62,7 +62,7 @@ export default function AuthScreen() {
     setBusy(true);
     setError(null);
     try {
-      await confirmation.confirm(code);
+      await confirmation.confirm(normalizeDigits(code));
     } catch (e) {
       setError(errorMessage(e));
     } finally {
@@ -96,7 +96,7 @@ export default function AuthScreen() {
             testID="verification-code"
             label={t("code")}
             value={code}
-            onChangeText={setCode}
+            onChangeText={value => setCode(normalizeDigits(value).replace(/\D/g, ""))}
             editable={!busy}
             keyboardType="number-pad"
             textContentType="oneTimeCode"

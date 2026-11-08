@@ -219,7 +219,11 @@ describe.skipIf(!enabled)(
         (await callApi(b, "setBlocked", { phone: a.phone, blocked: true }))
           .result?.blocked,
       ).toBe(true);
-      expect((await start(a, b)).error?.status).toBe("UNAVAILABLE");
+      const blocked = (await start(a, b)).error;
+      const missing = (await callApi(a, "startCall", { phone: "+12025550199", requestId: randomUUID() })).error;
+      expect(blocked?.status).toBe("UNAVAILABLE");
+      expect(blocked?.details).toEqual({ reason: "invite-to-famcall" });
+      expect(missing).toEqual(blocked);
       await callApi(b, "setBlocked", { phone: a.phone, blocked: false });
       expect((await start(a, b)).result?.status).toBe("ringing");
     }, 30_000);

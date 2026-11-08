@@ -12,6 +12,7 @@ import { useSession } from "../../state/Session";
 import { useCallReadiness } from "../../state/CallReadiness";
 import { t } from "../../i18n";
 import { useLanguage } from "../../state/Language";
+import { languageName } from "../../i18n/languages";
 
 function SettingsRow({ title, icon: Icon, detail, danger = false, busy = false, disabled = false, testID, onPress }: {
   title: string;
@@ -55,7 +56,7 @@ function SettingsRow({ title, icon: Icon, detail, danger = false, busy = false, 
 }
 
 export default function Settings() {
-  const { language } = useLanguage();
+  const { language, preference } = useLanguage();
   const c = useTheme();
   const { user } = useSession();
   const { canCall } = useCallReadiness();
@@ -103,7 +104,7 @@ export default function Settings() {
       <SettingsRow title={t("callingSetup")} icon={Phone} testID="calling-settings"
         detail={t(canCall ? "callingReady" : "callingSetupNeeded")}
         onPress={() => router.push("/calling-setup")} />
-      <SettingsRow title={t("language")} icon={Languages} detail={t(language === "fa" ? "persian" : "english")} testID="language-settings" onPress={() => router.push("/language")} />
+      <SettingsRow title={t("language")} icon={Languages} detail={preference === "system" ? `${t("systemLanguage")} · ${languageName(language)}` : languageName(language)} testID="language-settings" onPress={() => router.push("/language")} />
       <SettingsRow title={t("blocked")} icon={UserRoundX} onPress={() => router.push("/blocked")} />
       <SettingsRow title={t("support")} icon={Mail} onPress={() => openLink("mailto:info@silvergridtech.com")} />
       <SettingsRow title={t("privacy")} icon={Shield} onPress={() => openLink("https://famcall.web.app/privacy")} />

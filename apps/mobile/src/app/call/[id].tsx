@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
-import { Mic, MicOff, Phone, PhoneOff, Volume2 } from "lucide-react-native";
+import { MessageCircle, Mic, MicOff, Phone, PhoneOff, Volume2 } from "lucide-react-native";
 import { displayPhone, isTerminal } from "@famcall/core";
 import {
   Avatar,
@@ -14,6 +14,8 @@ import {
 import { useSession } from "../../state/Session";
 import { useCalling } from "../../state/Calling";
 import { t, type TranslationKey } from "../../i18n";
+import { inviteToFamCall } from "../../services/invite";
+import { errorMessage } from "../../services/errors";
 export default function CallScreen() {
   const params = useLocalSearchParams<{
     id: string;
@@ -25,6 +27,16 @@ export default function CallScreen() {
   const c = useTheme();
   const began = useRef(false);
   const [elapsed, setElapsed] = useState(0);
+  const [inviting, setInviting] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  async function invite() {
+    if (!calling.invitePhone || inviting) return;
+    setInviting(true);
+    setInviteError(null);
+    try { await inviteToFamCall(calling.invitePhone); }
+    catch (error) { setInviteError(errorMessage(error)); }
+    finally { setInviting(false); }
+  }
   const start = useEffectEvent(calling.start);
   useEffect(() => {
     if (params.id === "new" && params.phone && !began.current) {
@@ -84,8 +96,8 @@ export default function CallScreen() {
             {phone && name !== displayPhone(phone) && <Label muted style={{ textAlign: "center" }}>{displayPhone(phone)}</Label>}
           </View>
           <View style={{ alignItems: "center", gap: 8 }}>
-          <View accessibilityLiveRegion="polite">
-            <Label muted style={{ fontSize: 20, lineHeight: 28, textAlign: "center" }}>{t(status)}</Label>
+          <View accessibilityLiveRegion="polite" testID={calling.invitePhone ? "invite-call-status" : "call-status"}>
+            <Label muted style={{ fontSize: 20, lineHeight: 28, textAlign: "center" }}>{t(calling.invitePhone ? "inviteTitle" : status)}</Label>
           </View>
           {!ended && calling.voice === "reconnecting" && <Label muted style={{ textAlign: "center" }}>{t("reconnectingBody")}</Label>}
           {calling.connectedAt && !ended && (
@@ -96,11 +108,18 @@ export default function CallScreen() {
           </Label>
           )}
           </View>
+          {calling.invitePhone && <Label muted style={{ textAlign: "center", lineHeight: 26 }}>{t("inviteBody")}</Label>}
         </View>
-        <ErrorBanner message={calling.error} />
+        <ErrorBanner message={inviteError ?? calling.error} />
       </ScrollView>
       <View style={{ flexShrink: 0, paddingHorizontal: 24, paddingTop: 12, paddingBottom: 24, gap: 16 }}>
-        {incoming ? (
+        {calling.invitePhone ? (
+          <>
+            <Button testID="invite-to-famcall" title={t("inviteButton")} icon={MessageCircle}
+              busy={inviting} onPress={() => void invite()} style={{ minHeight: 64 }} textStyle={{ fontSize: 20 }} />
+            <Button title={t("done")} secondary onPress={() => router.replace("/")} style={{ minHeight: 60 }} />
+          </>
+        ) : incoming ? (
           <>
             <Button
               testID="answer-call"

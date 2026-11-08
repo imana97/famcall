@@ -23,7 +23,7 @@ import { presentIncomingCall } from "../services/incomingCallPresentation";
 import { OutgoingCallAttempt } from "../services/OutgoingCallAttempt";
 import { recordTestMetric, waitForTestCallStart } from "../services/e2eDiagnostics";
 import { VoicePeer, type VoiceState } from "../services/VoicePeer";
-import { callStartError, errorMessage } from "../services/errors";
+import { CallInviteError, callStartError, errorMessage } from "../services/errors";
 import { assertMicrophonePermission } from "../services/callReadiness";
 import {
   flushCallOutbox,
@@ -42,6 +42,7 @@ interface CallView {
   error: string | null;
   connectedAt: number | null;
   cancelledBeforeStart: boolean;
+  invitePhone: string | null;
 }
 interface Calling extends CallView {
   start: (phone: string) => Promise<void>;
@@ -59,6 +60,7 @@ const initial: CallView = {
   error: null,
   connectedAt: null,
   cancelledBeforeStart: false,
+  invitePhone: null,
 };
 const Context = createContext<Calling>({
   ...initial,
@@ -265,6 +267,10 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       },
       cancelled: () => { void end(); },
       error: error => {
+        if (error instanceof CallInviteError && !current.current.call) {
+          update({ invitePhone: phone, error: null });
+          return;
+        }
         const call = current.current.call;
         if (call?.id === id && !isTerminal(call.status))
           update({ call: { ...call, status: "failed", endedAtMs: Date.now() } });

@@ -6,17 +6,17 @@ import { HapticPressable as Pressable } from "../components/HapticPressable";
 import { ErrorBanner, Label, Page, useTheme } from "../components/ui";
 import { useLanguage } from "../state/Language";
 import { errorMessage } from "../services/errors";
-import { t, type Locale } from "../i18n";
-
-const choices = [{ code: "en", name: "English" }, { code: "fa", name: "فارسی" }] as const;
+import { t } from "../i18n";
+import { languages, type LanguagePreference } from "../i18n/languages";
 
 export default function Language() {
   const c = useTheme();
-  const { language, setLanguage } = useLanguage();
-  const [pending, setPending] = useState<Locale | null>(null);
+  const { preference, setLanguage } = useLanguage();
+  const choices = [{ code: "system" as const, name: t("systemLanguage") }, ...languages];
+  const [pending, setPending] = useState<LanguagePreference | null>(null);
   const [error, setError] = useState<string | null>(null);
-  async function choose(next: Locale) {
-    if (pending || next === language) return;
+  async function choose(next: LanguagePreference) {
+    if (pending || next === preference) return;
     setPending(next);
     setError(null);
     try { await setLanguage(next); }
@@ -36,11 +36,11 @@ export default function Language() {
     <View accessibilityRole="radiogroup" accessibilityLabel={t("language")}>
       {choices.map(choice => <Pressable key={choice.code} testID={"language-" + choice.code}
         accessibilityRole="radio" accessibilityLabel={choice.name}
-        accessibilityState={{ checked: language === choice.code, disabled: pending !== null, busy: pending === choice.code }}
+        accessibilityState={{ checked: preference === choice.code, disabled: pending !== null, busy: pending === choice.code }}
         disabled={pending !== null} onPress={() => void choose(choice.code)}
         style={({ pressed }) => ({ minHeight: 68, paddingHorizontal: 16, paddingVertical: 18, flexDirection: "row", alignItems: "center", gap: 14, borderBottomWidth: 1, borderBottomColor: c.line, opacity: pressed ? 0.6 : 1 })}>
-        <Label style={{ flex: 1, fontSize: 18, fontWeight: "500", writingDirection: choice.code === "fa" ? "rtl" : "ltr" }}>{choice.name}</Label>
-        {pending === choice.code ? <ActivityIndicator color={c.primary} /> : language === choice.code && <Check size={24} color={c.primary} />}
+        <Label style={{ flex: 1, fontSize: 18, fontWeight: "500", writingDirection: "ltr" }}>{choice.name}</Label>
+        {pending === choice.code ? <ActivityIndicator color={c.primary} /> : preference === choice.code && <Check size={24} color={c.primary} />}
       </Pressable>)}
     </View>
   </Page>;

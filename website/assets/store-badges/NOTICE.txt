@@ -1,0 +1,14 @@
+Official store badges, used without modification.
+
+Apple badge source:
+https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg
+Guidelines: https://developer.apple.com/app-store/marketing/guidelines/
+
+Google Play badge source: GetItOnGooglePlay_Badge_Web_color_English.svg,
+from the official Google Play Badge guidelines / Get it on Google Play Badges /
+Digital / svg download, obtained 8 November 2026.
+Guidelines: https://partnermarketinghub.withgoogle.com/brands/google-play/google-play/lockups-icons-badges/
+
+Apple and Google retain rights to their badges and trademarks. These third-party
+brand assets are not covered by FamCall's MIT license. Follow each vendor's
+brand and usage guidelines. Show download badges only for live public listings.

@@ -1,0 +1,93 @@
+appId: com.silvergridtech.famcall.e2e
+---
+# Authenticated demo build; OS language set to Arabic before launching.
+- tapOn:
+    id: people-menu
+- tapOn:
+    id: menu-settings
+- tapOn:
+    id: language-settings
+- assertVisible: اللغة
+- tapOn:
+    id: language-en
+- assertVisible: Language
+- stopApp
+- launchApp
+- tapOn:
+    id: people-menu
+- tapOn:
+    id: menu-settings
+- tapOn:
+    id: language-settings
+- assertVisible: Language
+- tapOn:
+    id: language-system
+- assertVisible: اللغة
+- tapOn:
+    id: language-hi
+- assertVisible: भाषा
+- tapOn:
+    id: language-es
+- assertVisible: Idioma
+- tapOn:
+    id: language-fr
+- assertVisible: Langue
+- tapOn:
+    id: language-zh
+- assertVisible: 语言
+- tapOn:
+    id: language-ar
+- assertVisible: اللغة
+- scrollUntilVisible:
+    element:
+      id: language-bn
+    direction: DOWN
+- tapOn:
+    id: language-bn
+- assertVisible: ভাষা
+- scrollUntilVisible:
+    element:
+      id: language-pt
+    direction: DOWN
+- tapOn:
+    id: language-pt
+- assertVisible: Idioma
+- scrollUntilVisible:
+    element:
+      id: language-ru
+    direction: DOWN
+- tapOn:
+    id: language-ru
+- assertVisible: Язык
+- scrollUntilVisible:
+    element:
+      id: language-id
+    direction: DOWN
+- tapOn:
+    id: language-id
+- assertVisible: Bahasa
+- scrollUntilVisible:
+    element:
+      id: language-ur
+    direction: DOWN
+- tapOn:
+    id: language-ur
+- assertVisible: زبان
+- scrollUntilVisible:
+    element:
+      id: language-fa
+    direction: DOWN
+- tapOn:
+    id: language-fa
+- assertVisible: زبان
+- scrollUntilVisible:
+    element:
+      id: language-en
+    direction: UP
+- tapOn:
+    id: language-en
+- assertVisible: Language
+- tapOn:
+    id: language-back
+- tapOn:
+    id: settings-back
