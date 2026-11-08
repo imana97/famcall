@@ -18,10 +18,14 @@
     "privacyResponses": "Published in App Store Connect after the owner explicitly approved Apple privacy accuracy/update agreement in chat.",
     "publicReviewSubmitted": true,
     "observedSubmissionState": "WAITING_FOR_REVIEW",
-    "observedReleaseType": "MANUAL; direct API readback found the metadata-skipping submission did not apply automatic release. Protected correction workflow is prepared.",
+    "observedReleaseType": "AFTER_APPROVAL",
     "privacyPublishedAt": "2026-11-08T17:42:48.330Z",
     "publicSubmissionAuthorization": "Owner requested autonomous public submission and specifically approved publishing Apple privacy responses.",
-    "publicSubmissionWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42506505019"
+    "publicSubmissionWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42506505019",
+    "automaticReleaseWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42507212042",
+    "reviewReceiptReference": "store/release/apple-review-submission-2026-11-08.json",
+    "reviewSubmissionId": "60f463fe-2901-44ff-8403-58d0124edd6a",
+    "publicationAfterApproval": "Automatic, subject to Apple approval and any further store requirements."
   },
   "googlePlay": {
     "internalVersionCodeToPromote": 7,
@@ -114,17 +118,18 @@
   "limits": [
     "Owner acceptance does not claim every individual physical-device/network matrix case was reported or reproduced for 0.3.0.",
     "Static signed-archive inventories describe declarations, not a runtime privacy audit.",
-    "Google and Apple review submissions are confirmed. Approval and public availability are not asserted; Apple automatic-release correction is pending verified readback.",
+    "Google and Apple review submissions and automatic-release settings are confirmed. Approval and public availability are not asserted.",
     "The account-owner Google trader declaration remains a separate existing-account requirement due February 1, 2027; it did not block this review submission."
   ],
   "validation": {
     "automatedChecks": {
-      "passed": 245,
+      "passed": 251,
       "skipped": 0,
       "environment": "Local demo-famcall Auth/Firestore/Functions emulators",
-      "note": "All 245 tests passed with local Firebase emulators, including three additional cases proving draft preparation cannot enable final submission or bypass quota/assets."
+      "note": "Full GitHub Quality run passed all 251 tests, including six Apple release-mode API cases. Both protected store submission workflows succeeded; Apple automatic release was separately verified by API."
     },
-    "googleIcon": "32-bit RGBA PNG with fully opaque alpha; Console SHA-256 matches the manifest."
+    "googleIcon": "32-bit RGBA PNG with fully opaque alpha; Console SHA-256 matches the manifest.",
+    "appleReleaseModeQualityWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42506957531"
   },
-  "observedAt": "2026-11-08T16:33:01.614Z"
+  "observedAt": "2026-11-08T17:55:12.177Z"
 }
