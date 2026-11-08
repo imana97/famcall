@@ -21,5 +21,8 @@
   "foregroundServiceObserved": true,
   "foregroundServiceAbsentAfterHangup": true,
   "scopeLimit": "Demonstrates Android calling UI and telecom foreground-service lifecycle in local emulators. Not a production push-delivery, audio-quality or physical-device test.",
-  "iosSimulatorAttempt": "Incoming answer automation did not complete on the iOS simulator; native call ended before Maestro could tap Answer. No iOS qualification is claimed by this video."
+  "iosSimulatorAttempt": "Native callservicesd could not open facetime://?launchForIncomingCall=1 and explicitly disconnected the incoming call because there was no UI host, before Maestro could tap Answer. This matches the prior local simulator diagnostic; it is not a successful iOS call test.",
+  "iosSimulatorDiagnosticReference": "store/release/ui-review-2026-11-07/ios-simulator-callkit.json",
+  "websiteDeployment": "https://github.com/silvergrid/famcall/actions/runs/42498285751",
+  "websiteVideoHttpStatus": 200
 }
