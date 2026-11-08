@@ -1,51 +1,52 @@
-FAMCALL — STORE COPY PACK
-Updated 7 November 2026 UTC
+FAMCALL — PUBLIC LISTING PACK
+Updated 8 November 2026 • Version 0.2.0
 
-Status: PUBLIC LISTING DRAFT. The approved app is implemented and available through
-Android internal testing (code 4) and owner-only TestFlight (build 3). English
-TestFlight description, feedback address and test instructions are saved and
-read-back verified. Actual development screenshots exist; final release captures
-and the full network/speech qualification remain open. Protected testing workflow
-42336889833 succeeded for source fecda429. The 7 November 2026 04:27 UTC readback
-confirms iOS build 3 IN_BETA_TESTING in the owner group and Android code 4 in the
-completed internal release; Play received the expected bundle hash. This proves
-delivery, not installation of the update or successful production calls. See
-release/testing-delivery-2026-11-07.json. No public store launch.
+English (US) only for both public store listings, screenshots and campaign copy.
+The app still offers English and Persian, with its approved left-to-right layout.
 
 Publisher: SilverGrid Technology LLC
 Support: info@silvergridtech.com
-Brand: FamCall
-Positioning: Simple voice calls designed for weak and unstable internet.
-Campaign line: A little signal. A familiar voice.
+Website: https://famcall.web.app
+Campaign: A little signal. A familiar voice.
+Positioning: Simple voice calls designed with weak and unstable internet in mind.
 
-USE
-metadata.json holds the structured source, known publisher information, and null
-values for unresolved submission fields. en-US/ contains individual plain-text
-fields for pasting into App Store Connect, Google Play Console, and TestFlight.
-Do not paste this status notice into the final store listing.
+CONTENTS
+metadata.json is the source of truth. en-US/apple and en-US/google-play contain
+individual paste-ready text fields. Run python3 store/release/prepare_metadata.py
+to export and validate them. validation.json records field limits and claim checks.
 
-Every feature described in the public copy is a release requirement, not a claim
-that a finished app has already been built. Check the final app against the
-claims_requiring_release_evidence array before upload. The beta descriptions and
-release notes also require a matching working build before use.
+store/assets/public-0.2.0 contains six actual app-screen compositions per store,
+the approved icons, Play feature graphic, raw captures, review preview and hashed
+asset manifest. store/marketing/0.2.0 contains four launch images, the illustration
+source and launch-copy.txt. Store assets use no fabricated app interfaces.
 
-The website is live at https://famcall.web.app. Its homepage, app-specific privacy,
-terms and account-deletion pages returned HTTP 200 and byte-matched source
-5ace4bb after protected website-only workflow 42339257054. The revised privacy
-and deletion notices are live, verified 7 November 2026 at 04:39 UTC; see
-release/website-delivery-2026-11-07.json. The homepage provides the support email
-link. Public-store privacy declarations still need review against the actual
-app and SDK behavior.
+The captures show the current 0.2.0 app UI from the release source in isolated
+native E2E builds using local demo fixtures. Names, 202-555-01xx phone numbers and
+call history are fictional. They are not production-call or network-test evidence.
+The AI-generated family photograph is an editorial illustration, not a testimonial.
+The approved icon and forest-green, cream and sage palette are preserved.
 
-No location-specific marketing is included. All public text uses the FamCall
-name and the weak-connection positioning. There are no claims about guaranteed
-connections, offline calling, price, unlimited use, or an unverified security
-architecture.
+DISTRIBUTION STATUS
+0.2.0 is already delivered to TestFlight build 5, Android internal version code 6,
+and https://famcall.web.app/downloads/famcall.apk. This pack prepares the public
+listings. It does not request review, promote a production track or publish stores.
+The protected store-listing workflow saves English metadata and assets as drafts.
+Its readback artifact is the authority for whether those drafts were saved.
 
-VALIDATION
-validation.json records checked character limits. Apple keywords were also
-checked in UTF-8 bytes. Text fits the documented field limits as of the date
-above. This is not a store-approval result. Recheck requirements before submission.
+PUBLIC SUBMISSION STILL REQUIRES
+Final privacy/Data Safety and age/content declarations; review contact and reliable
+reviewer access; final review of supported countries and encryption compliance;
+and release-candidate qualification recorded in store/release/candidate.json.
+That candidate remains not-ready. Existing no-France approval remains in place.
+Do not announce public App Store or Play availability until those pages are live.
+The website CTA can be used now. No store badge is included in campaign artwork.
 
-The release/ folder contains the screenshot storyboard, submission checklist,
-reviewer-access template, privacy worksheet, source links, and proposed E2E plan.
+ASSET REPRODUCTION
+npm ci --prefix store/release/tools
+CHROME_PATH=/path/to/chrome node store/release/render-assets.cjs
+node scripts/prepare-store-drafts.mjs
+The renderer only composes genuine raw app captures, approved brand assets and
+campaign text. It never edits the app interface inside a screenshot.
+
+No geographic targeting, offline-calling promise, guaranteed reliability, fabricated
+usage figures, price promise or unverified security claim is included.

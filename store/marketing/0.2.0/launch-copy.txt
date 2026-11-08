@@ -1,0 +1,58 @@
+FAMCALL • ENGLISH LAUNCH COPY • 0.2.0
+
+Campaign line
+A little signal. A familiar voice.
+
+Positioning
+Simple voice calls, built with weak and unstable internet in mind.
+
+Short introduction
+FamCall makes it easy to call your people. Add a name and phone number, tap to
+call, and keep the conversation simple. Designed with imperfect connections in
+mind, with a clear people list, a dial pad, and familiar call controls.
+
+Website / social introduction
+Some conversations are worth making time for, even when the internet has other
+plans. Meet FamCall: a simple voice-calling app designed with weak and unstable
+connections in mind. Keep your people in one clear list, or dial another FamCall
+user directly. English and Persian. Light and dark themes. Just the essentials.
+Explore FamCall at https://famcall.web.app.
+
+Social caption 1
+A little signal. A familiar voice.
+Meet FamCall—simple voice calls, built with weak and unstable internet in mind.
+https://famcall.web.app
+
+Social caption 2
+Your people. One simple list.
+Add someone, tap their name, and call. Or open the keypad and dial another
+FamCall user directly. Meet FamCall at https://famcall.web.app.
+
+Social caption 3
+No meeting links. No passwords to remember.
+Verify your number once and keep your people close with FamCall.
+https://famcall.web.app
+
+Short product description
+FamCall is a simple internet voice-calling app for iPhone and Android. It uses
+phone numbers to help people connect, with a clear contact list, direct dialing,
+recent and missed calls, blocking, and simple mute and speaker controls. English
+and Persian are available in the app, with light and dark themes.
+
+Important context for longer announcements
+Both people need FamCall and internet access. Calls connect FamCall users, not
+ordinary phone lines. Availability and performance depend on both connections
+and phone settings. Mobile data charges may apply. No emergency calling.
+
+Publisher
+SilverGrid Technology LLC
+Support / press contact: info@silvergridtech.com
+Website: https://famcall.web.app
+Public source: https://github.com/silvergrid/famcall • MIT license
+
+Usage
+All store copy and campaign artwork are English only. Persian is an in-app
+language option, not an additional store listing. Do not announce App Store or
+Google Play availability until each public listing is live. Website Android APK
+is already available. Use the supplied domain CTA rather than store badges for
+now. Photography is an AI-generated editorial illustration, not a testimonial.

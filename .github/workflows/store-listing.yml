@@ -1,0 +1,37 @@
+name: Prepare English public store drafts
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: famcall-store-build
+  cancel-in-progress: false
+jobs:
+  listings:
+    if: github.repository == 'silvergrid/famcall' && github.ref == 'refs/heads/main' && github.actor == 'silvergrid' && github.triggering_actor == 'silvergrid'
+    environment: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version-file: .nvmrc
+      - name: Validate English copy and artwork
+        run: |
+          python3 store/release/prepare_metadata.py
+          node scripts/prepare-store-drafts.mjs
+      - name: Save store drafts without submitting for review
+        env:
+          FAMCALL_APPLE_API_KEY_JSON: ${{ secrets.FAMCALL_APPLE_API_KEY_JSON }}
+          FAMCALL_PLAY_API_KEY_JSON: ${{ secrets.FAMCALL_PLAY_API_KEY_JSON }}
+        run: node scripts/prepare-store-drafts.mjs --apply
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: english-store-draft-readback
+          path: .local/store-listing-report/result.json
+          if-no-files-found: warn
+          retention-days: 30

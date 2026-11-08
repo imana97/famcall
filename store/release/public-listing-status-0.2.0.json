@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "updatedOn": "2026-11-08",
+  "locale": "en-US",
+  "scope": "Public store listing and marketing preparation, without public review submission.",
+  "copy": "English metadata exported and field-limit validated for both stores.",
+  "artwork": "Six genuine app-screen compositions per store, Play feature graphic, approved store icons and four campaign formats.",
+  "sourceAppCommit": "682a762d4157e7dbc35816b56674ae11f7934b2b",
+  "captureQualification": "Native E2E variants with the same release UI and fictional local data; not signed-store-build or calling qualification.",
+  "marketingPhotography": "AI-generated editorial illustration; not a customer testimonial.",
+  "draftUpload": "Use protected store-listing.yml; the run artifact records actual saved state and processing results.",
+  "submittedForReview": false,
+  "productionTrackChanged": false,
+  "remainingBeforePublicSubmission": [
+    "Confirm final App Privacy and Google Data Safety declarations against shipped SDK behavior.",
+    "Complete age/content, audience, publisher and country-of-distribution declarations; preserve current no-France approval.",
+    "Provide review contact name/phone and dependable reviewer access for phone-number calling.",
+    "Complete release-candidate qualification; candidate.json remains not-ready."
+  ],
+  "validation": {
+    "textFields": 8,
+    "opaqueExportedPNGs": 20,
+    "screenshotsPerPlatform": 6,
+    "appSourceDiffFromRelease": "empty",
+    "lint": "pass",
+    "typecheck": "pass",
+    "infrastructureTests": "8 passed",
+    "assetChecksumsAndDimensions": "pass"
+  }
+}

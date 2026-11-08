@@ -1,1 +1,1 @@
-Simple voice calls designed for weak and unstable internet connections
+Simple voice calls, built with weak and unstable internet in mind.
