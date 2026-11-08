@@ -5,7 +5,7 @@ export const requiredChecks = [...runtimeChecks, 'smsDailyLimit', 'storePrivacyA
 export function validateReleaseCandidate(candidate, platform, ownerReport, { initialAndroidDraft = false } = {}) {
   if (!['android', 'ios'].includes(platform)) throw new Error('Choose one public store.');
   if (initialAndroidDraft && platform !== 'android') throw new Error('Initial production drafts apply only to Google Play.');
-  // Preparing Google's first draft does not submit for review or publish it.
+  // Validating Google's first draft does not commit it or submit for review.
   // Final submission still requires ready status and complete legal evidence.
   if (candidate.status !== 'ready' && !(initialAndroidDraft && candidate.status === 'not-ready'))
     throw new Error('Release evidence is not ready.');

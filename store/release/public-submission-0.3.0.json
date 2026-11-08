@@ -38,7 +38,7 @@
       "restOfWorld": true,
       "franceIncluded": false
     },
-    "firstProductionReleaseRequirement": "Google validation requires a production draft for a draft app. Create it through public-release.yml with initial_android_draft=true, then finish the one-time Console review/rollout step. Subsequent releases use the normal completed promotion.",
+    "firstProductionReleaseRequirement": "Google requires draft status for a draft app and rejects changesNotSentForReview on this app. The workflow validates the exact tested production draft without committing an edit; the first production draft/review is then completed in Play Console. Subsequent ready releases use the normal API promotion.",
     "listingAndScreenshotHashesReadBack": true,
     "advertisingIdDeclaration": "Saved: does not use advertising ID.",
     "fullScreenIntentDeclaration": "Saved: making and receiving calls; opt-in requested for pre-grant at installation, subject to Google review.",
@@ -46,7 +46,12 @@
     "phoneCallServiceEvidence": "store/release/phone-call-service-demo-2026-11-08.json",
     "appContentDeclarationsNeedingAttention": 0,
     "phoneCallServiceVideoDeployment": "https://github.com/silvergrid/famcall/actions/runs/42498285751",
-    "initialDraftPreparation": "Allowed while declarations remain pending, solely to create an unsubmitted production draft. Public submission still requires ready status and complete store declarations."
+    "initialDraftPreparation": "The explicit Android draft workflow is validation-only and may run with pending declarations. It commits no edit and submits nothing for review. Final submission still requires completed store declarations.",
+    "initialApiDraftAttempt": {
+      "workflow": "https://github.com/silvergrid/famcall/actions/runs/42498953680",
+      "committed": false,
+      "error": "Google rejected the review-hold query parameter; the initial workflow stopped without retrying away that hold."
+    }
   },
   "googleDataSafetyInterpretation": {
     "collectedNonEphemeral": [
