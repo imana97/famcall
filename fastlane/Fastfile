@@ -16,11 +16,12 @@ lane :public_android do
     track: 'internal',
     version_code: candidate.fetch('androidBuildNumber').to_i,
     track_promote_to: 'production',
-    track_promote_release_status: 'completed',
+    track_promote_release_status: ENV['FAMCALL_INITIAL_PUBLIC_DRAFT'] == 'true' ? 'draft' : 'completed',
     skip_upload_apk: true, skip_upload_aab: true,
     skip_upload_metadata: true, skip_upload_changelogs: true,
     skip_upload_images: true, skip_upload_screenshots: true
   )
+  UI.important('Initial production draft prepared. Google requires its first review and rollout to be completed in Play Console; this API step has not submitted the app for review.') if ENV['FAMCALL_INITIAL_PUBLIC_DRAFT'] == 'true'
 end
 
 desc 'Submit the exact validated TestFlight build; publish after Apple approval'

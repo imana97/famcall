@@ -194,9 +194,9 @@
       "file": "store/assets/public-0.3.0/icons/google-play-512.png",
       "width": 512,
       "height": 512,
-      "alpha": false,
-      "bytes": 25010,
-      "sha256": "85aadf2e8c0994ede3d1623266f43541d84b5fda1efcaefbb42f6f47f7e98870"
+      "alpha": true,
+      "bytes": 27678,
+      "sha256": "2c546e4d806b02f6b12229eae5f6527d5a83fb1fc74d5bb7377c3815542f2ce4"
     },
     {
       "file": "store/assets/public-0.3.0/google-play/en-US/feature-graphic-1024x500.png",

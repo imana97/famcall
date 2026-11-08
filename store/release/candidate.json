@@ -5,13 +5,46 @@
   "androidBuildNumber": 7,
   "iosBuildNumber": 6,
   "checks": {
-    "twoWaySpeechAndPoorNetwork": null,
-    "interruptionAndRecovery": null,
-    "physicalAndroidAndIPhone": null,
-    "backgroundPushAndAudioRoutes": null,
-    "productionAuthAndAppCheck": null,
-    "smsDailyLimit": null,
-    "storePrivacyAndLegalDeclarations": null,
-    "releaseScreenshotsAndCopy": null
-  }
+    "twoWaySpeechAndPoorNetwork": {
+      "result": "owner-accepted",
+      "reference": "store/release/owner-release-acceptance-2026-11-08.json"
+    },
+    "interruptionAndRecovery": {
+      "result": "owner-accepted",
+      "reference": "store/release/owner-release-acceptance-2026-11-08.json"
+    },
+    "physicalAndroidAndIPhone": {
+      "result": "owner-accepted",
+      "reference": "store/release/owner-release-acceptance-2026-11-08.json"
+    },
+    "backgroundPushAndAudioRoutes": {
+      "result": "owner-accepted",
+      "reference": "store/release/owner-release-acceptance-2026-11-08.json"
+    },
+    "productionAuthAndAppCheck": {
+      "result": "owner-accepted",
+      "reference": "store/release/owner-release-acceptance-2026-11-08.json"
+    },
+    "smsDailyLimit": {
+      "result": "pass",
+      "reference": "store/release/sms-quota-verification-2026-11-08.json"
+    },
+    "storePrivacyAndLegalDeclarations": {
+      "platforms": {
+        "ios": {
+          "result": "pending",
+          "reference": "store/release/public-submission-0.3.0.json"
+        },
+        "android": {
+          "result": "pending",
+          "reference": "store/release/public-submission-0.3.0.json"
+        }
+      }
+    },
+    "releaseScreenshotsAndCopy": {
+      "result": "pass",
+      "reference": "store/assets/public-0.3.0/manifest.json"
+    }
+  },
+  "ownerAcceptanceReference": "store/release/owner-release-acceptance-2026-11-08.json"
 }

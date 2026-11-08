@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>FamCall — Phone-call service demonstration</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>main{max-width:760px;margin:48px auto;padding:0 24px}video{display:block;width:100%;max-width:360px;margin:28px auto;background:#183d34;border-radius:16px}li{margin:12px 0}.note{color:#52675e;font-size:15px;line-height:1.6}</style>
+</head>
+<body><main>
+  <a class="brand" href="/">FamCall</a>
+  <h1>Phone-call service demonstration</h1>
+  <p>This continuous screen recording shows a user starting an internet voice call, continuing the call in the background, and ending it.</p>
+  <video controls playsinline preload="metadata" aria-label="FamCall Android phone-call service demonstration">
+    <source src="/review/phone-call-service.mp4" type="video/mp4">
+    <a href="/review/phone-call-service.mp4">Open the demonstration video</a>
+  </video>
+  <ol>
+    <li>Tap a person in FamCall to initiate a call. The other test device answers.</li>
+    <li>The call screen shows Connected and the elapsed call time.</li>
+    <li>Go to the home screen and open notifications. Android shows an ongoing-call notification with a Hang Up action while the call continues.</li>
+    <li>Return through the notification, then tap End call. The call ends and its ongoing service stops.</li>
+  </ol>
+  <p class="note">Recorded November 8, 2026 using two local Android emulators, the 0.3.0 test build and an isolated test backend. Names and phone numbers are fictional. This video demonstrates the calling interface and background phone-call service; it contains no recorded conversation and does not demonstrate production push delivery or real-device network performance.</p>
+  <p class="note">FamCall uses FOREGROUND_SERVICE_PHONE_CALL and Android telecom APIs for active voice calls. The service is user-initiated and ends when the call ends. Delaying or interrupting it would prevent the user from starting or continuing their call.</p>
+  <p><a href="/privacy">Privacy</a> · <a href="mailto:info@silvergridtech.com">Support</a></p>
+</main></body>
+</html>

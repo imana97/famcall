@@ -7,6 +7,11 @@ on:
         description: Store to publish after review, using the checked-in candidate record
         options: [android, ios]
         required: true
+      initial_android_draft:
+        type: boolean
+        description: First Google Play release only — create the tested production draft, then complete the required Console review step
+        default: false
+        required: false
 permissions:
   contents: read
 concurrency:
@@ -20,6 +25,7 @@ jobs:
     timeout-minutes: 45
     env:
       FAMCALL_PLATFORM: ${{ inputs.platform }}
+      FAMCALL_INITIAL_PUBLIC_DRAFT: ${{ inputs.initial_android_draft }}
       FASTLANE_SKIP_UPDATE_CHECK: '1'
       FASTLANE_HIDE_CHANGELOG: '1'
     steps:

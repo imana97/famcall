@@ -1,0 +1,100 @@
+{
+  "version": "0.3.0",
+  "sourceCommit": "914112a72d93c23399613661379ded6d150ddb0c",
+  "ownerRequestedPublicSubmission": true,
+  "listingPreparationPR": "https://github.com/silvergrid/famcall/pull/23",
+  "listingWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42494270125",
+  "apple": {
+    "draftVersion": "0.3.0",
+    "build": 6,
+    "englishScreenshots": 6,
+    "reviewContactAndReusableAccessVerified": true,
+    "ageRatingAnswersSaved": true,
+    "primaryCategory": "SOCIAL_NETWORKING",
+    "price": "free",
+    "selectedTerritoryCount": 174,
+    "franceSelected": false,
+    "macAndVisionDistribution": false,
+    "privacyResponses": "Prepared; awaiting the browser-required confirmation of Apple's accuracy/update agreement.",
+    "publicReviewSubmitted": false
+  },
+  "googlePlay": {
+    "internalVersionCodeToPromote": 7,
+    "englishScreenshots": 6,
+    "initialSetupTasksCompleted": 11,
+    "privacyPolicyAndDeletionUrlsSaved": true,
+    "twoReusableReviewerSignInsSaved": true,
+    "containsAds": false,
+    "category": "COMMUNICATION",
+    "targetAudience": "18 and over; target audience is separate from the official IARC content rating",
+    "governmentFinancialHealthFeatures": false,
+    "dataSafety": "Completed and saved; submitted later with the production release.",
+    "aiAssistedMarketingAssetsLabeled": true,
+    "productionCountries": "All available entries except France selected and saved to Publishing overview.",
+    "traderStatus": "Requires the account owner; owner sign-in is awaiting Google identity verification.",
+    "publicReviewSubmitted": false,
+    "productionCountryReadback": {
+      "count": 176,
+      "restOfWorld": true,
+      "franceIncluded": false
+    },
+    "firstProductionReleaseRequirement": "Google validation requires a production draft for a draft app. Create it through public-release.yml with initial_android_draft=true, then finish the one-time Console review/rollout step. Subsequent releases use the normal completed promotion.",
+    "listingAndScreenshotHashesReadBack": true,
+    "advertisingIdDeclaration": "Saved: does not use advertising ID.",
+    "fullScreenIntentDeclaration": "Saved: making and receiving calls; opt-in requested for pre-grant at installation, subject to Google review.",
+    "foregroundServiceDeclaration": "VoIP/telecom selected; demonstration recorded and ready for website deployment before saving the video link.",
+    "phoneCallServiceEvidence": "store/release/phone-call-service-demo-2026-11-08.json"
+  },
+  "googleDataSafetyInterpretation": {
+    "collectedNonEphemeral": [
+      "Phone number",
+      "User IDs",
+      "Other personal info (connection IP information)",
+      "Contacts (optional)",
+      "App interactions",
+      "Diagnostics",
+      "Device or other IDs"
+    ],
+    "collectedEphemeral": [
+      "Voice or sound recordings (live voice; not archived by FamCall)"
+    ],
+    "shared": {
+      "Phone number": "Google's cross-service spam/abuse prevention"
+    },
+    "sharingExemptions": "Service providers processing on the publisher's behalf, and explicit user-initiated transfers such as calls and SMS invitations, are treated under Google's stated exceptions.",
+    "purposes": "App functionality/account management/security as applicable; Firebase SDK diagnostics additionally disclose Analytics. No advertising purpose.",
+    "encryptionInTransit": true,
+    "accountCreation": "Username and other authentication (phone number and verification code)",
+    "optionalPartialDeletionQuestion": "Left unanswered; not advertised as a separate comprehensive partial-deletion feature."
+  },
+  "applePrivacyInterpretation": {
+    "linkedAppFunctionality": [
+      "Phone Number",
+      "Contacts",
+      "User ID",
+      "Device ID",
+      "Other Usage Data",
+      "Other Data Types (connection IP information)"
+    ],
+    "unlinkedAnalytics": [
+      "Other Diagnostic Data (Firebase SDK user-agent metadata)"
+    ],
+    "tracking": false,
+    "realTimeAudio": "Not retained beyond servicing the live request; treated separately from Google's ephemeral-processing answer.",
+    "optionalSupportEmail": "Explicit user-initiated correspondence through the user's email app; not an ongoing in-app collection feature."
+  },
+  "limits": [
+    "Owner acceptance does not claim every individual physical-device/network matrix case was reported or reproduced for 0.3.0.",
+    "Static signed-archive inventories describe declarations, not a runtime privacy audit.",
+    "Neither store's review outcome or public availability is asserted by this preparation record.",
+    "Privacy confirmations, owner-only declarations and platform review validation still apply before submission."
+  ],
+  "validation": {
+    "automatedChecks": {
+      "passed": 242,
+      "skipped": 0,
+      "environment": "Local demo-famcall Auth/Firestore/Functions emulators"
+    },
+    "googleIcon": "32-bit RGBA PNG with fully opaque alpha; Console SHA-256 matches the manifest."
+  }
+}
