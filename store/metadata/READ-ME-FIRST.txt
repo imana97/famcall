@@ -30,8 +30,10 @@ DISTRIBUTION STATUS
 0.2.0 is already delivered to TestFlight build 5, Android internal version code 6,
 and https://famcall.web.app/downloads/famcall.apk. This pack prepares the public
 listings. It does not request review, promote a production track or publish stores.
-The protected store-listing workflow saves English metadata and assets as drafts.
-Its readback artifact is the authority for whether those drafts were saved.
+The protected store-listing workflow saves and verifies the Apple draft. Play
+requires Console Save as draft because its API sends edits for review automatically
+in this app’s current setup. Both drafts were saved and verified on 8 November;
+see store/release/public-listing-delivery-2026-11-08.json. No review was requested.
 
 PUBLIC SUBMISSION STILL REQUIRES
 Final privacy/Data Safety and age/content declarations; review contact and reliable

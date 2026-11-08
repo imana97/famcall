@@ -1,4 +1,4 @@
-/** Update English store drafts only. Deliberately has no review or track API. */
+/** Validate both English listings; save the Apple draft. Play uses Console Save as draft. */
 import {readFile, mkdir, writeFile} from 'node:fs/promises';
 import {resolve, relative} from 'node:path';
 import {createHash, sign} from 'node:crypto';
@@ -28,8 +28,7 @@ for(const [k,n]of Object.entries({title:30,short_description:80,full_description
 if(!apply){console.log('PASS: English metadata, six screenshots per store, PNG dimensions/opacity and all asset hashes. No store mutations.');process.exit(0);}
 assert(process.env.GITHUB_REPOSITORY==='silvergrid/famcall'&&process.env.GITHUB_REF==='refs/heads/main'&&process.env.GITHUB_ACTOR==='silvergrid'&&process.env.GITHUB_TRIGGERING_ACTOR==='silvergrid','Use the owner-approved main-branch listing workflow.');
 const appleKey=JSON.parse(process.env.FAMCALL_APPLE_API_KEY_JSON||'null');
-const playKey=JSON.parse(process.env.FAMCALL_PLAY_API_KEY_JSON||'null');
-assert(appleKey?.key&&playKey?.private_key,'Protected store credentials required');
+assert(appleKey?.key,'Protected Apple store credential required');
 async function request(url,init,label){
   const r=await fetch(url,init);const t=await r.text();
   if(!r.ok){let message;try{const e=JSON.parse(t);message=e.errors?.map(x=>x.detail||x.title).join('; ')||e.error?.message;}catch{}throw Error(`${label}: HTTP ${r.status}${message?' '+message.slice(0,600):''}`);}
@@ -94,41 +93,7 @@ async function appleDraft(){
   report.apple={versionId:version.id,state:draft.appStoreState,version:draft.versionString,build:'5',locale:'en-US',screenshots:screenshots.map(x=>({id:x.id,fileName:x.attributes.fileName,state:x.attributes.assetDeliveryState.state})),copyVerified:true};
   console.log('Apple English draft and six processed screenshots verified.');
 }
-async function playDraft(){
-  const now=Math.floor(Date.now()/1000),unsigned=encode({alg:'RS256',typ:'JWT'})+'.'+encode({iss:playKey.client_email,scope:'https://www.googleapis.com/auth/androidpublisher',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+600});
-  const result=await request('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sign('RSA-SHA256',Buffer.from(unsigned),playKey.private_key).toString('base64url')})},'Play authentication');
-  const headers={Authorization:'Bearer '+result.access_token};
-  const url='https://androidpublisher.googleapis.com/androidpublisher/v3/applications/com.silvergridtech.famcall';
-  const api=(p,m='GET',data)=>request(url+p,{method:m,headers:{...headers,'Content-Type':'application/json'},...(data?{body:JSON.stringify(data)}:{})},'Play '+m+' '+p.split('?')[0]);
-  const edit=await api('/edits','POST',{});let committed=false;
-  try{
-    const p='/edits/'+edit.id;
-    const tracksBefore=await api(p+'/tracks');
-    const listing={language:'en-US',title:meta.google_play.title,shortDescription:meta.google_play.short_description,fullDescription:meta.google_play.full_description};
-    await api(p+'/listings/en-US','PUT',listing);
-    const images=[['icon',[`${base}/icons/google-play-512.png`]],['featureGraphic',[`${base}/google-play/en-US/feature-graphic-1024x500.png`]],['phoneScreenshots',playFiles.map(a=>a.file)]];
-    for(const [type,files]of images){
-      await api(p+'/listings/en-US/'+type,'DELETE');
-      for(const file of files){
-        const bytes=await readFile(resolve(root,file));
-        await request(url.replace('/androidpublisher/v3/','/upload/androidpublisher/v3/')+p+'/listings/en-US/'+type+'?uploadType=media',{method:'POST',headers:{...headers,'Content-Type':'image/png'},body:bytes},'Play '+type+' upload');
-      }
-      const actual=await api(p+'/listings/en-US/'+type);assert(actual.images?.length===files.length,'Play image count differs: '+type);
-      assert(actual.images.every((image,i)=>image.sha256===manifest.assets.find(a=>a.file===files[i]).sha256),'Play image checksum differs: '+type);
-    }
-    assert(JSON.stringify(await api(p+'/tracks'))===JSON.stringify(tracksBefore),'Track state unexpectedly changed');
-    await api(p+':commit?changesNotSentForReview=true','POST',{});committed=true;
-    const verify=await api('/edits','POST',{});
-    try{
-      const actual=await api('/edits/'+verify.id+'/listings/en-US');
-      assert(Object.entries(listing).every(([k,v])=>actual[k]===v),'Play listing readback mismatch');
-      const counts={};for(const[type,files]of images){const rows=await api('/edits/'+verify.id+'/listings/en-US/'+type);counts[type]=rows.images?.length||0;assert(counts[type]===files.length,'Play saved image count differs');}
-      report.googlePlay={locale:'en-US',changesNotSentForReview:true,copyVerified:true,images:counts,tracksUnchanged:true};
-    }finally{await api('/edits/'+verify.id,'DELETE');}
-    console.log('Play English listing, icon, feature graphic and six screenshots saved without sending for review.');
-  }finally{if(!committed)await api('/edits/'+edit.id,'DELETE').catch(()=>{});}
-}
 await mkdir(resolve(root,'.local/store-listing-report'),{recursive:true});
-try{await appleDraft();await playDraft();report.completedAt=new Date().toISOString();}
+try{await appleDraft();report.googlePlay={state:'USE_CONSOLE_SAVE_AS_DRAFT',reason:'Google API requires automatic review for this app. This workflow does not mutate Play; use Console Save as draft with the validated English assets.'};report.completedAt=new Date().toISOString();}
 catch(e){report.error=e.message;throw e;}
 finally{await writeFile(resolve(root,'.local/store-listing-report/result.json'),JSON.stringify(report,null,2)+'\n');}

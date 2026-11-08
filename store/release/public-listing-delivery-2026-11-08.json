@@ -1,0 +1,64 @@
+{
+  "version": "0.2.0",
+  "locale": "en-US",
+  "startedAt": "2026-11-08T06:13:20.206Z",
+  "submittedForReview": false,
+  "productionTracksChanged": false,
+  "apple": {
+    "versionId": "50cc3f10-b3a8-44b9-8313-2c3942041c91",
+    "state": "PREPARE_FOR_SUBMISSION",
+    "version": "0.2.0",
+    "build": "5",
+    "locale": "en-US",
+    "screenshots": [
+      {
+        "id": "45000019-7313-8563-8036-ceada54b2be9",
+        "fileName": "01-people.png",
+        "state": "COMPLETE"
+      },
+      {
+        "id": "97800019-7313-8563-801b-db8bf2426fc5",
+        "fileName": "02-dial.png",
+        "state": "COMPLETE"
+      },
+      {
+        "id": "5b400019-7313-8563-8003-f3437bb5c842",
+        "fileName": "03-history.png",
+        "state": "COMPLETE"
+      },
+      {
+        "id": "35000019-7313-8563-8022-2378cf6ea29f",
+        "fileName": "04-add.png",
+        "state": "COMPLETE"
+      },
+      {
+        "id": "1ac00019-7313-8563-8023-be33995c36f4",
+        "fileName": "05-dark.png",
+        "state": "COMPLETE"
+      },
+      {
+        "id": "a3c00019-7313-8563-8036-4008285a30cf",
+        "fileName": "06-language.png",
+        "state": "COMPLETE"
+      }
+    ],
+    "copyVerified": true
+  },
+  "googlePlay": {
+    "state": "CONSOLE_DRAFT_SAVED",
+    "locale": "en-US",
+    "title": "FamCall: Simple Voice Calls",
+    "shortDescription": "Simple voice calls, built with weak and unstable internet in mind.",
+    "fullDescriptionCharacters": 1528,
+    "iconCount": 1,
+    "featureGraphicCount": 1,
+    "phoneScreenshotCount": 6,
+    "verification": "Console showed Your changes have been saved and Draft saved after Save as draft. All fields and 1/1 icon, 1/1 feature and 6/8 phone assets were visible.",
+    "submissionForReview": false,
+    "apiLimitation": "Publishing API requires automatic review for this app. Its edit was deleted without commit. Console draft is separate and is not exposed as a committed listing by Publishing API."
+  },
+  "completedOn": "2026-11-08",
+  "sourceCommit": "0f73656",
+  "appleWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42453820953",
+  "workflowNote": "Apple upload completed and readback verified; Google API draft commit was rejected, so Play was saved with Console Save as draft instead. Follow-up workflow uses only Apple mutations."
+}
