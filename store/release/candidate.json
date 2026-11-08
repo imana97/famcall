@@ -1,5 +1,5 @@
 {
-  "status": "not-ready",
+  "status": "ready",
   "version": "0.3.0",
   "sourceCommit": "914112a72d93c23399613661379ded6d150ddb0c",
   "androidBuildNumber": 7,
@@ -36,7 +36,7 @@
           "reference": "store/release/public-submission-0.3.0.json"
         },
         "android": {
-          "result": "pending",
+          "result": "pass",
           "reference": "store/release/public-submission-0.3.0.json"
         }
       }

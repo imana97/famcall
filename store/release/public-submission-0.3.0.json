@@ -31,7 +31,7 @@
     "dataSafety": "Completed and saved; submitted later with the production release.",
     "aiAssistedMarketingAssetsLabeled": true,
     "productionCountries": "All available entries except France selected and saved to Publishing overview.",
-    "traderStatus": "Requires the account owner; owner sign-in is awaiting Google identity verification.",
+    "traderStatus": "Account-owner declaration remains due by February 1, 2027 for this existing developer account. It is not blocking the current review submission; Console allows Submit 12 changes for review.",
     "publicReviewSubmitted": false,
     "productionCountryReadback": {
       "count": 176,
@@ -51,7 +51,17 @@
       "workflow": "https://github.com/silvergrid/famcall/actions/runs/42498953680",
       "committed": false,
       "error": "Google rejected the review-hold query parameter; the initial workflow stopped without retrying away that hold."
-    }
+    },
+    "traderStatusSource": "https://support.google.com/googleplay/android-developer/answer/17594752?hl=en",
+    "productionReleasePrepared": {
+      "version": "0.3.0",
+      "versionCode": 7,
+      "consolePreview": "Ready to release",
+      "savedToPublishingOverview": true
+    },
+    "draftValidationWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42499477316",
+    "currentReviewRequirements": "All required app-content declarations completed; English listing and production release saved. Managed publishing is off, so approved changes publish automatically. Google is running its quick checks before review.",
+    "ownerSignInRequiredForCurrentReview": false
   },
   "googleDataSafetyInterpretation": {
     "collectedNonEphemeral": [
