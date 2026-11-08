@@ -1,0 +1,888 @@
+{
+  "schemaVersion": 1,
+  "scope": "Static declarations from this IPA only; not a runtime collection audit, SDK completeness certification, or store approval.",
+  "archiveSha256": "290ad19eb907d64bce418b74a819d2040ee1251410ef3073cda64c3e209720bd",
+  "app": {
+    "CFBundleIdentifier": "com.silvergridtech.famcall",
+    "CFBundleShortVersionString": "0.3.0",
+    "CFBundleVersion": "6",
+    "MinimumOSVersion": "16.4"
+  },
+  "configuration": {
+    "FirebaseDataCollectionDefaultEnabled": null,
+    "FirebaseAppDelegateProxyEnabled": null,
+    "NSUserTrackingUsageDescription": null
+  },
+  "configurationNote": "null means the key was absent; it does not mean collection or delegation is disabled.",
+  "manifestCount": 40,
+  "declaredTrackingManifests": [],
+  "declaredTrackingDomains": [],
+  "declaredCollectedData": [
+    {
+      "manifest": "Firebase_FirebaseAuth.bundle/PrivacyInfo.xcprivacy",
+      "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
+      "NSPrivacyCollectedDataTypeLinked": false,
+      "NSPrivacyCollectedDataTypeTracking": false,
+      "NSPrivacyCollectedDataTypePurposes": [
+        "NSPrivacyCollectedDataTypePurposeAnalytics"
+      ]
+    },
+    {
+      "manifest": "Firebase_FirebaseAuth.bundle/PrivacyInfo.xcprivacy",
+      "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeUserID",
+      "NSPrivacyCollectedDataTypeLinked": true,
+      "NSPrivacyCollectedDataTypeTracking": false,
+      "NSPrivacyCollectedDataTypePurposes": [
+        "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+      ]
+    },
+    {
+      "manifest": "Firebase_FirebaseFirestore.bundle/PrivacyInfo.xcprivacy",
+      "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
+      "NSPrivacyCollectedDataTypeLinked": false,
+      "NSPrivacyCollectedDataTypeTracking": false,
+      "NSPrivacyCollectedDataTypePurposes": [
+        "NSPrivacyCollectedDataTypePurposeAnalytics"
+      ]
+    },
+    {
+      "manifest": "Firebase_FirebaseInstallations.bundle/PrivacyInfo.xcprivacy",
+      "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
+      "NSPrivacyCollectedDataTypeLinked": false,
+      "NSPrivacyCollectedDataTypeTracking": false,
+      "NSPrivacyCollectedDataTypePurposes": [
+        "NSPrivacyCollectedDataTypePurposeAnalytics"
+      ]
+    }
+  ],
+  "requiredReasonAPIUnion": {
+    "NSPrivacyAccessedAPICategoryDiskSpace": [
+      "85F4.1",
+      "E174.1"
+    ],
+    "NSPrivacyAccessedAPICategoryFileTimestamp": [
+      "0A2A.1",
+      "3B52.1",
+      "C617.1"
+    ],
+    "NSPrivacyAccessedAPICategorySystemBootTime": [
+      "35F9.1",
+      "8FFB.1"
+    ],
+    "NSPrivacyAccessedAPICategoryUserDefaults": [
+      "1C8F.1",
+      "C56D.1",
+      "CA92.1"
+    ]
+  },
+  "embeddedFrameworks": [
+    {
+      "path": "Frameworks/Collections.framework/Info.plist",
+      "identifier": "org.cocoapods.Collections",
+      "version": "1.1.1"
+    },
+    {
+      "path": "Frameworks/ExpoContacts.framework/Info.plist",
+      "identifier": "expocontacts.ExpoContacts",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/ExpoFileSystem.framework/Info.plist",
+      "identifier": "expofilesystem.ExpoFileSystem",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/ExpoFont.framework/Info.plist",
+      "identifier": "expofont.ExpoFont",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/ExpoModulesCore.framework/Info.plist",
+      "identifier": "expomodulescore.ExpoModulesCore",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/ExpoModulesJSI.framework/Info.plist",
+      "identifier": "apple.ExpoModulesJSI",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/ExpoModulesWorklets.framework/Info.plist",
+      "identifier": "expomodulesworklets.ExpoModulesWorklets",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/Firebase.framework/Info.plist",
+      "identifier": "firebase-ios-sdk.Firebase",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/FirebaseAppCheckInterop.framework/Info.plist",
+      "identifier": "firebase-ios-sdk.FirebaseAppCheckInterop",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/FirebaseAuthInterop.framework/Info.plist",
+      "identifier": "firebase-ios-sdk.FirebaseAuthInterop",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/FirebaseCore.framework/Info.plist",
+      "identifier": "firebase-ios-sdk.FirebaseCore",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/FirebaseCoreExtension.framework/Info.plist",
+      "identifier": "firebase-ios-sdk.FirebaseCoreExtension",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/FirebaseCoreInternal.framework/Info.plist",
+      "identifier": "firebase-ios-sdk.FirebaseCoreInternal",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/FirebaseSharedSwift.framework/Info.plist",
+      "identifier": "firebase-ios-sdk.FirebaseSharedSwift",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/GTMSessionFetcherCore_7C12F63883B5F82B_PackageProduct.framework/Info.plist",
+      "identifier": "gtm-session-fetcher.GTMSessionFetcherCore",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/GULNSData_456D1C2818A1930C_PackageProduct.framework/Info.plist",
+      "identifier": "googleutilities.GULNSData",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/GULUserDefaults_E3F6D5B982152CE_PackageProduct.framework/Info.plist",
+      "identifier": "googleutilities.GULUserDefaults",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/GoogleUtilities-Environment.framework/Info.plist",
+      "identifier": "googleutilities.GoogleUtilities-Environment",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/GoogleUtilities-Logger.framework/Info.plist",
+      "identifier": "googleutilities.GoogleUtilities-Logger",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/InternalCollectionsUtilities.framework/Info.plist",
+      "identifier": "org.cocoapods.InternalCollectionsUtilities",
+      "version": "1.1.1"
+    },
+    {
+      "path": "Frameworks/RNFBApp.framework/Info.plist",
+      "identifier": "org.cocoapods.RNFBApp",
+      "version": "27.1.0"
+    },
+    {
+      "path": "Frameworks/RNFBAppCheck.framework/Info.plist",
+      "identifier": "org.cocoapods.RNFBAppCheck",
+      "version": "27.1.0"
+    },
+    {
+      "path": "Frameworks/RNFBAuth.framework/Info.plist",
+      "identifier": "org.cocoapods.RNFBAuth",
+      "version": "27.1.0"
+    },
+    {
+      "path": "Frameworks/RNFBFirestore.framework/Info.plist",
+      "identifier": "org.cocoapods.RNFBFirestore",
+      "version": "27.1.0"
+    },
+    {
+      "path": "Frameworks/RNFBFunctions.framework/Info.plist",
+      "identifier": "org.cocoapods.RNFBFunctions",
+      "version": "27.1.0"
+    },
+    {
+      "path": "Frameworks/React.framework/Info.plist",
+      "identifier": "react-native.React",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/ReactCodegen.framework/Info.plist",
+      "identifier": "org.cocoapods.ReactCodegen",
+      "version": "0.88.1"
+    },
+    {
+      "path": "Frameworks/ReactNativeDependencies.framework/Info.plist",
+      "identifier": "third-party.ReactNativeDependencies",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/RecaptchaInterop_2A69ED0E4881D57C_PackageProduct.framework/Info.plist",
+      "identifier": "interop-ios-for-google-sdks.RecaptchaInterop",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/WebRTC.framework/Info.plist",
+      "identifier": "org.webrtc.WebRTC",
+      "version": "1.0"
+    },
+    {
+      "path": "Frameworks/hermesvm.framework/Info.plist",
+      "identifier": "dev.hermesengine.iphoneos",
+      "version": "1.0.0"
+    },
+    {
+      "path": "Frameworks/third-party-IsAppEncrypted.framework/Info.plist",
+      "identifier": "googleutilities.third-party-IsAppEncrypted",
+      "version": "1.0"
+    }
+  ],
+  "manifests": [
+    {
+      "path": "ExpoApplication_privacy.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "ExpoConstants_privacy.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "ExpoLocalization_privacy.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "ExpoNotifications_privacy.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "ExpoSystemUI_privacy.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "Firebase_FirebaseAuth.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
+            "NSPrivacyCollectedDataTypeLinked": false,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAnalytics"
+            ]
+          },
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeUserID",
+            "NSPrivacyCollectedDataTypeLinked": true,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          }
+        ],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "Firebase_FirebaseCore.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "Firebase_FirebaseCoreExtension.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    {
+      "path": "Firebase_FirebaseCoreInternal.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "1C8F.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "Firebase_FirebaseFirestore.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
+            "NSPrivacyCollectedDataTypeLinked": false,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAnalytics"
+            ]
+          }
+        ],
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    {
+      "path": "Firebase_FirebaseInstallations.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
+            "NSPrivacyCollectedDataTypeLinked": false,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAnalytics"
+            ]
+          }
+        ],
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    {
+      "path": "Frameworks/ExpoFileSystem.framework/expo-file-system_ExpoFileSystem.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "0A2A.1",
+              "3B52.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "E174.1",
+              "85F4.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "Frameworks/GTMSessionFetcherCore_7C12F63883B5F82B_PackageProduct.framework/GTMSessionFetcher_GTMSessionFetcherCore.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": []
+      }
+    },
+    {
+      "path": "Frameworks/GULNSData_456D1C2818A1930C_PackageProduct.framework/GoogleUtilities_GoogleUtilities-NSData.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    {
+      "path": "Frameworks/GULUserDefaults_E3F6D5B982152CE_PackageProduct.framework/GoogleUtilities_GoogleUtilities-UserDefaults.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "1C8F.1",
+              "C56D.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "Frameworks/React.framework/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
+    },
+    {
+      "path": "Frameworks/ReactNativeDependencies.framework/ReactNativeDependencies_SocketRocket.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
+    },
+    {
+      "path": "Frameworks/ReactNativeDependencies.framework/ReactNativeDependencies_boost.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
+    },
+    {
+      "path": "Frameworks/ReactNativeDependencies.framework/ReactNativeDependencies_folly.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
+    },
+    {
+      "path": "Frameworks/ReactNativeDependencies.framework/ReactNativeDependencies_glog.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
+    },
+    {
+      "path": "Frameworks/WebRTC.framework/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1",
+              "8FFB.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": []
+      }
+    },
+    {
+      "path": "GTMSessionFetcher_GTMSessionFetcherCore.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": []
+      }
+    },
+    {
+      "path": "GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    {
+      "path": "GoogleUtilities_GoogleUtilities-Environment.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C56D.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "GoogleUtilities_GoogleUtilities-Logger.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    {
+      "path": "GoogleUtilities_GoogleUtilities-NSData.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    {
+      "path": "GoogleUtilities_GoogleUtilities-Network.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "GoogleUtilities_GoogleUtilities-Reachability.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    {
+      "path": "GoogleUtilities_GoogleUtilities-UserDefaults.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "1C8F.1",
+              "C56D.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
+    },
+    {
+      "path": "Promises_FBLPromises.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": []
+      }
+    },
+    {
+      "path": "RNCAsyncStorage_resources.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "React-cxxreact_privacy.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
+    },
+    {
+      "path": "React-timing_privacy.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
+    },
+    {
+      "path": "abseil_abslWrapper.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    {
+      "path": "gRPC_grpcWrapper.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "gRPC_grpcppWrapper.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "gRPC_opensslWrapper.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "leveldb_leveldb.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "nanopb_nanopb.bundle/PrivacyInfo.xcprivacy",
+      "declaration": {
+        "NSPrivacyAccessedAPITypes": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": []
+      }
+    }
+  ]
+}

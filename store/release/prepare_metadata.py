@@ -10,7 +10,7 @@ limits = {
     'apple': {'name': 30, 'subtitle': 30, 'promotional_text': 170, 'keywords': 100, 'description': 4000},
     'google-play': {'title': 30, 'short_description': 80, 'full_description': 4000},
 }
-report = {'checked_on': data['checked_on'], 'result': 'PASS', 'version': '0.2.0', 'checks': [],
+report = {'checked_on': data['checked_on'], 'result': 'PASS', 'version': data['version'], 'checks': [],
           'scope': 'Store text limits, complete localized fields and brand restrictions; not a production publication decision.'}
 
 def export(locale, platform, fields):

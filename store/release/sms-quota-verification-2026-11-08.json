@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-08T14:57:43.323Z",
+  "name": "projects/635297130023/services/identitytoolkit.googleapis.com/consumerQuotaMetrics/identitytoolkit.googleapis.com%2Fsend_verification_code",
+  "displayName": "Send Verification Code",
+  "consumerQuotaLimits": [
+    {
+      "name": "projects/635297130023/services/identitytoolkit.googleapis.com/consumerQuotaMetrics/identitytoolkit.googleapis.com%2Fsend_verification_code/limits/%2Fd%2Fproject",
+      "unit": "1/d/{project}",
+      "metric": "identitytoolkit.googleapis.com/send_verification_code",
+      "quotaBuckets": [
+        {
+          "effectiveLimit": "50",
+          "defaultLimit": "4000000",
+          "consumerOverride": {
+            "name": "projects/635297130023/services/identitytoolkit.googleapis.com/consumerQuotaMetrics/identitytoolkit.googleapis.com%2Fsend_verification_code/limits/%2Fd%2Fproject/consumerOverrides/Cg1RdW90YU92ZXJyaWRl",
+            "overrideValue": "50"
+          }
+        }
+      ]
+    }
+  ],
+  "metric": "identitytoolkit.googleapis.com/send_verification_code"
+}

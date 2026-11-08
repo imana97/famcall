@@ -4,9 +4,9 @@ import {resolve, relative} from 'node:path';
 import {createHash, sign} from 'node:crypto';
 const root=resolve(import.meta.dirname,'..');
 const meta=JSON.parse(await readFile(resolve(root,'store/metadata/metadata.json'),'utf8'));
-const manifest=JSON.parse(await readFile(resolve(root,'store/assets/public-0.2.0/manifest.json'),'utf8'));
-const base='store/assets/public-0.2.0';
-const report={version:'0.2.0',locale:'en-US',startedAt:new Date().toISOString(),submittedForReview:false,productionTracksChanged:false};
+const manifest=JSON.parse(await readFile(resolve(root,'store/assets/public-0.3.0/manifest.json'),'utf8'));
+const base='store/assets/public-0.3.0';
+const report={version:'0.3.0',locale:'en-US',startedAt:new Date().toISOString(),submittedForReview:false,productionTracksChanged:false};
 const apply=process.argv.includes('--apply');
 const hash=(bytes,algorithm='sha256')=>createHash(algorithm).update(bytes).digest('hex');
 const encode=x=>Buffer.from(JSON.stringify(x)).toString('base64url');
@@ -49,11 +49,11 @@ async function english(parent,type,attributes){
 async function appleDraft(){
   const app='6831551843';
   const versions=(await apple(`/v1/apps/${app}/appStoreVersions?filter[platform]=IOS&limit=50`)).data;
-  const version=versions.find(x=>x.attributes.versionString==='0.2.0')||versions.find(x=>x.attributes.appStoreState==='PREPARE_FOR_SUBMISSION');
+  const version=versions.find(x=>x.attributes.versionString==='0.3.0')||versions.find(x=>x.attributes.appStoreState==='PREPARE_FOR_SUBMISSION');
   assert(version?.attributes.appStoreState==='PREPARE_FOR_SUBMISSION','Apple version must be an editable, unsubmitted draft');
-  const build=(await apple('/v1/builds/868dd720-b6aa-4f3e-81d2-dc861a09156b?include=preReleaseVersion')).data;
-  assert(build.attributes.version==='5'&&build.attributes.processingState==='VALID','Expected validated TestFlight build 5');
-  await apple('/v1/appStoreVersions/'+version.id,'PATCH',{type:'appStoreVersions',id:version.id,attributes:{versionString:'0.2.0',copyright:meta.apple.copyright,releaseType:'MANUAL'},relationships:{build:{data:{type:'builds',id:build.id}}}});
+  const build=(await apple('/v1/builds/4aa1d2db-7229-420c-b3eb-c6285da76ae6?include=preReleaseVersion')).data;
+  assert(build.attributes.version==='6'&&build.attributes.processingState==='VALID','Expected validated TestFlight build 6');
+  await apple('/v1/appStoreVersions/'+version.id,'PATCH',{type:'appStoreVersions',id:version.id,attributes:{versionString:'0.3.0',copyright:meta.apple.copyright,releaseType:'MANUAL'},relationships:{build:{data:{type:'builds',id:build.id}}}});
   const infos=(await apple(`/v1/apps/${app}/appInfos`)).data;
   const info=infos.find(x=>x.attributes.appStoreState==='PREPARE_FOR_SUBMISSION');assert(info,'No editable Apple app information');
   const infoLocale=await english('/v1/appInfos/'+info.id,'appInfoLocalizations',{name:meta.apple.name,subtitle:meta.apple.subtitle,privacyPolicyUrl:'https://famcall.web.app/privacy'});
@@ -89,8 +89,8 @@ async function appleDraft(){
   const infoActual=(await apple('/v1/appInfoLocalizations/'+infoLocale.id)).data.attributes;
   assert(infoActual.name===meta.apple.name&&infoActual.subtitle===meta.apple.subtitle,'Apple title readback mismatch');
   const draft=(await apple('/v1/appStoreVersions/'+version.id)).data.attributes;
-  assert(draft.appStoreState==='PREPARE_FOR_SUBMISSION'&&draft.versionString==='0.2.0','Apple draft state changed unexpectedly');
-  report.apple={versionId:version.id,state:draft.appStoreState,version:draft.versionString,build:'5',locale:'en-US',screenshots:screenshots.map(x=>({id:x.id,fileName:x.attributes.fileName,state:x.attributes.assetDeliveryState.state})),copyVerified:true};
+  assert(draft.appStoreState==='PREPARE_FOR_SUBMISSION'&&draft.versionString==='0.3.0','Apple draft state changed unexpectedly');
+  report.apple={versionId:version.id,state:draft.appStoreState,version:draft.versionString,build:'6',locale:'en-US',screenshots:screenshots.map(x=>({id:x.id,fileName:x.attributes.fileName,state:x.attributes.assetDeliveryState.state})),copyVerified:true};
   console.log('Apple English draft and six processed screenshots verified.');
 }
 await mkdir(resolve(root,'.local/store-listing-report'),{recursive:true});

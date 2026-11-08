@@ -6,7 +6,7 @@ YOUR PEOPLE, ONE SIMPLE LIST
 Add a name and phone number, or choose someone from your phone’s contacts. Tap a person to call. Only the contacts you choose are added.
 
 JUST WANT TO DIAL?
-Open the keypad, enter a number with its country code, and call another FamCall user. No need to save the number first.
+Open the keypad, enter a number with its country code, and call another FamCall user. No need to save the number first. If they haven’t joined FamCall, invite them with a ready-to-edit text message.
 
 LESS TO THINK ABOUT
 Verify your phone number once and stay signed in. No password or meeting link to remember. Clear controls for mute, speaker and ending a call keep the conversation front and center.
@@ -15,7 +15,7 @@ KEEP UP WITH YOUR CALLS
 See recent and missed calls. Edit or remove saved people, block an unwanted number, and unblock it whenever you choose.
 
 FAMILIAR IN MORE WAYS
-Choose English or Persian. Enjoy a clear light or dark appearance that follows your phone’s theme.
+Available in 12 languages, with automatic selection from your phone and a language choice in Settings. Enjoy a clear light or dark appearance that follows your phone’s theme.
 
 MADE WITH IMPERFECT CONNECTIONS IN MIND
 FamCall focuses on voice. If a connection is interrupted, it tries to reconnect and shows you what is happening.
