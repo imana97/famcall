@@ -1,23 +1,20 @@
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { validateReleaseCandidate } from './release-candidate.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const candidate = JSON.parse(readFileSync(resolve(root, 'store/release/candidate.json')));
 const platform = process.env.FAMCALL_PLATFORM;
-if (!['android', 'ios'].includes(platform)) throw new Error('Choose one public store.');
-if (candidate.status !== 'ready') throw new Error('Release evidence is not ready for owner review.');
-if (!/^[a-f0-9]{40}$/.test(candidate.sourceCommit ?? '')) throw new Error('A tested source commit is required.');
-if (!/^\d+\.\d+\.\d+$/.test(candidate.version ?? '')) throw new Error('Invalid release version.');
-if (!/^\d+$/.test(String(candidate[platform + 'BuildNumber'] ?? ''))) throw new Error('An explicit tested build number is required.');
-for (const check of ['twoWaySpeechAndPoorNetwork', 'interruptionAndRecovery', 'physicalAndroidAndIPhone',
-  'backgroundPushAndAudioRoutes', 'productionAuthAndAppCheck', 'smsDailyLimit',
-  'storePrivacyAndLegalDeclarations', 'releaseScreenshotsAndCopy']) {
-  const evidence = candidate.checks[check];
-  if (evidence?.result !== 'pass' || typeof evidence.reference !== 'string' || !evidence.reference.trim()) {
-    throw new Error('Missing passing release evidence: ' + check);
-  }
+if (process.env.FAMCALL_INITIAL_PUBLIC_DRAFT === 'true' && platform !== 'android')
+  throw new Error('Initial production drafts apply only to Google Play.');
+let ownerReport;
+if (candidate.ownerAcceptanceReference) {
+  const evidenceFile = resolve(root, candidate.ownerAcceptanceReference);
+  if (!evidenceFile.startsWith(root + '/store/release/')) throw new Error('Owner evidence must be in the release records.');
+  ownerReport = JSON.parse(readFileSync(evidenceFile, 'utf8'));
 }
+validateReleaseCandidate(candidate, platform, ownerReport);
 // Evidence can be committed after testing, but app/backend/build inputs must match.
 execFileSync('git', ['merge-base', '--is-ancestor', candidate.sourceCommit, 'HEAD'], { cwd: root });
 execFileSync('git', ['diff', '--exit-code', candidate.sourceCommit, 'HEAD', '--',

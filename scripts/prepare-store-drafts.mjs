@@ -16,7 +16,8 @@ for(const asset of manifest.assets){
   const b=await readFile(file);assert(hash(b)===asset.sha256,'Asset checksum differs: '+asset.file);
   assert(b.subarray(1,4).toString()==='PNG','PNG required');
   assert(b.readUInt32BE(16)===asset.width&&b.readUInt32BE(20)===asset.height,'Wrong dimensions');
-  assert([0,2].includes(b[25]),'Store exports must be opaque');
+  if(asset.file.endsWith('/icons/google-play-512.png')) assert(b[24]===8&&b[25]===6,'Play icon must be 32-bit RGBA PNG');
+  else assert([0,2].includes(b[25]),'Store screenshot exports must be opaque RGB PNG');
 }
 assert(manifest.locale==='en-US'&&!meta.localizations,'English store listings only');
 const appleFiles=manifest.assets.filter(a=>a.file.includes('/apple/en-US/iphone-67/'));

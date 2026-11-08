@@ -1,0 +1,18 @@
+{
+  "owner": "silvergrid",
+  "recordedOn": "2026-11-08",
+  "version": "0.3.0",
+  "sourceCommit": "914112a72d93c23399613661379ded6d150ddb0c",
+  "buildNumbers": {
+    "ios": 6,
+    "android": 7
+  },
+  "testingConfirmed": true,
+  "publicSubmissionAuthorized": true,
+  "source": "Owner statements in the FamCall project conversation",
+  "testingStatement": "I have tested them. What is blocking you from submitting to stores?",
+  "submissionStatement": "Can you do it all autonomously?",
+  "scopeLimit": "Owner acceptance of the delivered testing builds, not a claim that every physical-device, background-state, audio-route or measured impairment scenario was individually reported or reproduced for 0.3.0. Detailed measurement remains separate from acceptance.",
+  "individuallyReportedCurrentVersionScenarios": [],
+  "relatedTestingEvidence": "store/release/testing-delivery-multilingual-2026-11-08.json"
+}

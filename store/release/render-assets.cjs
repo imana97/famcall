@@ -48,8 +48,10 @@ try {
     }
   }
   for(const [size,name] of [[1024,'apple-1024'],[512,'google-play-512']]){
-    const file=`${base}/icons/${name}.png`;await fs.mkdir(path.dirname(path.join(root,file)),{recursive:true});await sharp(path.join(root,'store/assets/icons/apple-icon-1024.png')).resize(size,size).removeAlpha().png().toFile(path.join(root,file));
-    const bytes=await fs.readFile(path.join(root,file));records.push({file,width:size,height:size,alpha:false,bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')});
+    const file=`${base}/icons/${name}.png`;await fs.mkdir(path.dirname(path.join(root,file)),{recursive:true});
+    const source=sharp(path.join(root,'store/assets/icons/apple-icon-1024.png')).resize(size,size);
+    await (size===512?source.ensureAlpha():source.removeAlpha()).png().toFile(path.join(root,file));
+    const bytes=await fs.readFile(path.join(root,file));records.push({file,width:size,height:size,alpha:size===512,bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')});
   }
   const feature=`<div class="motif" style="width:650px;height:650px;right:-300px;top:-70px;border-width:40px;opacity:.2"></div><div class="brand" style="position:absolute;left:65px;top:46px;font-size:38px"><img src="${icon}">FamCall</div><h1 data-fit style="position:absolute;left:65px;top:165px;width:760px;height:166px;font-size:72px">A little signal.<br>A familiar voice.</h1><p data-fit style="position:absolute;left:69px;top:360px;width:830px;height:75px;font-size:27px">Simple voice calls for imperfect connections.</p>`;
   await render(browser,`${base}/google-play/en-US/feature-graphic-1024x500.png`,1024,500,feature);
