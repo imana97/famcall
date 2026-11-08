@@ -1,9 +1,9 @@
 {
   "status": "not-ready",
-  "version": "0.2.0",
-  "sourceCommit": "682a762d4157e7dbc35816b56674ae11f7934b2b",
-  "androidBuildNumber": 6,
-  "iosBuildNumber": 5,
+  "version": "0.3.0",
+  "sourceCommit": "914112a72d93c23399613661379ded6d150ddb0c",
+  "androidBuildNumber": 7,
+  "iosBuildNumber": 6,
   "checks": {
     "twoWaySpeechAndPoorNetwork": null,
     "interruptionAndRecovery": null,

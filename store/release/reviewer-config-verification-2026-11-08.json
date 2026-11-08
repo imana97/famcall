@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-11-08T14:41:27.268Z",
+  "reviewAccountCount": 2,
+  "fictionalNumbersOnly": true,
+  "existingTestNumbersPreserved": true,
+  "phoneAuthEnabled": true,
+  "realSMSUsed": false,
+  "appVerificationDisabled": false
+}

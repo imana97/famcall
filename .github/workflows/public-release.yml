@@ -41,6 +41,8 @@ jobs:
         env:
           FAMCALL_APPLE_API_KEY_JSON: ${{ secrets.FAMCALL_APPLE_API_KEY_JSON }}
           FAMCALL_PLAY_API_KEY_JSON: ${{ secrets.FAMCALL_PLAY_API_KEY_JSON }}
+          FAMCALL_REVIEW_ACCESS_JSON: ${{ secrets.FAMCALL_REVIEW_ACCESS_JSON }}
         run: |
           export PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
+          if [ "$FAMCALL_PLATFORM" = ios ]; then node scripts/prepare-review-access.mjs; fi
           fastlane "public_$FAMCALL_PLATFORM"

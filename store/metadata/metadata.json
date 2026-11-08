@@ -2,7 +2,7 @@
   "schema_version": 2,
   "locale": "en-US",
   "checked_on": "2026-11-08",
-  "status": "Public listing preparation for 0.2.0. Store review and production publication have not been requested.",
+  "status": "Owner-authorized public review and production release preparation for tested 0.3.0.",
   "publisher": "SilverGrid Technology LLC",
   "support_email": "info@silvergridtech.com",
   "brand": {
@@ -14,15 +14,15 @@
   "apple": {
     "name": "FamCall: Simple Voice Calls",
     "subtitle": "Voice calls for weak networks",
-    "promotional_text": "A little signal. A familiar voice. Call your people with a simple app designed with weak and unstable internet in mind. English and Persian included.",
+    "promotional_text": "A little signal. A familiar voice. Simple voice calls designed with weak and unstable internet in mind. Now available in 12 languages.",
     "keywords": "family,friends,audio,phone,low bandwidth,unstable internet,contacts,international",
-    "description": "A little signal. A familiar voice.\n\nSome conversations are worth making time for, even when the internet has other plans. FamCall keeps voice calling simple, with weak and unstable connections in mind.\n\nYOUR PEOPLE, ONE SIMPLE LIST\nAdd a name and phone number, or choose someone from your phone’s contacts. Tap a person to call. Only the contacts you choose are added.\n\nJUST WANT TO DIAL?\nOpen the keypad, enter a number with its country code, and call another FamCall user. No need to save the number first.\n\nLESS TO THINK ABOUT\nVerify your phone number once and stay signed in. No password or meeting link to remember. Clear controls for mute, speaker and ending a call keep the conversation front and center.\n\nKEEP UP WITH YOUR CALLS\nSee recent and missed calls. Edit or remove saved people, block an unwanted number, and unblock it whenever you choose.\n\nFAMILIAR IN MORE WAYS\nChoose English or Persian. Enjoy a clear light or dark appearance that follows your phone’s theme.\n\nMADE WITH IMPERFECT CONNECTIONS IN MIND\nFamCall focuses on voice. If a connection is interrupted, it tries to reconnect and shows you what is happening.\n\nBoth people need FamCall and an internet connection. Calls are between FamCall users, not ordinary telephone lines. Availability and performance depend on both connections and phone settings. Mobile data charges may apply. FamCall does not support emergency calls.\n\nQuestions or feedback? info@silvergridtech.com\nPrivacy: https://famcall.web.app/privacy\n\nDeveloped by SilverGrid Technology LLC.",
+    "description": "A little signal. A familiar voice.\n\nSome conversations are worth making time for, even when the internet has other plans. FamCall keeps voice calling simple, with weak and unstable connections in mind.\n\nYOUR PEOPLE, ONE SIMPLE LIST\nAdd a name and phone number, or choose someone from your phone’s contacts. Tap a person to call. Only the contacts you choose are added.\n\nJUST WANT TO DIAL?\nOpen the keypad, enter a number with its country code, and call another FamCall user. No need to save the number first. If they haven’t joined FamCall, invite them with a ready-to-edit text message.\n\nLESS TO THINK ABOUT\nVerify your phone number once and stay signed in. No password or meeting link to remember. Clear controls for mute, speaker and ending a call keep the conversation front and center.\n\nKEEP UP WITH YOUR CALLS\nSee recent and missed calls. Edit or remove saved people, block an unwanted number, and unblock it whenever you choose.\n\nFAMILIAR IN MORE WAYS\nAvailable in 12 languages, with automatic selection from your phone and a language choice in Settings. Enjoy a clear light or dark appearance that follows your phone’s theme.\n\nMADE WITH IMPERFECT CONNECTIONS IN MIND\nFamCall focuses on voice. If a connection is interrupted, it tries to reconnect and shows you what is happening.\n\nBoth people need FamCall and an internet connection. Calls are between FamCall users, not ordinary telephone lines. Availability and performance depend on both connections and phone settings. Mobile data charges may apply. FamCall does not support emergency calls.\n\nQuestions or feedback? info@silvergridtech.com\nPrivacy: https://famcall.web.app/privacy\n\nDeveloped by SilverGrid Technology LLC.",
     "copyright": "2026 SilverGrid Technology LLC"
   },
   "google_play": {
     "title": "FamCall: Simple Voice Calls",
     "short_description": "Simple voice calls, built with weak and unstable internet in mind.",
-    "full_description": "A little signal. A familiar voice.\n\nSome conversations are worth making time for, even when the internet has other plans. FamCall keeps voice calling simple, with weak and unstable connections in mind.\n\nYOUR PEOPLE, ONE SIMPLE LIST\nAdd a name and phone number, or choose someone from your phone’s contacts. Tap a person to call. Only the contacts you choose are added.\n\nJUST WANT TO DIAL?\nOpen the keypad, enter a number with its country code, and call another FamCall user. No need to save the number first.\n\nLESS TO THINK ABOUT\nVerify your phone number once and stay signed in. No password or meeting link to remember. Clear controls for mute, speaker and ending a call keep the conversation front and center.\n\nKEEP UP WITH YOUR CALLS\nSee recent and missed calls. Edit or remove saved people, block an unwanted number, and unblock it whenever you choose.\n\nFAMILIAR IN MORE WAYS\nChoose English or Persian. Enjoy a clear light or dark appearance that follows your phone’s theme.\n\nMADE WITH IMPERFECT CONNECTIONS IN MIND\nFamCall focuses on voice. If a connection is interrupted, it tries to reconnect and shows you what is happening.\n\nBoth people need FamCall and an internet connection. Calls are between FamCall users, not ordinary telephone lines. Availability and performance depend on both connections and phone settings. Mobile data charges may apply. FamCall does not support emergency calls.\n\nQuestions or feedback? info@silvergridtech.com\nPrivacy: https://famcall.web.app/privacy\n\nDeveloped by SilverGrid Technology LLC.",
+    "full_description": "A little signal. A familiar voice.\n\nSome conversations are worth making time for, even when the internet has other plans. FamCall keeps voice calling simple, with weak and unstable connections in mind.\n\nYOUR PEOPLE, ONE SIMPLE LIST\nAdd a name and phone number, or choose someone from your phone’s contacts. Tap a person to call. Only the contacts you choose are added.\n\nJUST WANT TO DIAL?\nOpen the keypad, enter a number with its country code, and call another FamCall user. No need to save the number first. If they haven’t joined FamCall, invite them with a ready-to-edit text message.\n\nLESS TO THINK ABOUT\nVerify your phone number once and stay signed in. No password or meeting link to remember. Clear controls for mute, speaker and ending a call keep the conversation front and center.\n\nKEEP UP WITH YOUR CALLS\nSee recent and missed calls. Edit or remove saved people, block an unwanted number, and unblock it whenever you choose.\n\nFAMILIAR IN MORE WAYS\nAvailable in 12 languages, with automatic selection from your phone and a language choice in Settings. Enjoy a clear light or dark appearance that follows your phone’s theme.\n\nMADE WITH IMPERFECT CONNECTIONS IN MIND\nFamCall focuses on voice. If a connection is interrupted, it tries to reconnect and shows you what is happening.\n\nBoth people need FamCall and an internet connection. Calls are between FamCall users, not ordinary telephone lines. Availability and performance depend on both connections and phone settings. Mobile data charges may apply. FamCall does not support emergency calls.\n\nQuestions or feedback? info@silvergridtech.com\nPrivacy: https://famcall.web.app/privacy\n\nDeveloped by SilverGrid Technology LLC.",
     "developer_name": "SilverGrid Technology LLC",
     "support_email": "info@silvergridtech.com"
   },
@@ -44,7 +44,7 @@
     "android_application_id": "com.silvergridtech.famcall",
     "apple_sku": "famcall-ios",
     "apple_app_id": "6831551843",
-    "initial_version": "0.2.0",
+    "initial_version": "0.3.0",
     "apple_primary_category_proposed": "Social Networking",
     "google_play_category_proposed": "Communication",
     "pricing": null,
@@ -54,7 +54,7 @@
     "target_audience_and_content_questionnaire": null,
     "contains_ads": false,
     "app_privacy_answers": null,
-    "google_data_safety_answers": null,
+    "google_data_safety_answers": "Completed and saved in Play Console on 2026-11-08; final review submission pending.",
     "encryption_export_compliance": null,
     "internal_testing_export_declaration": {
       "ios_build": "2",
@@ -68,7 +68,7 @@
     "review_contact_email": "info@silvergridtech.com",
     "review_account_a": null,
     "review_account_b": null,
-    "review_access_instructions": null,
+    "review_access_instructions": "Two private fictional reviewer accounts verified against Firebase and supplied through protected release secrets; no credentials in this repository.",
     "testflight_join_url": null,
     "google_play_internal_opt_in_url": "https://play.google.com/apps/internaltest/4700744436494600533",
     "app_store_url": null,
@@ -95,5 +95,6 @@
   "localization_notes": {
     "stores": "English (US) only, as requested.",
     "app": "0.3.0 adds Chinese, Hindi, Spanish, Arabic, French, Bengali, Portuguese, Russian, Indonesian and Urdu alongside English and Persian. The app follows the phone language by default, with a manual override. Every layout remains left-to-right. Store listings stay English only."
-  }
+  },
+  "version": "0.3.0"
 }

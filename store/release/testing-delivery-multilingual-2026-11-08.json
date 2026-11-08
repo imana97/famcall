@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-08T07:48:44.302Z",
+  "sourceCommit": "914112a72d93c23399613661379ded6d150ddb0c",
+  "version": "0.3.0",
+  "pr": 22,
+  "backendWebsiteRun": 42458708288,
+  "testingBuildRun": 42458708408,
+  "tests": 233,
+  "storeListingsLocale": "en-US",
+  "publicSubmissionRequested": false,
+  "ios": {
+    "checkedAt": "2026-11-08T07:48:24.074Z",
+    "sourceCommit": "914112a72d93c23399613661379ded6d150ddb0c",
+    "version": "0.3.0",
+    "build": "6",
+    "appleBuildId": "4aa1d2db-7229-420c-b3eb-c6285da76ae6",
+    "easBuildId": "6903db5d-44d1-402a-8c1b-c9d135aca91b",
+    "processingState": "VALID",
+    "usesNonExemptEncryption": false,
+    "internalBuildState": "IN_BETA_TESTING",
+    "ownerGroupAssigned": true,
+    "expectedOwnerTesterFound": true,
+    "englishTestingNotesMatched": true,
+    "latestBuildInstallation": "not verified"
+  },
+  "android": {
+    "version": "0.3.0",
+    "versionCode": "7",
+    "internalTrack": {
+      "track": "internal",
+      "releases": [
+        {
+          "name": "0.3.0",
+          "versionCodes": [
+            "7"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    "inspectedArchiveMatchesPlay": true,
+    "sha256": "77426e8884296eaec8f033d01daa6d799a25ad21ddc6a4605baad9e295ad3cdd",
+    "submissionStatus": "FINISHED"
+  },
+  "testflightAccessRun": 42459374222,
+  "testingWorkflows": "success",
+  "quality": {
+    "tests": 233,
+    "workflow": 42458494247,
+    "conclusion": "success"
+  },
+  "uiVerification": {
+    "version": "0.3.0",
+    "sourceCommit": "914112a72d93c23399613661379ded6d150ddb0c",
+    "automatedTests": {
+      "result": "pass",
+      "tests": 233,
+      "suites": 25,
+      "scope": "Final GitHub quality workflow 42458494247; local Auth, Firestore and Functions emulators; no production SMS or users."
+    },
+    "infrastructureTests": {
+      "result": "pass",
+      "tests": 8
+    },
+    "typecheck": "pass",
+    "lint": "pass",
+    "nativeAndroidBuild": "pass",
+    "nativeIOSBuild": "pass",
+    "androidLanguages": {
+      "result": "pass",
+      "scope": "Automatic Arabic phone preference; all manual language choices; persistence after restart; return to automatic; LTR layout."
+    },
+    "website": {
+      "responsivePhoneWidth": 390,
+      "horizontalOverflow": false,
+      "apkLinks": 0,
+      "officialBadges": "Staged with original artwork, gated by verified public availability."
+    },
+    "storeListings": "English only; no production review submitted.",
+    "iosLanguages": {
+      "result": "pass",
+      "scope": "Automatic Spanish on launch, manual Arabic and English; LTR layout retained."
+    },
+    "invitation": {
+      "android": "Invite button replaces error; OS SMS composer verified with fictional recipient and website prefilled. Nothing sent.",
+      "ios": "Invite button replaces error; simulator without SMS opens share sheet with website invitation. No message sent.",
+      "serverPrivacy": "Blocked and unregistered responses are identical; only explicit invite outcome changes UI.",
+      "localizedDigits": "Arabic, Persian, Devanagari, Bengali and full-width digits normalize to ASCII; phone username/code tests pass."
+    }
+  },
+  "website": {
+    "sourceCommit": "914112a72d93c23399613661379ded6d150ddb0c",
+    "verifiedAt": "2026-11-08T07:31:16.602Z",
+    "checked": [
+      {
+        "file": "index.html",
+        "status": 200,
+        "sha256": "2c3b012082f387b9ceb352eb59318a0c2375503430109b29519b3d21ed3daced"
+      },
+      {
+        "file": "style.css",
+        "status": 200,
+        "sha256": "cefe17e635f2c6bd038d564ef3fd9b63ed70fbcc042193fecf35234725f808ae"
+      },
+      {
+        "file": "store-downloads.js",
+        "status": 200,
+        "sha256": "5aabddcfe06027036d17f842cefd5c81cb0054cb8c367c4914d2218084d1cc3e"
+      },
+      {
+        "file": "store-links.json",
+        "status": 200,
+        "sha256": "af5a21daf46543165ff66e1884e2b7c7ed9a658f08a67a43b1f860ecbcca8091"
+      },
+      {
+        "file": "assets/store-badges/app-store.svg",
+        "status": 200,
+        "sha256": "a26fc5b38380272c92e9019a2eb8b45542a66814b3e2b203772db8904b9fb99f"
+      },
+      {
+        "file": "assets/store-badges/google-play.svg",
+        "status": 200,
+        "sha256": "4ffa4c7edd2f10b297ca4de2131eddaa00d03b2278d1e178fe512920d824ca34"
+      },
+      {
+        "file": "privacy",
+        "status": 200,
+        "sha256": "8e2020a60a0fb5217ac6d294661922b4c6e6ab07b41dbbccc5950fda3b22f293"
+      },
+      {
+        "file": "terms",
+        "status": 200,
+        "sha256": "43b4d4f113587e1a8a94cfef396c96c3f8f4911a42dcf008e71e564d43b8352b"
+      },
+      {
+        "file": "delete-account",
+        "status": 200,
+        "sha256": "c77996955618fbaf3bf3697844da44a446645cd016a7c06d0a450a83826c1b2e"
+      },
+      {
+        "file": "downloads/famcall.apk",
+        "status": 404
+      },
+      {
+        "file": "downloads/release.json",
+        "status": 404
+      },
+      {
+        "file": "downloads/famcall.apk.sha256",
+        "status": 404
+      }
+    ]
+  },
+  "limits": [
+    "Latest installed testing build not verified on physical phones in this task.",
+    "iOS simulator tested share-sheet fallback; Android emulator tested native SMS composer. No messages sent.",
+    "Public store pages not published; original store badges remain gated until verified on a hosting deployment.",
+    "Static archive declarations do not establish runtime privacy qualification."
+  ],
+  "scope": "Testing-channel delivery and local native UI verification. Store-installed runtime qualification is not inferred from simulator captures.",
+  "ownerTesting": {
+    "reportedOn": "2026-11-08",
+    "statement": "I have tested them.",
+    "version": "0.3.0",
+    "additionalScenariosInferred": false
+  }
+}

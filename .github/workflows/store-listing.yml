@@ -26,7 +26,10 @@ jobs:
       - name: Save Apple draft; keep Play changes in Console drafts
         env:
           FAMCALL_APPLE_API_KEY_JSON: ${{ secrets.FAMCALL_APPLE_API_KEY_JSON }}
-        run: node scripts/prepare-store-drafts.mjs --apply
+          FAMCALL_REVIEW_ACCESS_JSON: ${{ secrets.FAMCALL_REVIEW_ACCESS_JSON }}
+        run: |
+          node scripts/prepare-store-drafts.mjs --apply
+          node scripts/prepare-review-access.mjs
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

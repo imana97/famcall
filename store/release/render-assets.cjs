@@ -7,8 +7,8 @@ const root = path.resolve(__dirname, '../..');
 const deps = createRequire(path.resolve(process.env.FAMCALL_ASSET_TOOLS || path.join(__dirname, 'tools'), 'package.json'));
 const {chromium} = deps('playwright-core');
 const sharp = deps('sharp');
-const base = 'store/assets/public-0.2.0';
-const marketing = 'store/marketing/0.2.0';
+const base = 'store/assets/public-0.3.0';
+const marketing = 'store/marketing/0.3.0';
 const cream = '#f6f5ed', green = '#193e35', sage = '#c4db96';
 const scenes = [
   ['01-people', 'A little signal.<br>A familiar voice.', 'Simple voice calls for imperfect connections.'],
@@ -16,7 +16,7 @@ const scenes = [
   ['03-history', 'Recent calls.<br>Right here.', 'See your calls, including the ones you missed.'],
   ['04-add', 'Your people.<br>One simple list.', 'Add a name and number. Then tap to call.'],
   ['05-dark', 'Light or dark.<br>Always familiar.', 'A clear, simple app that follows your phone’s theme.'],
-  ['06-language', 'English or Persian.<br>Your choice.', 'Choose your language in Settings.'],
+  ['06-language', 'Your language.<br>Your familiar voice.', '12 languages. One simple app.'],
 ];
 const records = [];
 async function data(file) {const bytes=await fs.readFile(path.join(root,file)); return 'data:image/png;base64,'+bytes.toString('base64');}
@@ -64,7 +64,7 @@ try {
   for(const platform of ['apple/en-US/iphone-67','google-play/en-US/phone'])for(const [name]of scenes)thumbs.push(`<div><img src="${await data(`${base}/${platform}/${name}.png`)}"><p>${platform.startsWith('apple')?'iPhone':'Android'} · ${name.slice(3)}</p></div>`);
   await render(browser,`${base}/preview.png`,1800,1580,`<div class="grid">${thumbs.join('')}</div>`,'.grid{padding:25px;display:grid;grid-template-columns:repeat(6,1fr);gap:24px}.grid img{width:100%;height:690px;object-fit:contain;background:#ebece2}.grid p{font-size:20px;margin-top:12px;text-align:center}');
   const rawCaptures=[];for(const platform of ['android','ios'])for(const[name]of scenes){const file=`${base}/raw/${platform}/${name}.png`,b=await fs.readFile(path.join(root,file)),m=await sharp(b).metadata();rawCaptures.push({file,width:m.width,height:m.height,sha256:crypto.createHash('sha256').update(b).digest('hex')});}
-  const manifest={rawCaptures,version:'0.2.0',locale:'en-US',generatedOn:new Date().toISOString(),status:'Listing preparation only; no review submission or public store publication.',sourceAppCommit:'682a762d4157e7dbc35816b56674ae11f7934b2b',captureMode:'Current release UI, isolated E2E native builds with local demo-famcall authentication/contacts/history. Fictional 202-555-01xx numbers. App screens are genuine captures; not evidence of production calling.',appleDisplayType:'APP_IPHONE_67',photography:{file:`${marketing}/family-call-photo.png`,origin:'AI-generated editorial illustration; no customer testimonial or app UI.',creativeBrief:'Two adult family members in separate warm cream, sage and forest-green homes, each holding a phone to the ear. Natural editorial photography, no text, marks, screens or identifiable location.'},assets:records};
+  const manifest={rawCaptures,version:'0.3.0',locale:'en-US',generatedOn:new Date().toISOString(),status:'Listing preparation only; no review submission or public store publication.',sourceAppCommit:'914112a72d93c23399613661379ded6d150ddb0c',captureMode:'Current release UI, isolated E2E native builds with local demo-famcall authentication/contacts/history. Fictional 202-555-01xx numbers. App screens are genuine captures; not evidence of production calling.',appleDisplayType:'APP_IPHONE_67',photography:{file:`${marketing}/family-call-photo.png`,origin:'AI-generated editorial illustration; no customer testimonial or app UI.',creativeBrief:'Two adult family members in separate warm cream, sage and forest-green homes, each holding a phone to the ear. Natural editorial photography, no text, marks, screens or identifiable location.'},assets:records};
   await fs.writeFile(path.join(root,base,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
   console.log(`Rendered ${records.length} opaque PNG assets; verified image and text bounds.`);
 }finally{await browser.close();}

@@ -1,0 +1,14 @@
+[
+  {
+    "account": "Reviewer A",
+    "firebaseSignIn": "pass",
+    "realSMSUsed": false,
+    "authorization": "ordinary authenticated user; no admin claim"
+  },
+  {
+    "account": "Reviewer B",
+    "firebaseSignIn": "pass",
+    "realSMSUsed": false,
+    "authorization": "ordinary authenticated user; no admin claim"
+  }
+]
