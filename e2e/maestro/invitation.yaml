@@ -8,8 +8,29 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: open-dial-pad
 - tapOn:
-    id: dial-number
-- inputText: '+12025550199'
+    id: 'dial-key-\+'
+- tapOn:
+    id: "dial-key-1"
+- tapOn:
+    id: "dial-key-2"
+- tapOn:
+    id: "dial-key-0"
+- tapOn:
+    id: "dial-key-2"
+- tapOn:
+    id: "dial-key-5"
+- tapOn:
+    id: "dial-key-5"
+- tapOn:
+    id: "dial-key-5"
+- tapOn:
+    id: "dial-key-0"
+- tapOn:
+    id: "dial-key-1"
+- tapOn:
+    id: "dial-key-9"
+- tapOn:
+    id: "dial-key-9"
 - scrollUntilVisible:
     element:
       id: dial-call

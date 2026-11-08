@@ -39,7 +39,7 @@
     "support_url": "https://famcall.web.app",
     "privacy_policy_url": "https://famcall.web.app/privacy",
     "external_account_deletion_url": "https://famcall.web.app/delete-account",
-    "url_status": "Website and Android APK are live. Store listing materials are being refreshed for 0.2.0.",
+    "url_status": "Website is switching to registered official App Store and Google Play destinations. Direct website APK distribution is retired. Store badges appear only after the public pages are verified live.",
     "apple_bundle_id": "com.silvergridtech.famcall",
     "android_application_id": "com.silvergridtech.famcall",
     "apple_sku": "famcall-ios",
@@ -94,6 +94,6 @@
   ],
   "localization_notes": {
     "stores": "English (US) only, as requested.",
-    "app": "English default; Persian available in Settings. Both retain the approved left-to-right layout."
+    "app": "0.3.0 adds Chinese, Hindi, Spanish, Arabic, French, Bengali, Portuguese, Russian, Indonesian and Urdu alongside English and Persian. The app follows the phone language by default, with a manual override. Every layout remains left-to-right. Store listings stay English only."
   }
 }
