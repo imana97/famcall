@@ -16,7 +16,9 @@
     "franceSelected": false,
     "macAndVisionDistribution": false,
     "privacyResponses": "Prepared; awaiting the browser-required confirmation of Apple's accuracy/update agreement.",
-    "publicReviewSubmitted": false
+    "publicReviewSubmitted": false,
+    "observedSubmissionState": "PREPARE_FOR_SUBMISSION",
+    "observedReleaseType": "MANUAL; the authorized public iOS workflow requests automatic release when it submits."
   },
   "googlePlay": {
     "internalVersionCodeToPromote": 7,
@@ -32,13 +34,13 @@
     "aiAssistedMarketingAssetsLabeled": true,
     "productionCountries": "All available entries except France selected and saved to Publishing overview.",
     "traderStatus": "Account-owner declaration remains due by February 1, 2027 for this existing developer account. It is not blocking the current review submission; Console allows Submit 12 changes for review.",
-    "publicReviewSubmitted": false,
+    "publicReviewSubmitted": true,
     "productionCountryReadback": {
       "count": 176,
       "restOfWorld": true,
       "franceIncluded": false
     },
-    "firstProductionReleaseRequirement": "Google requires draft status for a draft app and rejects changesNotSentForReview on this app. The workflow validates the exact tested production draft without committing an edit; the first production draft/review is then completed in Play Console. Subsequent ready releases use the normal API promotion.",
+    "firstProductionReleaseRequirement": "For the initial app, Google rejected creating a completed production release through the API. After protected workflow validation, the existing tested code 7 was selected and saved in the one-time Console production setup. The protected public-release workflow then successfully promoted/committed it for review; Console confirms Changes in review.",
     "listingAndScreenshotHashesReadBack": true,
     "advertisingIdDeclaration": "Saved: does not use advertising ID.",
     "fullScreenIntentDeclaration": "Saved: making and receiving calls; opt-in requested for pre-grant at installation, subject to Google review.",
@@ -60,8 +62,13 @@
       "savedToPublishingOverview": true
     },
     "draftValidationWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42499477316",
-    "currentReviewRequirements": "All required app-content declarations completed; English listing and production release saved. Managed publishing is off, so approved changes publish automatically. Google is running its quick checks before review.",
-    "ownerSignInRequiredForCurrentReview": false
+    "currentReviewRequirements": "All 12 prepared changes, including the production release, English listing, countries, content rating and privacy declarations, are now in review.",
+    "ownerSignInRequiredForCurrentReview": false,
+    "publicSubmissionWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42499955120",
+    "consoleVerifiedState": "Changes in review",
+    "consoleVerifiedMessage": "Your changes are now in review. We may find additional issues when reviewing your app.",
+    "managedPublishing": false,
+    "publicationAfterApproval": "Automatic, subject to Google approval and any further store requirements."
   },
   "googleDataSafetyInterpretation": {
     "collectedNonEphemeral": [
@@ -104,8 +111,8 @@
   "limits": [
     "Owner acceptance does not claim every individual physical-device/network matrix case was reported or reproduced for 0.3.0.",
     "Static signed-archive inventories describe declarations, not a runtime privacy audit.",
-    "Neither store's review outcome or public availability is asserted by this preparation record.",
-    "Privacy confirmations, owner-only declarations and platform review validation still apply before submission."
+    "Google review submission is confirmed; approval and public availability are not asserted. Apple submission awaits the requested privacy accuracy/update agreement confirmation.",
+    "The account-owner Google trader declaration remains a separate existing-account requirement due February 1, 2027; it did not block this review submission."
   ],
   "validation": {
     "automatedChecks": {
@@ -115,5 +122,6 @@
       "note": "All 245 tests passed with local Firebase emulators, including three additional cases proving draft preparation cannot enable final submission or bypass quota/assets."
     },
     "googleIcon": "32-bit RGBA PNG with fully opaque alpha; Console SHA-256 matches the manifest."
-  }
+  },
+  "observedAt": "2026-11-08T16:33:01.614Z"
 }
