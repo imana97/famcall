@@ -40,7 +40,7 @@
     "dataSafety": "Completed and saved; submitted later with the production release.",
     "aiAssistedMarketingAssetsLabeled": true,
     "productionCountries": "All available entries except France selected and saved to Publishing overview.",
-    "traderStatus": "Account-owner declaration remains due by February 1, 2027 for this existing developer account. It is not blocking the current review submission; Console allows Submit 12 changes for review.",
+    "traderStatus": "Developer account is declared Trader. FamCall inherits that status; its app-level confirmation and existing public Terms of Service URL are saved.",
     "publicReviewSubmitted": true,
     "productionCountryReadback": {
       "count": 176,
@@ -75,7 +75,9 @@
     "consoleVerifiedState": "Changes in review",
     "consoleVerifiedMessage": "Your changes are now in review. We may find additional issues when reviewing your app.",
     "managedPublishing": false,
-    "publicationAfterApproval": "Automatic, subject to Google approval and any further store requirements."
+    "publicationAfterApproval": "Automatic, subject to Google approval and any further store requirements.",
+    "termsOfServiceUrl": "https://famcall.web.app/terms",
+    "traderDeclarationReference": "store/release/google-trader-declaration-2026-11-08.json"
   },
   "googleDataSafetyInterpretation": {
     "collectedNonEphemeral": [
@@ -119,7 +121,7 @@
     "Owner acceptance does not claim every individual physical-device/network matrix case was reported or reproduced for 0.3.0.",
     "Static signed-archive inventories describe declarations, not a runtime privacy audit.",
     "Google and Apple review submissions and automatic-release settings are confirmed. Approval and public availability are not asserted.",
-    "The account-owner Google trader declaration remains a separate existing-account requirement due February 1, 2027; it did not block this review submission."
+    "Google account Trader status is confirmed, and FamCall’s inherited app-level Trader confirmation and Terms URL are saved."
   ],
   "validation": {
     "automatedChecks": {
