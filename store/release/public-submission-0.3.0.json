@@ -17,7 +17,7 @@
     "macAndVisionDistribution": false,
     "privacyResponses": "Published in App Store Connect after the owner explicitly approved Apple privacy accuracy/update agreement in chat.",
     "publicReviewSubmitted": true,
-    "observedSubmissionState": "WAITING_FOR_REVIEW",
+    "observedSubmissionState": "READY_FOR_SALE",
     "observedReleaseType": "AFTER_APPROVAL",
     "privacyPublishedAt": "2026-11-08T17:42:48.330Z",
     "publicSubmissionAuthorization": "Owner requested autonomous public submission and specifically approved publishing Apple privacy responses.",
@@ -25,7 +25,10 @@
     "automaticReleaseWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42507212042",
     "reviewReceiptReference": "store/release/apple-review-submission-2026-11-08.json",
     "reviewSubmissionId": "60f463fe-2901-44ff-8403-58d0124edd6a",
-    "publicationAfterApproval": "Automatic, subject to Apple approval and any further store requirements."
+    "publicationAfterApproval": "Automatic, subject to Apple approval and any further store requirements.",
+    "publicAvailable": true,
+    "publicUrl": "https://apps.apple.com/app/id6831551843",
+    "publicationReceiptReference": "store/release/apple-publication-2026-11-08.json"
   },
   "googlePlay": {
     "internalVersionCodeToPromote": 7,
@@ -40,7 +43,7 @@
     "dataSafety": "Completed and saved; submitted later with the production release.",
     "aiAssistedMarketingAssetsLabeled": true,
     "productionCountries": "All available entries except France selected and saved to Publishing overview.",
-    "traderStatus": "Account-owner declaration remains due by February 1, 2027 for this existing developer account. It is not blocking the current review submission; Console allows Submit 12 changes for review.",
+    "traderStatus": "Developer account is declared Trader. FamCall inherits that status; its app-level confirmation and existing public Terms of Service URL are saved.",
     "publicReviewSubmitted": true,
     "productionCountryReadback": {
       "count": 176,
@@ -75,7 +78,9 @@
     "consoleVerifiedState": "Changes in review",
     "consoleVerifiedMessage": "Your changes are now in review. We may find additional issues when reviewing your app.",
     "managedPublishing": false,
-    "publicationAfterApproval": "Automatic, subject to Google approval and any further store requirements."
+    "publicationAfterApproval": "Automatic, subject to Google approval and any further store requirements.",
+    "termsOfServiceUrl": "https://famcall.web.app/terms",
+    "traderDeclarationReference": "store/release/google-trader-declaration-2026-11-08.json"
   },
   "googleDataSafetyInterpretation": {
     "collectedNonEphemeral": [
@@ -118,8 +123,8 @@
   "limits": [
     "Owner acceptance does not claim every individual physical-device/network matrix case was reported or reproduced for 0.3.0.",
     "Static signed-archive inventories describe declarations, not a runtime privacy audit.",
-    "Google and Apple review submissions and automatic-release settings are confirmed. Approval and public availability are not asserted.",
-    "The account-owner Google trader declaration remains a separate existing-account requirement due February 1, 2027; it did not block this review submission."
+    "Apple approval and public App Store availability are confirmed. Google public availability is not yet confirmed.",
+    "Google account Trader status is confirmed, and FamCall’s inherited app-level Trader confirmation and Terms URL are saved."
   ],
   "validation": {
     "automatedChecks": {
