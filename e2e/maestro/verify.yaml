@@ -3,9 +3,22 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: verification-code
 - inputText: ${OTP}
-- tapOn: Check your messages.
+- runFlow: dismiss-keyboard.yaml
 - tapOn:
     id: verify-number
+- extendedWaitUntil:
+    visible: "Your people\\.|Get ready to call\\."
+    timeout: 30000
+- runFlow:
+    when:
+      visible: Get ready to call.
+    commands:
+      - scrollUntilVisible:
+          element:
+            id: setup-finish
+          direction: DOWN
+      - tapOn:
+          id: setup-finish
 - extendedWaitUntil:
     visible: Your people.
     timeout: 30000

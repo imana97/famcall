@@ -1,12 +1,9 @@
-Use two test phones with this FamCall build installed.
+FamCall 0.3.0
 
-1. Verify your phone number and reopen the app. Check that you remain signed in.
-2. Add someone from contacts, then try adding a number manually with its country code. Try again with contact access declined.
-3. Call in both directions. Check that both people can hear and understand each other.
-4. Try an incoming call with the receiving phone locked and the app in the background.
-5. During a call, switch between Wi-Fi and mobile data. Briefly lose the connection, then restore it. Note whether speech returns and how long it takes.
-6. Try speakerphone, headphones, mute, declining a call, and hanging up from either end.
+Check automatic phone-language selection and Settings > Language. English, Persian, Chinese, Hindi, Spanish, Arabic, French, Bengali, Portuguese, Russian, Indonesian and Urdu are available. All layouts stay left-to-right. A manual language choice should survive restarting the app.
 
-Include the app build, phone model, OS version, approximate time and timezone, connection type at each end, whether a VPN was used, and the steps that caused the problem. If a diagnostic reference is shown, include it.
+Call an unregistered number: the call screen should offer Invite to FamCall instead of an error. Tap it and confirm that the text composer contains the right number and https://famcall.web.app. Cancel without sending if you only want to test the flow. On a device without SMS, a share sheet is offered.
 
-Do not include verification codes, passwords, other people's phone numbers, contact lists, or recordings of private conversations. Use the feedback address info@silvergridtech.com.
+Also check ordinary calls between two FamCall users, locked-screen ringing and answering, mute, speaker, recent/missed calls, and recovery after a connection interruption. Both phones need internet.
+
+Feedback: info@silvergridtech.com

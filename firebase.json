@@ -1,12 +1,59 @@
 {
-  "functions": [{ "source": "backend", "codebase": "famcall", "ignore": ["node_modules", ".git", "*-debug.log", ".env*", "src", "tsconfig.json"], "predeploy": ["npm run build:backend"] }],
-  "firestore": { "rules": "firestore.rules", "indexes": "firestore.indexes.json" },
-  "hosting": { "public": "website", "ignore": ["firebase.json", "**/.*", "**/node_modules/**"], "cleanUrls": true },
+  "functions": [
+    {
+      "source": "backend",
+      "codebase": "famcall",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "*-debug.log",
+        ".env*",
+        "src",
+        "tsconfig.json"
+      ],
+      "predeploy": [
+        "npm run build:backend"
+      ]
+    }
+  ],
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "website",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "headers": [
+      {
+        "source": "/store-links.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ]
+  },
   "emulators": {
-    "auth": { "port": 9099 },
-    "functions": { "port": 5001 },
-    "firestore": { "port": 8080 },
-    "ui": { "enabled": true, "port": 4000 },
+    "auth": {
+      "port": 9099
+    },
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    },
     "singleProjectMode": true
   }
 }

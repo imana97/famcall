@@ -3,8 +3,11 @@ FAMCALL — EXISTING ENCRYPTION EXPORT ANSWER
 The owner approved the existing encryption declaration for TestFlight, with no
 France distribution for now. App Store Connect readbacks for version 0.1.0 builds
 2 and 3 confirm usesNonExemptEncryption=false. Build 3 reused the already approved
-answer; this configuration change carries that same answer into future binaries.
-It is not a new encryption classification or a change to country availability.
+answer. Current build 4 from 5f72e339 reused that existing answer automatically,
+and its readback also reports usesNonExemptEncryption=false. It is now
+VALID/IN_BETA_TESTING following successful protected workflow 42348865146; see
+testing-delivery-ui-refresh-2026-11-07.json. This is not a new encryption
+classification, country-availability approval or public-release approval.
 
 Expo SDK 58 maps ios.config.usesNonExemptEncryption to the boolean
 ITSAppUsesNonExemptEncryption in the generated iOS Info.plist. Keeping the approved
@@ -17,7 +20,9 @@ change. Revisit the existing France restriction before enabling distribution
 there. Any changed declaration requires an appropriate reviewed answer; do not
 infer it from this stored value. Public-store release gates remain separate.
 
-For a future protected build, inspect the packaged IPA's Info.plist and confirm
+The build 4 delivery readback does not establish tester installation or runtime
+behavior. Public candidate.json remains not-ready. For each future protected
+build, inspect the packaged IPA's Info.plist and confirm
 the key is present as a boolean false, then verify App Store Connect processing.
 Local Expo prebuild validation proves generated configuration, not acceptance of
 a future archive. Do not edit generated native files to supply this answer.

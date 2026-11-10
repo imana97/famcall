@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-11-08T17:55:12.177Z",
+  "version": "0.3.0",
+  "state": "WAITING_FOR_REVIEW",
+  "releaseType": "AFTER_APPROVAL",
+  "build": "6",
+  "processingState": "VALID",
+  "submissionWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42506505019",
+  "automaticReleaseWorkflow": "https://github.com/silvergrid/famcall/actions/runs/42507212042",
+  "reviewSubmissionId": "60f463fe-2901-44ff-8403-58d0124edd6a"
+}

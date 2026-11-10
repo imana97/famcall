@@ -1,5 +1,9 @@
 import type { ExpoConfig } from "expo/config";
 import path from "node:path";
+import { readdirSync } from "node:fs";
+
+const supportedLocales = readdirSync(path.join(__dirname, "locales"))
+  .filter(file => file.endsWith(".json")).map(file => file.slice(0, -5)).sort();
 
 const e2e = process.env.APP_VARIANT === "e2e";
 const emulatorHost = e2e
@@ -15,10 +19,11 @@ const config: ExpoConfig = {
   name: e2e ? "FamCall Test" : "FamCall",
   slug: "famcall",
   owner: "silvergrid",
-  version: "0.1.0",
+  version: "0.3.0",
   scheme: e2e ? "famcall-test" : "famcall",
   orientation: "portrait",
   userInterfaceStyle: "automatic",
+  locales: Object.fromEntries(supportedLocales.map(code => [code, `./locales/${code}.json`])),
   icon: "./assets/icon.png",
   ios: {
     bundleIdentifier: "com.silvergridtech.famcall" + (e2e ? ".e2e" : ""),
@@ -71,8 +76,18 @@ const config: ExpoConfig = {
     "./plugins/withAudioOnly",
     "./plugins/withFirebasePhoneAuth",
     "./plugins/withTestBackend",
+    "./plugins/withCallPermissions",
     "expo-router",
-    ["expo-localization", { supportedLocales: ["en"], supportsRTL: false }],
+    [
+      "expo-splash-screen",
+      {
+        backgroundColor: "#183D34",
+        image: "./assets/splash-icon.png",
+        imageWidth: 240,
+        resizeMode: "contain",
+      },
+    ],
+    ["expo-localization", { supportedLocales, supportsRTL: false, forcesRTL: false }],
     [
       "expo-contacts",
       {
@@ -80,7 +95,11 @@ const config: ExpoConfig = {
           "Choose someone from your contacts to add to FamCall.",
       },
     ],
-    ["expo-notifications", { enableBackgroundRemoteNotifications: true }],
+    ["expo-notifications", {
+      enableBackgroundRemoteNotifications: true,
+      icon: "./assets/notification-icon.png",
+      color: "#183D34",
+    }],
     [
       "expo-build-properties",
       {
@@ -110,6 +129,8 @@ const config: ExpoConfig = {
         supportsVideo: false,
         supportsHolding: false,
         includesCallsInRecents: false,
+        iconTemplateIos: "./assets/callkit-icon.png",
+        notificationIconAndroid: "./assets/notification-icon.png",
         cameraPermission: false,
         microphonePermission:
           "FamCall uses your microphone during voice calls.",

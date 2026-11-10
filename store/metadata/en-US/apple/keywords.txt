@@ -1,1 +1,1 @@
-family,friends,phone,audio,low bandwidth,unstable internet,stay connected
+family,friends,audio,phone,low bandwidth,unstable internet,contacts,international

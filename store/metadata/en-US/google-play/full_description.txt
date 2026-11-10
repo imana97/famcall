@@ -1,21 +1,28 @@
 A little signal. A familiar voice.
 
-FamCall is a simple way to call the people who matter, designed with weak and unstable internet connections in mind.
+Some conversations are worth making time for, even when the internet has other plans. FamCall keeps voice calling simple, with weak and unstable connections in mind.
 
-Just voice. Just your people.
-Open your contacts, choose someone, and start a one-to-one voice call. Both people use FamCall, so a familiar voice is only a few taps away.
+YOUR PEOPLE, ONE SIMPLE LIST
+Add a name and phone number, or choose someone from your phone’s contacts. Tap a person to call. Only the contacts you choose are added.
 
-Get started with your phone number
-Verify your number and stay signed in. There is no password to remember. Add people from your contacts with your permission, or enter a phone number with its country code.
+JUST WANT TO DIAL?
+Open the keypad, enter a number with its country code, and call another FamCall user. No need to save the number first. If they haven’t joined FamCall, invite them with a ready-to-edit text message.
 
-Made for imperfect connections
-FamCall focuses on keeping conversation understandable when bandwidth is limited. If the connection is interrupted, it tries to reconnect and shows you what is happening.
+LESS TO THINK ABOUT
+Verify your phone number once and stay signed in. No password or meeting link to remember. Clear controls for mute, speaker and ending a call keep the conversation front and center.
 
-Keep it simple
-One-to-one voice calls. A clear contact list. An easy way to answer, talk, and hang up. Recent and missed calls, with blocking when you need it.
+KEEP UP WITH YOUR CALLS
+See recent and missed calls. Edit or remove saved people, block an unwanted number, and unblock it whenever you choose.
 
-Both people need FamCall and an internet connection. Call availability and performance depend on the connection at each end. Mobile data charges may apply.
+FAMILIAR IN MORE WAYS
+Available in 12 languages, with automatic selection from your phone and a language choice in Settings. Enjoy a clear light or dark appearance that follows your phone’s theme.
 
-Questions or feedback? Contact info@silvergridtech.com.
+MADE WITH IMPERFECT CONNECTIONS IN MIND
+FamCall focuses on voice. If a connection is interrupted, it tries to reconnect and shows you what is happening.
 
-FamCall is developed by SilverGrid Technology LLC.
+Both people need FamCall and an internet connection. Calls are between FamCall users, not ordinary telephone lines. Availability and performance depend on both connections and phone settings. Mobile data charges may apply. FamCall does not support emergency calls.
+
+Questions or feedback? info@silvergridtech.com
+Privacy: https://famcall.web.app/privacy
+
+Developed by SilverGrid Technology LLC.

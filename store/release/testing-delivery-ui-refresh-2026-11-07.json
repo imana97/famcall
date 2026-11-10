@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-11-07T07:16:02.361159+00:00",
+  "scope": "Verified updated testing delivery and static signed-archive inspection only. No latest-update installation, production-auth/push/call qualification, finalized privacy label or public-store approval is asserted.",
+  "source_commit": "5f72e33936aa5839b89ec8a5504a4e309888cab3",
+  "reviewed_pr_head": "42f3d9f70760ac50a17cddd312048fd9bd693378",
+  "pull_request": "https://github.com/silvergrid/famcall/pull/14",
+  "quality": {
+    "run": 42348666952,
+    "conclusion": "success",
+    "reviewed_tree_matches_merged_source": true
+  },
+  "workflow": {
+    "run": 42348865146,
+    "url": "https://github.com/silvergrid/famcall/actions/runs/42348865146",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "ios": {
+    "version": "0.1.0",
+    "build": "4",
+    "apple_build_id": "d3d0ec53-7bba-4a9a-ab68-1455322f260b",
+    "processing_state": "VALID",
+    "internal_build_state": "IN_BETA_TESTING",
+    "owner_group_assigned": true,
+    "owner_testing_access": "expected owner tester verified in existing group; already accepted",
+    "latest_build_installation": "not verified",
+    "test_notes_readback_matched": true,
+    "eas_build_id": "d7c60e1c-8e23-4dc6-b305-76c7b73588f4",
+    "submission_id": "adb7c01d-b19a-4ca4-a8cc-1143d266810d",
+    "submission_status": "FINISHED",
+    "archive_sha256": "06d949037af19164eef47da1ac9bdb1216d9ea0c1ac4bfd2ab030eb77a3e8a12",
+    "privacy_inventory": "ios-build-4-privacy.json",
+    "uses_non_exempt_encryption": false,
+    "production_push_and_app_attest_entitlements": true,
+    "debug_entitlement": false,
+    "iphone_only": true,
+    "embedded_signal_bridge_icon_visually_checked": true
+  },
+  "android": {
+    "version": "0.1.0",
+    "version_code": "5",
+    "track": "internal",
+    "release_status": "completed",
+    "owner_tester_list": "Previously configured internal tester access remains unchanged by this update",
+    "opt_in_url": "https://play.google.com/apps/internaltest/4700744436494600533",
+    "eas_build_id": "7396f289-6f6f-4388-b49d-f4c78f7a6233",
+    "submission_id": "a7219571-ee5a-4e80-bdfb-cd731db3b77f",
+    "submission_status": "FINISHED",
+    "bundle_sha256": "5afa3f0c5d5b7567ddba11dc7ac0a730cb76b310488400ffb466869b3beb69a8",
+    "play_received_bundle_hash_matches": true,
+    "privacy_inventory": "android-build-5-privacy.json",
+    "camera_call_log_write_contacts_shared_storage_overlay_permissions_absent": true,
+    "launcher_adaptive_monochrome_signal_bridge_icons_visually_checked": true,
+    "play_status_read_session_deleted_without_commit": true,
+    "release_notes": "Updated internal notes prepared in metadata; no separate Play release mutation was made outside the protected workflow."
+  },
+  "changes_in_this_build": [
+    "Approved Signal bridge icon throughout the app, native call surfaces and store assets",
+    "Upfront microphone setup and read-only calling checks, with Android alert/full-screen choices optional",
+    "Canceled preflight cannot create a late call; clearer permission recovery",
+    "Keyboard, forms, contact/history loading, navigation and large-text polish",
+    "Account-deletion retry support paired with backend deployment 42348863699"
+  ],
+  "static_privacy_audit": {
+    "ios_manifest_count": 40,
+    "ios_declarations_unchanged_from_historical_build_2": true,
+    "ios_declared_tracking_manifests": [],
+    "ios_declared_tracking_domains": [],
+    "android_sdk_metadata_unchanged_from_historical_build_3": true,
+    "android_permissions_removed_since_historical_3": [
+      "READ_EXTERNAL_STORAGE",
+      "SYSTEM_ALERT_WINDOW",
+      "WRITE_CONTACTS",
+      "WRITE_EXTERNAL_STORAGE"
+    ],
+    "android_permissions_added_since_historical_3": [],
+    "limit": "Static package declarations and selected metadata only; not runtime collection verification or a completed privacy label."
+  },
+  "historical_delivery_record": "testing-delivery-2026-11-07.json",
+  "historical_privacy_reports": [
+    "ios-build-2-privacy.json",
+    "android-build-3-privacy.json"
+  ],
+  "public_release": "not performed; candidate.json remains not-ready"
+}

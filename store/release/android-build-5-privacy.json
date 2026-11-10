@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "scope": "Static base-module manifest and selected SDK metadata from this AAB; not a complete dependency inventory, runtime collection audit, or Play-signature verification.",
+  "archiveSha256": "5afa3f0c5d5b7567ddba11dc7ac0a730cb76b310488400ffb466869b3beb69a8",
+  "bundletoolSha256": "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29",
+  "app": {
+    "package": "com.silvergridtech.famcall",
+    "versionName": "0.1.0",
+    "versionCode": "5"
+  },
+  "sdk": {
+    "minSdkVersion": "24",
+    "targetSdkVersion": "36"
+  },
+  "applicationFlags": {
+    "allowBackup": "true",
+    "debuggable": null,
+    "usesCleartextTraffic": "false"
+  },
+  "flagNote": "null means absent; apply Android defaults when interpreting the value.",
+  "permissions": [
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.ACCESS_WIFI_STATE",
+    "android.permission.BLUETOOTH",
+    "android.permission.BLUETOOTH_CONNECT",
+    "android.permission.FOREGROUND_SERVICE",
+    "android.permission.FOREGROUND_SERVICE_PHONE_CALL",
+    "android.permission.INTERNET",
+    "android.permission.MANAGE_OWN_CALLS",
+    "android.permission.MODIFY_AUDIO_SETTINGS",
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.READ_APP_BADGE",
+    "android.permission.READ_CONTACTS",
+    "android.permission.RECEIVE_BOOT_COMPLETED",
+    "android.permission.RECORD_AUDIO",
+    "android.permission.USE_FULL_SCREEN_INTENT",
+    "android.permission.VIBRATE",
+    "android.permission.WAKE_LOCK",
+    "com.anddoes.launcher.permission.UPDATE_COUNT",
+    "com.google.android.c2dm.permission.RECEIVE",
+    "com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE",
+    "com.google.android.providers.gsf.permission.READ_GSERVICES",
+    "com.htc.launcher.permission.READ_SETTINGS",
+    "com.htc.launcher.permission.UPDATE_SHORTCUT",
+    "com.huawei.android.launcher.permission.CHANGE_BADGE",
+    "com.huawei.android.launcher.permission.READ_SETTINGS",
+    "com.huawei.android.launcher.permission.WRITE_SETTINGS",
+    "com.majeur.launcher.permission.UPDATE_BADGE",
+    "com.oppo.launcher.permission.READ_SETTINGS",
+    "com.oppo.launcher.permission.WRITE_SETTINGS",
+    "com.sec.android.provider.badge.permission.READ",
+    "com.sec.android.provider.badge.permission.WRITE",
+    "com.silvergridtech.famcall.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+    "com.sonyericsson.home.permission.BROADCAST_BADGE",
+    "com.sonymobile.home.permission.PROVIDER_INSERT_BADGE",
+    "me.everything.badger.permission.BADGE_COUNT_READ",
+    "me.everything.badger.permission.BADGE_COUNT_WRITE"
+  ],
+  "firebaseComponents": [
+    "com.google.firebase.FirebaseCommonKtxRegistrar",
+    "com.google.firebase.appcheck.FirebaseAppCheckKtxRegistrar",
+    "com.google.firebase.appcheck.FirebaseAppCheckRegistrar",
+    "com.google.firebase.appcheck.debug.FirebaseAppCheckDebugRegistrar",
+    "com.google.firebase.appcheck.playintegrity.FirebaseAppCheckPlayIntegrityRegistrar",
+    "com.google.firebase.auth.FirebaseAuthRegistrar",
+    "com.google.firebase.datatransport.TransportRegistrar",
+    "com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar",
+    "com.google.firebase.firestore.FirestoreRegistrar",
+    "com.google.firebase.functions.FirebaseFunctionsKtxRegistrar",
+    "com.google.firebase.functions.FunctionsRegistrar",
+    "com.google.firebase.iid.Registrar",
+    "com.google.firebase.installations.FirebaseInstallationsKtxRegistrar",
+    "com.google.firebase.installations.FirebaseInstallationsRegistrar",
+    "com.google.firebase.messaging.FirebaseMessagingKtxRegistrar",
+    "com.google.firebase.messaging.FirebaseMessagingRegistrar",
+    "io.invertase.firebase.app.ReactNativeFirebaseAppRegistrar"
+  ],
+  "sdkProperties": {
+    "firebase-auth-interop.properties": {
+      "version": "20.0.0",
+      "client": "firebase-auth-interop"
+    },
+    "firebase-auth.properties": {
+      "version": "25.0.0",
+      "client": "firebase-auth"
+    },
+    "firebase-iid-interop.properties": {
+      "version": "17.1.0",
+      "client": "firebase-iid-interop"
+    },
+    "firebase-iid.properties": {
+      "version": "21.1.0",
+      "client": "firebase-iid"
+    },
+    "firebase-measurement-connector.properties": {
+      "version": "19.0.0",
+      "client": "firebase-measurement-connector"
+    },
+    "integrity.properties": {
+      "version": "1.4.0",
+      "client": "integrity"
+    },
+    "play-services-auth-api-phone.properties": {
+      "version": "18.0.2",
+      "client": "play-services-auth-api-phone"
+    },
+    "play-services-auth-base.properties": {
+      "version": "18.0.10",
+      "client": "play-services-auth-base"
+    },
+    "play-services-auth.properties": {
+      "version": "21.5.0",
+      "client": "play-services-auth"
+    },
+    "play-services-base.properties": {
+      "version": "18.9.0",
+      "client": "play-services-base"
+    },
+    "play-services-basement.properties": {
+      "version": "18.9.0",
+      "client": "play-services-basement"
+    },
+    "play-services-cloud-messaging.properties": {
+      "version": "17.4.0",
+      "client": "play-services-cloud-messaging"
+    },
+    "play-services-fido.properties": {
+      "version": "20.1.0",
+      "client": "play-services-fido"
+    },
+    "play-services-stats.properties": {
+      "version": "17.0.2",
+      "client": "play-services-stats"
+    },
+    "play-services-tasks.properties": {
+      "version": "18.4.0",
+      "client": "play-services-tasks"
+    },
+    "recaptcha.properties": {
+      "version": "18.6.1",
+      "client": "recaptcha"
+    }
+  }
+}

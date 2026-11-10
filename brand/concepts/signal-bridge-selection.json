@@ -1,0 +1,20 @@
+{
+  "selectedConcept": "2 — Signal bridge",
+  "selectedOn": "2026-11-07",
+  "reference": "signal-bridge-selected.png",
+  "referenceSource": "Approved FamCall design preview exec-ca9ba36d-152f-4992-a7b8-4d4f915b2228.png",
+  "direction": "Tilted ivory handset with two separated sage signal arcs on forest green.",
+  "colors": {
+    "forest": "#183D34",
+    "ivory": "#F5F4E9",
+    "sage": "#C5DF9E"
+  },
+  "productionMaster": "../famcall-glyph.svg",
+  "renderer": "../../scripts/render-icons.sh",
+  "referencePurpose": "Design reference only. Production artwork uses flat, exact brand colors and vector geometry; platform masks and effects are applied by the operating system.",
+  "specificationSources": [
+    "https://developer.apple.com/design/human-interface-guidelines/app-icons",
+    "https://developer.android.com/develop/ui/compose/system/icon_design_adaptive",
+    "https://developer.android.com/distribute/google-play/resources/icon-design-specifications"
+  ]
+}

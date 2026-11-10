@@ -8,8 +8,8 @@ import React, {
 } from "react";
 import { AppState } from "react-native";
 import { router } from "expo-router";
+import { signOut } from "@react-native-firebase/auth";
 import * as Calls from "expo-callkit-telecom";
-import * as Notifications from "expo-notifications";
 import { randomUUID } from "expo-crypto";
 import NetInfo from "@react-native-community/netinfo";
 import { doc, onSnapshot } from "@react-native-firebase/firestore";
@@ -19,10 +19,12 @@ import { DeviceRegistration } from "../services/DeviceRegistration";
 import { prepareDeviceRegistration } from "../services/deviceRegistrationStorage";
 import { consumeNativeEvents } from "../services/nativeEvents";
 import { NativeCallCoordinator } from "../services/NativeCallCoordinator";
+import { presentIncomingCall } from "../services/incomingCallPresentation";
 import { OutgoingCallAttempt } from "../services/OutgoingCallAttempt";
 import { recordTestMetric, waitForTestCallStart } from "../services/e2eDiagnostics";
 import { VoicePeer, type VoiceState } from "../services/VoicePeer";
-import { callStartError, errorMessage } from "../services/errors";
+import { CallInviteError, callStartError, errorMessage } from "../services/errors";
+import { assertMicrophonePermission } from "../services/callReadiness";
 import {
   flushCallOutbox,
   hasEndedLocally,
@@ -30,6 +32,7 @@ import {
   restoreCallOutbox,
 } from "../services/callOutbox";
 import { useSession } from "./Session";
+import { useCallReadiness } from "./CallReadiness";
 
 interface CallView {
   call: CallRecord | null;
@@ -39,11 +42,13 @@ interface CallView {
   error: string | null;
   connectedAt: number | null;
   cancelledBeforeStart: boolean;
+  invitePhone: string | null;
 }
 interface Calling extends CallView {
   start: (phone: string) => Promise<void>;
   answer: () => Promise<void>;
   end: () => Promise<void>;
+  logOut: () => Promise<void>;
   toggleMute: () => void;
   toggleSpeaker: () => void;
 }
@@ -55,18 +60,24 @@ const initial: CallView = {
   error: null,
   connectedAt: null,
   cancelledBeforeStart: false,
+  invitePhone: null,
 };
 const Context = createContext<Calling>({
   ...initial,
   async start() {},
   async answer() {},
   async end() {},
+  async logOut() {},
   toggleMute() {},
   toggleSpeaker() {},
 });
 
 export function CallingProvider({ children }: React.PropsWithChildren) {
   const { user } = useSession();
+  const readiness = useCallReadiness();
+  const permissionsReady = useRef(readiness.canCall);
+  permissionsReady.current = readiness.canCall;
+  const refreshRegistration = useRef<() => void>(() => undefined);
   const [view, setView] = useState<CallView>(initial);
   const current = useRef(view);
   const peer = useRef<VoicePeer | null>(null);
@@ -78,15 +89,42 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
   const endedNativeIds = useRef(new Set<string>());
   const reporting = useRef<string | null>(null);
   const flushPending = useRef<() => void>(() => undefined);
+  const pauseRegistration = useRef<() => (() => void)>(() => () => undefined);
   const update = (patch: Partial<CallView>) => {
     current.current = { ...current.current, ...patch };
     setView(current.current);
   };
-  const fail = (e: unknown) => update({ error: errorMessage(e) });
+  const fail = (e: unknown) => {
+    if (__DEV__) console.info("[FamCall call error]", JSON.stringify({
+      code: (e as { code?: string } | null)?.code,
+      name: (e as { name?: string } | null)?.name,
+    }));
+    update({ error: errorMessage(e) });
+  };
   const applyMute = (muted: boolean) => {
     peer.current?.mute(muted);
     update({ muted });
   };
+
+  function reportIncoming(call: CallRecord) {
+    if (call.status !== "ringing" || call.calleeId !== user?.uid ||
+        !permissionsReady.current || nativeId.current || reporting.current === call.id ||
+        watchedId.current !== call.id || hasEndedLocally(call.id) || Date.now() >= call.ringExpiresAtMs) return;
+    reporting.current = call.id;
+    void presentIncomingCall(Calls.getActiveCallSession, () =>
+      watchedId.current === call.id && !nativeId.current &&
+      current.current.call?.id === call.id && current.current.call.status === "ringing" &&
+      !hasEndedLocally(call.id) && Date.now() < call.ringExpiresAtMs,
+    () => Calls.reportIncomingCall({
+      eventId: call.id,
+      serverCallId: call.id,
+      hasVideo: false,
+      supportsDTMF: false,
+      supportsHolding: false,
+      startedAt: new Date(call.createdAtMs).toISOString(),
+      caller: { id: call.callerId, phoneNumber: call.callerPhone, displayName: call.callerPhone },
+    })).catch(error => { if (watchedId.current === call.id) fail(error); });
+  }
 
   function watch(id: string, initialMuted?: boolean) {
     if (watchedId.current === id) {
@@ -108,28 +146,7 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         if (hasEndedLocally(call.id) && !isTerminal(call.status)) return;
         recordTestMetric({ kind: "call-record", callId: call.id, status: call.status, muted: current.current.muted });
         update({ call });
-        if (
-          call.status === "ringing" &&
-          call.calleeId === user?.uid &&
-          !nativeId.current &&
-          reporting.current !== call.id &&
-          Date.now() < call.ringExpiresAtMs
-        ) {
-          reporting.current = call.id;
-          void Calls.reportIncomingCall({
-            eventId: call.id,
-            serverCallId: call.id,
-            hasVideo: false,
-            supportsDTMF: false,
-            supportsHolding: false,
-            startedAt: new Date(call.createdAtMs).toISOString(),
-            caller: {
-              id: call.callerId,
-              phoneNumber: call.callerPhone,
-              displayName: call.callerPhone,
-            },
-          }).catch(error => { if (watchedId.current === id) fail(error); });
-        }
+        reportIncoming(call);
         if (isTerminal(call.status)) {
           peer.current?.close();
           peer.current = null;
@@ -206,6 +223,14 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       hasEndedLocally: () => hasEndedLocally(id) ||
         (current.current.call?.id === id && isTerminal(current.current.call.status)),
       nativeEnded: systemId => endedNativeIds.current.has(systemId),
+      preflight: async () => {
+        // The attempt already owns cancellation while OS checks are pending.
+        // Nothing rings and no server call exists until this check succeeds.
+        const allowed = await readiness.preflight();
+        if (!attempt.active || auth.currentUser?.uid !== uid) return false;
+        if (!allowed && AppState.currentState === "active") router.replace("/calling-setup");
+        return allowed;
+      },
       create: async () => {
         await waitForTestCallStart("before-request", id);
         const call = await api<CallRecord>("startCall", { phone, requestId: id })
@@ -237,10 +262,15 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
           if (nativeId.current === systemId) fail(error);
         });
         if (current.current.call?.status === "accepted") void connect(current.current.call);
-        router.replace({ pathname: "/call/[id]", params: { id: call.id } });
+        // The outgoing screen already owns this attempt. Its call data comes
+        // from context; replacing /call/new would remount and animate it again.
       },
       cancelled: () => { void end(); },
       error: error => {
+        if (error instanceof CallInviteError && !current.current.call) {
+          update({ invitePhone: phone, error: null });
+          return;
+        }
         const call = current.current.call;
         if (call?.id === id && !isTerminal(call.status))
           update({ call: { ...call, status: "failed", endedAtMs: Date.now() } });
@@ -299,18 +329,49 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
   const failEvent = useEffectEvent(fail);
   const muteEvent = useEffectEvent(applyMute);
   const connectEvent = useEffectEvent(connect);
+  const reconcilePermissions = useEffectEvent(() => {
+    if (current.current.call) reportIncoming(current.current.call);
+  });
   const uid = user?.uid;
+  useEffect(() => {
+    if (readiness.canCall) {
+      refreshRegistration.current();
+      // Firestore can publish a ringing call before the first permission read.
+      // It need not publish it again when setup finishes.
+      reconcilePermissions();
+    }
+  }, [readiness.canCall]);
   useEffect(() => {
     if (!uid) return;
     let mounted = true;
-    const registration = new DeviceRegistration(uid, {
-      current: () => mounted && auth.currentUser?.uid === uid,
+    const createRegistration = () => new DeviceRegistration(uid, {
+      current: () => mounted && auth.currentUser?.uid === uid && permissionsReady.current,
       registerNative: Calls.registerVoIPPush,
       readToken: Calls.getVoIPPushToken,
       prepare: prepareDeviceRegistration,
       send: (data) => api("registerDevice", data),
       error: failEvent,
     });
+    let registration = createRegistration();
+    let registrationPaused = false;
+    const register = () => {
+      if (!isE2E && mounted && !registrationPaused && permissionsReady.current) {
+        registration.start();
+        registration.refresh();
+      }
+    };
+    refreshRegistration.current = register;
+    pauseRegistration.current = () => {
+      registrationPaused = true;
+      registration.dispose();
+      return () => {
+        if (!mounted || auth.currentUser?.uid !== uid) return;
+        registrationPaused = false;
+        registration = createRegistration();
+        register();
+      };
+    };
+    register();
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     const flush = () => {
       if (!mounted) return;
@@ -358,13 +419,29 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
       },
       answer: (session, requestId) => {
         const id = session.incomingCallEvent!.serverCallId;
+        if (__DEV__) console.info("[FamCall answer] received", id);
         answerRequest.current = requestId;
-        void api("updateCall", { callId: id, action: "accept" })
+        void assertMicrophonePermission()
+          .then(() => {
+            if (__DEV__) console.info("[FamCall answer] microphone allowed", id);
+            if (!mounted || nativeId.current !== session.id || hasEndedLocally(id)) return;
+            return api("updateCall", { callId: id, action: "accept" });
+          })
           .then(() => {
             if (mounted && nativeId.current === session.id && watchedId.current === id && !hasEndedLocally(id))
               router.replace({ pathname: "/call/[id]", params: { id } });
           }).catch(error => {
-            if (mounted && nativeId.current === session.id && watchedId.current === id) failEvent(error);
+            if (__DEV__) console.info("[FamCall answer] failed", id, (error as {code?: string})?.code, (error as {name?: string})?.name);
+            if (!mounted || nativeId.current !== session.id || watchedId.current !== id) return;
+            failEvent(error);
+            answerRequest.current = null;
+            // A revoked microphone must not open a prompt on the lock screen
+            // or leave the native answer action waiting until it times out.
+            void Calls.failIncomingCallConnected(session.id, requestId).catch(() => undefined);
+            // Native answer can precede the first Firestore call snapshot.
+            // Persist its known server ID even when end() has no CallView yet.
+            void queueCallEnd(uid, id).then(flush).catch(error => { if (mounted) failEvent(error); });
+            void endEvent();
           });
       },
       dismiss: (id) => { void Calls.reportCallEnded(id, "remoteEnded").catch(error => { if (mounted) failEvent(error); }); },
@@ -377,11 +454,6 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         event.token ? { token: event.token, type: event.type } : null,
       );
     });
-    if (!isE2E) {
-      void Notifications.requestPermissionsAsync()
-        .then(() => registration.start())
-        .catch(error => { if (mounted) failEvent(error); });
-    }
     let activeRevision = 0;
     const active = onSnapshot(
       doc(database, "activeCalls", uid),
@@ -398,6 +470,8 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
     return () => {
       mounted = false;
       registration.dispose();
+      pauseRegistration.current = () => () => undefined;
+      refreshRegistration.current = () => undefined;
       flushPending.current = () => undefined;
       if (retryTimer) clearTimeout(retryTimer);
       detachNetwork();
@@ -423,6 +497,21 @@ export function CallingProvider({ children }: React.PropsWithChildren) {
         start,
         answer,
         end,
+        logOut: async () => {
+          if (!uid || auth.currentUser?.uid !== uid) return;
+          if (outgoing.current?.active || (current.current.call && !isTerminal(current.current.call.status)))
+            throw new Error("A call is still in progress.");
+          const resume = pauseRegistration.current();
+          try {
+            const registration = await prepareDeviceRegistration();
+            await api("unregisterDevice", registration);
+            if (auth.currentUser?.uid !== uid) throw new Error("Account changed.");
+            await signOut(auth);
+          } catch (error) {
+            resume();
+            throw error;
+          }
+        },
         toggleMute: () => {
           const muted = !current.current.muted;
           peer.current?.mute(muted);

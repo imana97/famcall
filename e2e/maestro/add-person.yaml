@@ -5,11 +5,19 @@ appId: com.silvergridtech.famcall.e2e
 - tapOn:
     id: contact-name
 - inputText: ${CONTACT_NAME}
-- tapOn: Add a person
+- runFlow: dismiss-keyboard.yaml
+- scrollUntilVisible:
+    element:
+      id: contact-number
+    direction: DOWN
 - tapOn:
     id: contact-number
 - inputText: ${CONTACT_PHONE}
-- tapOn: Add a person
+- runFlow: dismiss-keyboard.yaml
+- scrollUntilVisible:
+    element:
+      id: save-contact
+    direction: DOWN
 - tapOn:
     id: save-contact
 - extendedWaitUntil:

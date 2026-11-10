@@ -1,7 +1,7 @@
 import React from "react";
 import {
   ActivityIndicator,
-  Pressable,
+  KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,15 +10,19 @@ import {
   useColorScheme,
   type TextInputProps,
   type ViewStyle,
+  type TextStyle,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { LucideIcon } from "lucide-react-native";
 import { ArrowLeft } from "lucide-react-native";
 import { router } from "expo-router";
 import { t } from "../i18n";
+import { HapticPressable as Pressable } from "./HapticPressable";
+import { useLanguage } from "../state/Language";
 
 export function useTheme() {
-  return useColorScheme() === "dark"
+  const { language } = useLanguage();
+  const colors = useColorScheme() === "dark"
     ? {
         bg: "#131E1B",
         card: "#1D2B26",
@@ -41,26 +45,73 @@ export function useTheme() {
         danger: "#B34134",
         avatar: "#DFEBD8",
       };
+  return { ...colors, language };
 }
 export function Page({
   children,
   scroll = true,
-}: React.PropsWithChildren<{ scroll?: boolean }>) {
+  safeBottom = true,
+  header,
+  headerStyle,
+  footer,
+  contentStyle,
+}: React.PropsWithChildren<{
+  scroll?: boolean;
+  safeBottom?: boolean;
+  header?: React.ReactNode;
+  headerStyle?: ViewStyle;
+  footer?: React.ReactNode;
+  contentStyle?: ViewStyle;
+}>) {
   const c = useTheme();
   return (
     <SafeAreaView
-      edges={["top", "left", "right"]}
+      edges={
+        safeBottom ? ["top", "left", "right", "bottom"] : ["top", "left", "right"]
+      }
       style={{ flex: 1, backgroundColor: c.bg, direction: "ltr" }}
     >
+      {header && (
+        <View style={[{
+          paddingHorizontal: 24,
+          paddingTop: 12,
+          paddingBottom: 16,
+          gap: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: c.line,
+          backgroundColor: c.bg,
+        }, headerStyle]}>
+          {header}
+        </View>
+      )}
       {scroll ? (
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.page}
-        >
-          {children}
-        </ScrollView>
+        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+          <ScrollView
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={[styles.page, contentStyle]}
+          >
+            {children}
+          </ScrollView>
+        </KeyboardAvoidingView>
       ) : (
         <View style={[styles.page, { flex: 1 }]}>{children}</View>
+      )}
+      {footer && (
+        <View
+          style={{
+            flexShrink: 0,
+            paddingHorizontal: 24,
+            paddingTop: 12,
+            paddingBottom: 8,
+            gap: 8,
+            borderTopWidth: 1,
+            borderTopColor: c.line,
+            backgroundColor: c.bg,
+          }}
+        >
+          {footer}
+        </View>
       )}
     </SafeAreaView>
   );
@@ -69,14 +120,16 @@ export function Heading({
   title,
   subtitle,
   back = false,
+  bottomSpacing = 26,
 }: {
   title: string;
   subtitle?: string;
   back?: boolean;
+  bottomSpacing?: number;
 }) {
   const c = useTheme();
   return (
-    <View style={{ gap: 12, marginBottom: 26 }}>
+    <View style={{ gap: 12, marginBottom: bottomSpacing }}>
       {back && (
         <Pressable
           accessibilityRole="button"
@@ -97,6 +150,7 @@ export function Heading({
           letterSpacing: -1,
           color: c.text,
           textAlign: "left",
+          writingDirection: "ltr",
         }}
       >
         {title}
@@ -108,6 +162,7 @@ export function Heading({
             lineHeight: 24,
             color: c.muted,
             textAlign: "left",
+            writingDirection: "ltr",
           }}
         >
           {subtitle}
@@ -148,6 +203,9 @@ export function Button({
   danger = false,
   testID,
   icon: Icon,
+  style,
+  textStyle,
+  selected,
 }: {
   title: string;
   onPress: () => void;
@@ -157,18 +215,22 @@ export function Button({
   danger?: boolean;
   testID?: string;
   icon?: LucideIcon;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
+  selected?: boolean;
 }) {
   const c = useTheme();
   const color = secondary ? (danger ? c.danger : c.text) : c.onPrimary;
   return (
     <Pressable
       testID={testID}
+      haptic={danger ? "medium" : selected !== undefined || secondary ? "selection" : "light"}
       accessibilityRole="button"
       accessibilityLabel={title}
-      accessibilityState={{ disabled: disabled || busy, busy }}
+      accessibilityState={{ disabled: disabled || busy, busy, selected }}
       disabled={disabled || busy}
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={({ pressed }) => [{
         minHeight: 54,
         borderRadius: 18,
         backgroundColor: secondary ? c.card : danger ? c.danger : c.primary,
@@ -181,23 +243,36 @@ export function Button({
         flexDirection: "row",
         gap: 10,
         opacity: disabled || busy ? 0.5 : pressed ? 0.75 : 1,
-      })}
+      }, style]}
     >
       {busy ? (
         <ActivityIndicator color={color} />
       ) : (
         Icon && <Icon size={20} color={color} />
       )}
-      <Text style={{ fontSize: 16, fontWeight: "600", color }}>{title}</Text>
+      <Text
+        style={[{
+          fontSize: 16,
+          fontWeight: "600",
+          color,
+          flexShrink: 1,
+          textAlign: "center",
+          writingDirection: "ltr",
+        }, textStyle]}
+      >
+        {title}
+      </Text>
     </Pressable>
   );
 }
-export function Field({ label, ...props }: TextInputProps & { label: string }) {
+export function Field({ label, hideLabel = false, ...props }: TextInputProps & { label: string; hideLabel?: boolean }) {
   const c = useTheme();
   return (
     <View style={{ gap: 8 }}>
-      <Label style={{ fontSize: 14, fontWeight: "500" }}>{label}</Label>
+      {!hideLabel && <Label style={{ fontSize: 14, fontWeight: "500" }}>{label}</Label>}
       <TextInput
+        returnKeyType="done"
+        inputAccessoryViewButtonLabel={t("done")}
         {...props}
         accessibilityLabel={label}
         placeholderTextColor={c.muted}

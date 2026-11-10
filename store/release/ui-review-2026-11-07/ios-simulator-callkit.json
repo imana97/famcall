@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-11-07",
+  "evidence_type": "local_ios_simulator_native_diagnostic",
+  "source_commit": "e973f63392384eb60d7537e4f9eb5fd0721eb29c",
+  "app_bundle": "com.silvergridtech.famcall.e2e",
+  "environment": {
+    "device": "FamCall UI Small",
+    "os": "iOS 18.6 Simulator",
+    "backend": "Local demo-famcall Auth, Firestore and Functions emulators",
+    "time_zone": "America/New_York",
+    "physical_device": false,
+    "production_push": false
+  },
+  "scenario": "After granting Microphone in the simulator's native Settings and reopening FamCall, calling setup showed Allowed. Tapping the fictional Alex contact immediately produced Call cancelled before the automated check saw End call. The test did not tap End call.",
+  "timeline": [
+    {
+      "at": "2026-11-07T01:39:08.701-05:00",
+      "source": "Local Firestore call record",
+      "event": "The outgoing call was created. In this source, server creation occurs only after the microphone preflight succeeds."
+    },
+    {
+      "at": "2026-11-07T01:39:08.815-05:00",
+      "source": "Simulator callservicesd",
+      "event": "The native start-call transaction was allowed."
+    },
+    {
+      "at": "2026-11-07T01:39:08.931532-05:00",
+      "source": "Simulator callservicesd",
+      "event": "Failed to open the native in-call interface URL.",
+      "url": "facetime://?showInCallUI=1",
+      "error_domain": "NSOSStatusErrorDomain",
+      "error_code": -10814
+    },
+    {
+      "at": "2026-11-07T01:39:08.982317-05:00",
+      "source": "Simulator callservicesd",
+      "message": "Disconnecting call because there wont be a UI to host the call"
+    },
+    {
+      "at": "2026-11-07T01:39:08.982739-05:00",
+      "source": "Simulator callservicesd",
+      "event": "The system issued CXEndCallAction for the same native call."
+    },
+    {
+      "at": "2026-11-07T01:39:09.035-05:00",
+      "source": "Local Firestore call record",
+      "event": "FamCall persisted the cancelled state, 334 milliseconds after server call creation."
+    }
+  ],
+  "conclusion": {
+    "microphone_preflight_passed": true,
+    "native_call_host_unavailable": true,
+    "finding": "The simulator's system call service ended an accepted outgoing call because its native in-call UI host was unavailable. This attempt was not rejected by the new microphone permission preflight. The mechanism is consistent with the previously documented standalone CallKit simulator probe.",
+    "regression_scope": "This evidence explains this cancellation and does not establish absence of unrelated calling defects.",
+    "production_ring_or_audio_qualification": false,
+    "remaining_gate": "Validate the final store-signed build on real iPhone hardware for incoming and outgoing calls, locked/background/terminated delivery, two-way speech and audio routes. This simulator observation does not close those release gates."
+  },
+  "evidence_references": {
+    "private_ui_log": ".local/ui-review/ios/recovery-verified.log",
+    "private_ui_commands": ".local/ui-review/ios/recovery-verified/2026-11-07_013901/commands-(ios-after-mic.yaml).json",
+    "private_native_excerpt": ".local/ui-review/ios/native-callkit-diagnostic-excerpt.txt",
+    "prior_standalone_probe": "e2e/ios-callkit-probe/README.txt"
+  },
+  "collection_scope": "Read-only inspection of existing local emulator records and retained simulator logs. No further calls, device boot or source changes were performed for diagnosis."
+}

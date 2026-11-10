@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-11-07T07:16:02.361159+00:00",
+  "scope": "Updated testing delivery, static signed-archive audit and backend/website verification. Public launch, runtime qualification and store form decisions remain open.",
+  "brand_preparation": {
+    "concept": "Signal bridge",
+    "local_source_commit": "b6204c032308d98f10eb3b97caeb36ccfa03f20b",
+    "master": "brand/famcall-glyph.svg",
+    "palette": [
+      "#183D34",
+      "#F5F4E9",
+      "#C5DF9E"
+    ],
+    "reference": "brand/concepts/signal-bridge-selected.png",
+    "apple_icon": {
+      "path": "store/assets/icons/apple-icon-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "format": "8-bit RGB PNG, opaque",
+      "bytes": 33712
+    },
+    "play_icon": {
+      "path": "store/assets/icons/google-play-icon-512.png",
+      "width": 512,
+      "height": 512,
+      "format": "8-bit RGBA PNG, opaque background",
+      "bytes": 17066
+    },
+    "feature_graphic": {
+      "path": "store/assets/google-play/feature-graphic-1024x500.png",
+      "width": 1024,
+      "height": 500,
+      "format": "8-bit RGB PNG, opaque",
+      "bytes": 57707
+    },
+    "checks": [
+      "Visual inspection of selected reference and vector recreation",
+      "Circle, rounded-square and squircle mask previews",
+      "Small-size previews from 64px to 16px",
+      "Adaptive visible radius 296.81px is inside the 312.89px guaranteed safe radius",
+      "Native monochrome notification and CallKit template previews",
+      "Required dimensions and PNG color types",
+      "Byte-identical regeneration of 18 assets/source files",
+      "Mobile lint and typecheck"
+    ],
+    "delivery_status": "Delivered to TestFlight build 4, Android internal code 5 and the live website from source 5f72e339; native launcher icons extracted and visually checked."
+  },
+  "user_device_report": "user-reported-device-test-2026-11-07.json",
+  "calling_setup": {
+    "status": "Implemented, locally verified on Android/iPhone simulators, and delivered in updated testing builds. Store-signed production push/audio behavior still requires validation.",
+    "planned_review_path": "After phone verification, complete Get ready to call. Allow Microphone on iPhone and Android. Android additionally offers optional Call alerts and Lock screen calls when shown; declining them must not prevent outgoing calls. iPhone uses its native call screen without ordinary notification permission. Contacts remain optional.",
+    "verification_required": "Final store-signed APNs/FCM lifecycle, audio-route and production verification remains required. See ui-review-2026-11-07/verification.txt for local permission/UI evidence."
+  },
+  "still_pending": [
+    "Private reviewer accounts, stable verification and reachable second endpoint",
+    "Reviewer contact name and phone",
+    "Measured network and background/push/audio-route qualification",
+    "Final public-store privacy/legal declarations",
+    "Compare refreshed screenshot drafts with the final signed candidate before store upload",
+    "Re-audit archive privacy if public candidate application or SDK content changes"
+  ],
+  "candidate_record_changed": false,
+  "ui_review": "ui-review-2026-11-07/verification.txt",
+  "previous_testing_delivery": {
+    "record": "testing-delivery-2026-11-07.json",
+    "workflow_url": "https://github.com/silvergrid/famcall/actions/runs/42336889833",
+    "source_commit": "fecda4296f7c1e64576b172d8d170e0883ad958b",
+    "ios_version": "0.1.0",
+    "ios_build": "3",
+    "android_version": "0.1.0",
+    "android_version_code": "4",
+    "status_basis": "Previously verified delivery record; not a fresh store-console readback."
+  },
+  "current_testing_delivery": {
+    "record": "testing-delivery-ui-refresh-2026-11-07.json",
+    "workflow_url": "https://github.com/silvergrid/famcall/actions/runs/42348865146",
+    "source_commit": "5f72e33936aa5839b89ec8a5504a4e309888cab3",
+    "ios_version": "0.1.0",
+    "ios_build": "4",
+    "android_version": "0.1.0",
+    "android_version_code": "5",
+    "status_basis": "Fresh App Store Connect and Google Play API readbacks; signed archives inspected. No installation of the latest update was observed."
+  },
+  "previous_hosting_recheck": {
+    "record": "website-delivery-2026-11-07.json",
+    "pages": [
+      {
+        "url": "https://famcall.web.app/",
+        "http_status": 200,
+        "sha256": "c71978c5a62ff300b8026b8ea56ac6bf88bd16702f89dd16d9f1affa2bba0e5a",
+        "matches_recorded_deployment": true
+      },
+      {
+        "url": "https://famcall.web.app/privacy",
+        "http_status": 200,
+        "sha256": "8e2020a60a0fb5217ac6d294661922b4c6e6ab07b41dbbccc5950fda3b22f293",
+        "matches_recorded_deployment": true
+      },
+      {
+        "url": "https://famcall.web.app/terms",
+        "http_status": 200,
+        "sha256": "43b4d4f113587e1a8a94cfef396c96c3f8f4911a42dcf008e71e564d43b8352b",
+        "matches_recorded_deployment": true
+      },
+      {
+        "url": "https://famcall.web.app/delete-account",
+        "http_status": 200,
+        "sha256": "c77996955618fbaf3bf3697844da44a446645cd016a7c06d0a450a83826c1b2e",
+        "matches_recorded_deployment": true
+      }
+    ]
+  },
+  "hosting_recheck": {
+    "record": "website-delivery-ui-refresh-2026-11-07.json",
+    "source_commit": "5f72e33936aa5839b89ec8a5504a4e309888cab3",
+    "pages_and_assets": [
+      {
+        "url": "https://famcall.web.app/",
+        "sourcePath": "website/index.html",
+        "httpStatus": 200,
+        "sha256": "c71978c5a62ff300b8026b8ea56ac6bf88bd16702f89dd16d9f1affa2bba0e5a",
+        "matchesSource": true
+      },
+      {
+        "url": "https://famcall.web.app/privacy",
+        "sourcePath": "website/privacy.html",
+        "httpStatus": 200,
+        "sha256": "8e2020a60a0fb5217ac6d294661922b4c6e6ab07b41dbbccc5950fda3b22f293",
+        "matchesSource": true
+      },
+      {
+        "url": "https://famcall.web.app/terms",
+        "sourcePath": "website/terms.html",
+        "httpStatus": 200,
+        "sha256": "43b4d4f113587e1a8a94cfef396c96c3f8f4911a42dcf008e71e564d43b8352b",
+        "matchesSource": true
+      },
+      {
+        "url": "https://famcall.web.app/delete-account",
+        "sourcePath": "website/delete-account.html",
+        "httpStatus": 200,
+        "sha256": "c77996955618fbaf3bf3697844da44a446645cd016a7c06d0a450a83826c1b2e",
+        "matchesSource": true
+      },
+      {
+        "url": "https://famcall.web.app/style.css",
+        "sourcePath": "website/style.css",
+        "httpStatus": 200,
+        "sha256": "9d3dcde7b39b3e493c5427d6daf8d418a70443867a31e15b61f43414cff64957",
+        "matchesSource": true
+      },
+      {
+        "url": "https://famcall.web.app/assets/icon.svg",
+        "sourcePath": "website/assets/icon.svg",
+        "httpStatus": 200,
+        "sha256": "bd0c5bab17a5ae138a922e3ba6b69a42c339655ddfce18a5fe39703a951101cd",
+        "matchesSource": true
+      },
+      {
+        "url": "https://famcall.web.app/assets/glyph.svg",
+        "sourcePath": "website/assets/glyph.svg",
+        "httpStatus": 200,
+        "sha256": "e902635acedaa44d8a2f64e2c4cdfbe770b7aa7228b6ae0ce41bbef259244ac4",
+        "matchesSource": true
+      },
+      {
+        "url": "https://famcall.web.app/assets/familiar-voices.webp",
+        "sourcePath": "website/assets/familiar-voices.webp",
+        "httpStatus": 200,
+        "sha256": "86f8ec8b326f11ab5fceb7727bfbeb780e465f5aaa06b387d2e2f83b6df0a9b8",
+        "matchesSource": true
+      }
+    ]
+  },
+  "static_archive_privacy_reports": [
+    "ios-build-4-privacy.json",
+    "android-build-5-privacy.json"
+  ]
+}

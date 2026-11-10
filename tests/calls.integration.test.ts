@@ -15,8 +15,7 @@ const app = enabled
   ? initializeApp({ projectId: project }, "calls-integration")
   : undefined;
 
-async function user() {
-  const phone = "+14085550" + nextPhone++;
+async function user(phone = "+14085550" + nextPhone++) {
   const base =
     "http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:";
   const post = async (method: string, body: unknown) => {
@@ -72,6 +71,14 @@ async function callApi(
   );
   const body = await response.json();
   return { http: response.status, ...body };
+}
+function withAuthTime(identity: Awaited<ReturnType<typeof user>>, authTime: number) {
+  // The Auth emulator issues unsigned tokens. Never alter a production token.
+  const [header, payload] = identity.token.split(".");
+  if (JSON.parse(Buffer.from(header, "base64url").toString()).alg !== "none")
+    throw new Error("Expected an unsigned Auth emulator token.");
+  const claims = { ...JSON.parse(Buffer.from(payload, "base64url").toString()), auth_time: authTime };
+  return { ...identity, token: [header, Buffer.from(JSON.stringify(claims)).toString("base64url"), ""].join(".") };
 }
 async function start(
   caller: Awaited<ReturnType<typeof user>>,
@@ -212,7 +219,11 @@ describe.skipIf(!enabled)(
         (await callApi(b, "setBlocked", { phone: a.phone, blocked: true }))
           .result?.blocked,
       ).toBe(true);
-      expect((await start(a, b)).error?.status).toBe("UNAVAILABLE");
+      const blocked = (await start(a, b)).error;
+      const missing = (await callApi(a, "startCall", { phone: "+12025550199", requestId: randomUUID() })).error;
+      expect(blocked?.status).toBe("UNAVAILABLE");
+      expect(blocked?.details).toEqual({ reason: "invite-to-famcall" });
+      expect(missing).toEqual(blocked);
       await callApi(b, "setBlocked", { phone: a.phone, blocked: false });
       expect((await start(a, b)).result?.status).toBe("ringing");
     }, 30_000);
@@ -256,26 +267,153 @@ describe.skipIf(!enabled)(
       await getFirestore(app!).doc("activeCalls/" + a.uid).update({expiresAtMs: Date.now() - 1000});
       expect((await callApi(a, "heartbeatCall", {callId})).result?.active).toBe(false);
     }, 30_000);
-    it("durably deletes an account, its private data and calls, denying its stale token", async () => {
+    it("deletes an ordinary account, auth identity and call trees before returning, denying its stale token", async () => {
       const [a, b] = await Promise.all([user(), user()]);
+      const db = getFirestore(app!);
       await callApi(a, "registerProfile", {});
       await callApi(a, "saveContact", {phone: b.phone, name: "Test contact"});
+      await callApi(a, "registerDevice", {
+        userId: a.uid, installationId: randomUUID(), sequence: 1,
+        token: "fictional-deletion-test-device-token", type: "FCM",
+      });
       const cancelledId = randomUUID();
       await callApi(a, "updateCall", { callId: cancelledId, action: "end" });
       expect((await getFirestore(app!).doc("users/" + a.uid + "/cancelledStarts/" + cancelledId).get()).exists).toBe(true);
       const {result} = await start(a, b);
-      expect((await callApi(a, "deleteAccount", {})).result?.accepted).toBe(true);
+      for (const collection of ["signals", "candidates", "restarts"])
+        await db.doc(`calls/${result.id}/${collection}/deletion-test`).set({ participant: a.uid });
+      expect((await callApi(a, "deleteAccount", {})).result).toEqual({ accepted: true, status: "complete" });
+      // No polling: success now means the cleanup has completed before the response.
+      expect((await db.doc("accountDeletions/" + a.uid).get()).data()?.status).toBe("complete");
+      await expect(getAuth(app!).getUser(a.uid)).rejects.toMatchObject({ code: "auth/user-not-found" });
+      for (const collection of ["signals", "candidates", "restarts"])
+        expect((await db.collection(`calls/${result.id}/${collection}`).get()).empty).toBe(true);
+      expect((await callApi(a, "deleteAccount", {})).result).toEqual({ accepted: true, status: "complete" });
       expect((await callApi(a, "registerProfile", {})).error?.status).toBe("PERMISSION_DENIED");
-      const db = getFirestore(app!);
-      await expect.poll(async () => (await db.doc("accountDeletions/" + a.uid).get()).data()?.status,
-        {timeout: 20_000, interval: 300}).toBe("complete");
+      const completedJob = (await db.doc("accountDeletions/" + a.uid).get()).data();
+      const staleIdentity = withAuthTime(a, Math.floor(Date.now() / 1000) - 600);
+      expect((await callApi(staleIdentity, "deleteAccount", {})).result).toEqual({ accepted: true, status: "complete" });
+      expect((await db.doc("accountDeletions/" + a.uid).get()).data()).toEqual(completedJob);
       expect((await db.doc("users/" + a.uid).get()).exists).toBe(false);
       expect((await db.collection("users/" + a.uid + "/contacts").get()).empty).toBe(true);
+      expect((await db.collection("users/" + a.uid + "/devices").get()).empty).toBe(true);
       expect((await db.collection("users/" + a.uid + "/cancelledStarts").get()).empty).toBe(true);
       expect((await callApi(a, "updateCall", { callId: randomUUID(), action: "end" })).error?.status).toBe("PERMISSION_DENIED");
       expect((await db.doc("calls/" + result.id).get()).exists).toBe(false);
       expect((await db.doc("activeCalls/" + b.uid).get()).exists).toBe(false);
       expect((await start(b, a)).error?.status).toBe("UNAVAILABLE");
+    }, 30_000);
+    it("accepts concurrent account deletion requests through one durable job", async () => {
+      const a = await user();
+      const responses = await Promise.all(Array.from({ length: 4 }, () => callApi(a, "deleteAccount", {})));
+      expect(responses.map(response => response.result?.accepted)).toEqual([true, true, true, true]);
+      expect(responses.map(response => response.result?.status)).toEqual(["complete", "complete", "complete", "complete"]);
+      const job = getFirestore(app!).doc("accountDeletions/" + a.uid);
+      const requestedAt = (await job.get()).data()?.requestedAt;
+      expect(requestedAt).toBeDefined();
+      expect((await job.get()).data()?.status).toBe("complete");
+      expect((await job.get()).data()?.requestedAt).toEqual(requestedAt);
+      expect((await callApi(a, "registerProfile", {})).error?.status).toBe("PERMISSION_DENIED");
+    }, 30_000);
+    it("does not recreate private data when profile and device writes race account deletion", async () => {
+      const [a, b] = await Promise.all([user(), user()]);
+      const device = {
+        userId: a.uid, installationId: randomUUID(), sequence: 1,
+        token: "fictional-deletion-race-device-token", type: "FCM",
+      };
+      const writes = [
+        callApi(a, "registerProfile", {}),
+        callApi(a, "registerDevice", device),
+        callApi(a, "saveContact", { phone: b.phone, name: "Concurrent contact" }),
+        callApi(a, "setBlocked", { phone: b.phone, blocked: true }),
+      ];
+      expect((await callApi(a, "deleteAccount", {})).result).toEqual({ accepted: true, status: "complete" });
+      await Promise.all(writes);
+      const db = getFirestore(app!);
+      expect((await db.doc("users/" + a.uid).get()).exists).toBe(false);
+      for (const collection of ["contacts", "devices", "blocked"])
+        expect((await db.collection(`users/${a.uid}/${collection}`).get()).empty).toBe(true);
+      expect((await callApi(a, "registerDevice", device)).error?.status).toBe("PERMISSION_DENIED");
+    }, 30_000);
+    it("re-registers the same phone with a new UID without an old deletion retry removing it", async () => {
+      const old = await user();
+      const db = getFirestore(app!);
+      expect((await callApi(old, "registerProfile", {})).result?.phone).toBe(old.phone);
+      expect((await callApi(old, "deleteAccount", {})).result).toEqual({ accepted: true, status: "complete" });
+      const job = db.doc("accountDeletions/" + old.uid);
+      expect((await job.get()).data()?.status).toBe("complete");
+      await expect(getAuth(app!).getUser(old.uid)).rejects.toMatchObject({ code: "auth/user-not-found" });
+
+      const replacement = await user(old.phone);
+      expect(replacement.uid).not.toBe(old.uid);
+      expect((await callApi(replacement, "registerProfile", {})).result?.phone).toBe(old.phone);
+      const profile = db.doc("users/" + replacement.uid);
+      const savedProfile = (await profile.get()).data();
+      const completedJob = (await job.get()).data();
+
+      // Retry a lost deletion response with the original identity after the
+      // same phone number has been verified into its replacement account.
+      const stale = withAuthTime(old, Math.floor(Date.now() / 1000) - 600);
+      expect((await callApi(stale, "deleteAccount", {})).result).toEqual({ accepted: true, status: "complete" });
+      expect((await job.get()).data()).toEqual(completedJob);
+      expect((await profile.get()).data()).toEqual(savedProfile);
+      expect((await getAuth(app!).getUserByPhoneNumber(old.phone)).uid).toBe(replacement.uid);
+      expect((await getAuth(app!).getUser(replacement.uid)).disabled).toBe(false);
+      expect((await db.doc("accountDeletions/" + replacement.uid).get()).exists).toBe(false);
+      expect((await db.doc("users/" + old.uid).get()).exists).toBe(false);
+      expect((await callApi(old, "registerProfile", {})).error?.status).toBe("PERMISSION_DENIED");
+    }, 30_000);
+    it("logs out only this device without deleting account data or allowing stale token uploads", async () => {
+      const [a, b] = await Promise.all([user(), user()]);
+      await callApi(a, "registerProfile", {});
+      await callApi(a, "saveContact", { phone: b.phone, name: "Saved person" });
+      const installationId = randomUUID();
+      const otherInstallationId = randomUUID();
+      const data = { userId: a.uid, installationId, sequence: 1, type: "FCM", token: "fictional-logout-device-token" };
+      await callApi(a, "registerDevice", data);
+      await callApi(a, "registerDevice", { ...data, installationId: otherInstallationId });
+      expect((await callApi(a, "unregisterDevice", { installationId, sequence: 2 })).result?.ok).toBe(true);
+      const db = getFirestore(app!);
+      const ref = db.doc("users/" + a.uid + "/devices/" + installationId);
+      expect((await ref.get()).data()?.invalidated).toBe(true);
+      expect((await ref.get()).data()?.token).toBeUndefined();
+      expect((await db.doc("users/" + a.uid + "/devices/" + otherInstallationId).get()).data()?.invalidated).toBe(false);
+      expect((await db.collection("users/" + a.uid + "/contacts").get()).size).toBe(1);
+      expect((await db.doc("accountDeletions/" + a.uid).get()).exists).toBe(false);
+      expect((await getAuth(app!).getUser(a.uid)).disabled).toBe(false);
+      await callApi(a, "registerDevice", data);
+      await callApi(a, "registerDevice", { ...data, sequence: 2 });
+      expect((await ref.get()).data()?.invalidated).toBe(true);
+      await callApi(b, "unregisterDevice", { installationId, sequence: 3 });
+      expect((await ref.get()).data()?.sequence).toBe(2);
+      await callApi(a, "registerDevice", { ...data, sequence: 3 });
+      expect((await ref.get()).data()?.invalidated).toBe(false);
+      expect((await callApi(a, "unregisterDevice", { installationId, sequence: 2 })).error?.status).toBe("FAILED_PRECONDITION");
+      expect((await ref.get()).data()?.invalidated).toBe(false);
+    }, 30_000);
+    it("atomically edits a contact phone, normalizes country codes and refuses to overwrite another person", async () => {
+      const [a, b, c] = await Promise.all([user(), user(), user()]);
+      await callApi(a, "saveContact", { phone: b.phone, name: "Original" });
+      const changed = await callApi(a, "saveContact", {
+        previousPhone: b.phone, phone: "00" + c.phone.slice(1), name: "Updated",
+      });
+      expect(changed.result?.phone).toBe(c.phone);
+      const contacts = getFirestore(app!).collection("users/" + a.uid + "/contacts");
+      expect((await contacts.doc(b.phone).get()).exists).toBe(false);
+      expect((await contacts.doc(c.phone).get()).data()?.name).toBe("Updated");
+      expect((await contacts.get()).size).toBe(1);
+      await callApi(a, "saveContact", { phone: b.phone, name: "Other person" });
+      expect((await callApi(a, "saveContact", { previousPhone: c.phone, phone: b.phone, name: "Conflict" })).error?.status).toBe("ALREADY_EXISTS");
+      expect((await contacts.doc(c.phone).get()).data()?.name).toBe("Updated");
+      expect((await contacts.doc(b.phone).get()).data()?.name).toBe("Other person");
+      expect((await callApi(b, "saveContact", { previousPhone: c.phone, phone: a.phone, name: "Not mine" })).error?.status).toBe("NOT_FOUND");
+    }, 30_000);
+    it("requires recent verified phone authentication for a new deletion job", async () => {
+      const a = await user();
+      const staleIdentity = withAuthTime(a, Math.floor(Date.now() / 1000) - 600);
+      expect((await callApi(staleIdentity, "deleteAccount", {})).error?.status).toBe("UNAUTHENTICATED");
+      expect((await getFirestore(app!).doc("accountDeletions/" + a.uid).get()).exists).toBe(false);
+      expect((await callApi(a, "registerProfile", {})).result?.phone).toBe(a.phone);
     }, 30_000);
   },
 );

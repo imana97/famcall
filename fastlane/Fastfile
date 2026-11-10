@@ -10,17 +10,22 @@ end
 desc 'Promote the exact validated internal Android build to production review'
 lane :public_android do
   candidate = JSON.parse(File.read('../store/release/candidate.json'))
+  initial_draft = ENV['FAMCALL_INITIAL_PUBLIC_DRAFT'] == 'true'
   upload_to_play_store(
     package_name: 'com.silvergridtech.famcall',
     json_key_data: ENV.fetch('FAMCALL_PLAY_API_KEY_JSON'),
     track: 'internal',
     version_code: candidate.fetch('androidBuildNumber').to_i,
     track_promote_to: 'production',
-    track_promote_release_status: 'completed',
+    track_promote_release_status: initial_draft ? 'draft' : 'completed',
+    validate_only: initial_draft,
+    changes_not_sent_for_review: initial_draft,
+    rescue_changes_not_sent_for_review: !initial_draft,
     skip_upload_apk: true, skip_upload_aab: true,
     skip_upload_metadata: true, skip_upload_changelogs: true,
     skip_upload_images: true, skip_upload_screenshots: true
   )
+  UI.important('Initial production draft validated only; no edit was committed and no review was submitted. Prepare the exact tested build in Play Console for the first release, then finish its review and rollout after the remaining declarations are complete.') if initial_draft
 end
 
 desc 'Submit the exact validated TestFlight build; publish after Apple approval'

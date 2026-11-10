@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-11-09T04:00:51.073Z",
+  "developerAccountTraderStatus": "Trader",
+  "appTraderStatus": "Trader",
+  "inheritedAccountStatus": true,
+  "appLevelConfirmationSaved": true,
+  "termsOfServiceUrl": "https://famcall.web.app/terms",
+  "termsPagePublicHttpsVerified": true,
+  "appBundle": "com.silvergridtech.famcall",
+  "testedVersion": "0.3.0",
+  "testedAndroidVersionCode": 7,
+  "scope": "Retained the account’s inherited Trader choice and supplied the existing app-specific public Terms URL. No account classification change or binary change.",
+  "submissionWorkflow": "https://github.com/silvergrid/famcall/actions/workflows/public-release.yml"
+}

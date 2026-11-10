@@ -1,4 +1,5 @@
-name: Submit tested build for public release
+name: Prepare or submit tested public release
+run-name: ${{ inputs.ios_release_mode_only && 'Configure Apple automatic release' || inputs.initial_android_draft && 'Validate first Android production draft' || 'Submit tested build for public review' }}
 on:
   workflow_dispatch:
     inputs:
@@ -7,6 +8,16 @@ on:
         description: Store to publish after review, using the checked-in candidate record
         options: [android, ios]
         required: true
+      initial_android_draft:
+        type: boolean
+        description: First Google Play release only — validate the tested production draft, then prepare and submit it in Console
+        default: false
+        required: false
+      ios_release_mode_only:
+        type: boolean
+        description: Configure automatic release for the tested Apple version without resubmitting its review
+        default: false
+        required: false
 permissions:
   contents: read
 concurrency:
@@ -20,6 +31,8 @@ jobs:
     timeout-minutes: 45
     env:
       FAMCALL_PLATFORM: ${{ inputs.platform }}
+      FAMCALL_INITIAL_PUBLIC_DRAFT: ${{ inputs.initial_android_draft }}
+      FAMCALL_IOS_RELEASE_MODE_ONLY: ${{ inputs.ios_release_mode_only }}
       FASTLANE_SKIP_UPDATE_CHECK: '1'
       FASTLANE_HIDE_CHANGELOG: '1'
     steps:
@@ -41,6 +54,13 @@ jobs:
         env:
           FAMCALL_APPLE_API_KEY_JSON: ${{ secrets.FAMCALL_APPLE_API_KEY_JSON }}
           FAMCALL_PLAY_API_KEY_JSON: ${{ secrets.FAMCALL_PLAY_API_KEY_JSON }}
+          FAMCALL_REVIEW_ACCESS_JSON: ${{ secrets.FAMCALL_REVIEW_ACCESS_JSON }}
         run: |
           export PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
+          if [ "$FAMCALL_IOS_RELEASE_MODE_ONLY" = true ] && [ "$FAMCALL_PLATFORM" != ios ]; then
+            echo 'Apple release mode applies only to iOS.' >&2
+            exit 1
+          fi
+          if [ "$FAMCALL_PLATFORM" = ios ]; then node scripts/prepare-review-access.mjs; fi
+          if [ "$FAMCALL_IOS_RELEASE_MODE_ONLY" = true ]; then exit 0; fi
           fastlane "public_$FAMCALL_PLATFORM"

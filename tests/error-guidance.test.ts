@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { PhoneError } from "@famcall/core";
-import { callStartError, errorMessage } from "../apps/mobile/src/services/errors";
+import { CallInviteError, callStartError, errorMessage } from "../apps/mobile/src/services/errors";
 
 const generic = "Couldn’t finish that. Please try again.";
 
 describe("error guidance across app operations", () => {
+  it.each(["unavailable", "functions/unavailable"])("offers an invite only for the explicit startCall outcome: %s", code => {
+    expect(callStartError({ code, details: { reason: "invite-to-famcall" } })).toBeInstanceOf(CallInviteError);
+    expect(callStartError({ code })).not.toBeInstanceOf(CallInviteError);
+    expect(callStartError({ code: "firestore/unavailable", details: { reason: "invite-to-famcall" } })).not.toBeInstanceOf(CallInviteError);
+  });
   it.each([
     { code: "functions/permission-denied" }, // Expired call or account deletion.
     { code: "permission-denied" }, // Native Firebase Functions 27 uses bare codes.

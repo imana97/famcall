@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-11-08T16:04:07.297Z",
+  "version": "0.3.0",
+  "sourceCommit": "914112a72d93c23399613661379ded6d150ddb0c",
+  "testBuildPackage": "com.silvergridtech.famcall.e2e",
+  "environment": "Two local Android emulators; demo-famcall backend; live relay credentials provided only to the emulator backend in memory.",
+  "videoUrl": "https://famcall.web.app/review/phone-call-service.mp4",
+  "explanationUrl": "https://famcall.web.app/review/phone-call-service.html",
+  "videoSha256": "19fcdb5c1733475b50ece3060cdad675e4a6a5c86cad000f29389d61acd1dd24",
+  "durationSeconds": 84.11,
+  "continuousScreenRecording": true,
+  "containsRecordedConversation": false,
+  "fictionalAccountsOnly": true,
+  "observed": [
+    "User taps contact to initiate a call",
+    "Both devices reach Connected",
+    "Android ongoing-call notification while the app is in the background",
+    "Notification opens the connected call",
+    "End call stops the call and active phone-call service"
+  ],
+  "foregroundServiceObserved": true,
+  "foregroundServiceAbsentAfterHangup": true,
+  "scopeLimit": "Demonstrates Android calling UI and telecom foreground-service lifecycle in local emulators. Not a production push-delivery, audio-quality or physical-device test.",
+  "iosSimulatorAttempt": "Native callservicesd could not open facetime://?launchForIncomingCall=1 and explicitly disconnected the incoming call because there was no UI host, before Maestro could tap Answer. This matches the prior local simulator diagnostic; it is not a successful iOS call test.",
+  "iosSimulatorDiagnosticReference": "store/release/ui-review-2026-11-07/ios-simulator-callkit.json",
+  "websiteDeployment": "https://github.com/silvergrid/famcall/actions/runs/42498285751",
+  "websiteVideoHttpStatus": 200
+}

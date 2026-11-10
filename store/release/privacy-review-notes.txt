@@ -2,12 +2,20 @@ FAMCALL — STORE PRIVACY REVIEW
 7 November 2026 UTC. Proposed answers, not submitted declarations or release approval.
 
 EVIDENCE
-The inspected store artifacts are iOS 0.1.0 (2), source 60d0406, and Android
-0.1.0 (3), source 0c92b91. SHA-256 identities and selected declarations are in
-ios-build-2-privacy.json and android-build-3-privacy.json. These describe the
-earlier testing builds, not the current build 3/code 4 update or final public
-candidate. Delivery of the update from fecda429 is verified separately in
-testing-delivery-2026-11-07.json. Re-run privacy inspection after app/SDK changes.
+The current inspected testing artifacts are iOS 0.1.0 (4) and Android 0.1.0 (5),
+from source 5f72e33936aa5839b89ec8a5504a4e309888cab3. SHA-256 identities and static
+declarations are in ios-build-4-privacy.json and android-build-5-privacy.json.
+Protected testing workflow 42348865146 succeeded. TestFlight reports build 4 as
+VALID/IN_BETA_TESTING with the owner group/tester configured and testing notes
+read back; Play reports code 5 completed on internal testing and its bundle hash
+matches the inspected AAB. See testing-delivery-ui-refresh-2026-11-07.json.
+No installation or runtime behavior is established by these delivery readbacks.
+These testing artifacts are not an approved final public-release candidate.
+
+Historical reports ios-build-2-privacy.json (source 60d0406) and
+android-build-3-privacy.json (source 0c92b91) remain as dated evidence. Earlier
+build 3/code 4 delivery from fecda429 remains recorded in
+testing-delivery-2026-11-07.json. Re-run inspection after app/SDK changes.
 
 Reproduce from your private downloaded store artifacts:
   python3 scripts/inspect-ios-privacy.py <store.ipa> --output <report.json>
@@ -17,9 +25,11 @@ The Android audit used official bundletool 1.18.3, with its published digest
 verified. Neither script installs an app or reads Firebase configuration values.
 
 WHAT THE BUILD AUDIT ESTABLISHES
-- The IPA contains 40 privacy-manifest files, including duplicate nested SDK
-  declarations. No inspected manifest declares tracking or a tracking domain.
-  This is not proof that every SDK behavior is covered or that no traffic occurs.
+- The build 4 IPA contains 40 privacy-manifest files, including duplicate nested
+  SDK declarations. The collected-data declarations, required-reason API union
+  and inspected configuration are unchanged from build 2. No inspected manifest
+  declares tracking or a tracking domain. This is not proof that every SDK
+  behavior is covered or that no traffic occurs.
 - Firebase Auth declares linked User ID for App Functionality. Auth, Firestore
   and Installations declare unlinked Other Diagnostic Data for Analytics.
   No explicit FirebaseDataCollectionDefaultEnabled override is in Info.plist.
@@ -31,12 +41,13 @@ WHAT THE BUILD AUDIT ESTABLISHES
   A Firebase measurement connector is not proof that an Analytics feature runs.
   The debug App Check registrar is packaged by the dependency; production source
   selects Play Integrity. Availability is not proof of debug-provider activation.
-- Historical Android code 3 has unnecessary write-contact, shared-storage and
-  overlay permissions. PR #7 removed them and verified a rebuilt native manifest;
-  the fix is merged and delivered in code 4 from fecda429 by successful workflow
-  42336889833. Play received the expected bundle hash. That delivery check does
-  not extend the code 3 static audit to code 4. Inspect the final candidate AAB
-  and IPA before finalizing disclosures; retain these dated reports.
+- Historical Android code 3 contains unused WRITE_CONTACTS, READ_EXTERNAL_STORAGE,
+  WRITE_EXTERNAL_STORAGE and SYSTEM_ALERT_WINDOW permissions. PR #7 removed them;
+  the earlier code 4 delivery from fecda429 is recorded under workflow 42336889833.
+  The fresh code 5 AAB audit now confirms all four are absent, with no permissions
+  added relative to code 3. Selected Firebase components and SDK metadata are
+  unchanged. Play's received SHA-256 matches the inspected code 5 AAB. These are
+  static findings, not runtime collection or final privacy-label qualification.
 
 PROPOSED APP STORE ANSWERS
 Data collected: Yes. No advertising, advertising measurement or data-broker
@@ -107,10 +118,14 @@ all provider copies disappear when the app's account-deletion worker completes.
 REMAINING DECISIONS / EVIDENCE
 Publisher review of form categories and provider sharing; support retention and
 external ownership-verification procedure; provider IP/derived-location handling;
-actual production auth/App Check/push tests; final-candidate archives, privacy
-reports and screenshots. The revised website notices are live from source
-5ace4bb after protected workflow 42339257054; see website-delivery-2026-11-07.json.
-This hosting update does not resolve the remaining store-disclosure decisions.
+store-installed auth/App Check/push/audio testing; screenshots matching the signed candidate and
+final public-candidate qualification. The current testing archives are inspected
+as described above; delivery does not verify installation or runtime privacy.
+The website and backend are deployed from source 5f72e339 by protected workflow
+42348863699. Eight live static files byte-match that source and 13 functions are
+ACTIVE; see website-delivery-ui-refresh-2026-11-07.json. The earlier revised-notice
+deployment from 5ace4bb remains in website-delivery-2026-11-07.json. Neither hosting
+nor static archive inspection resolves the remaining disclosure decisions.
 candidate.json remains not-ready.
 
 PRIMARY SOURCES (checked 7 November 2026 UTC)

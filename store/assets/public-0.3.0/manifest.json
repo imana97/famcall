@@ -1,0 +1,250 @@
+{
+  "rawCaptures": [
+    {
+      "file": "store/assets/public-0.3.0/raw/android/01-people.png",
+      "width": 1080,
+      "height": 2160,
+      "sha256": "d11d73d63874c7099242c8de832ac1d1d335754dd6435b71dfdfbb4e0bde5dab"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/android/02-dial.png",
+      "width": 1080,
+      "height": 2160,
+      "sha256": "10c1435ade3cca0ec8b4cb0eaccb094209df5ee0b8fb51d4fa24cc3f6fb1cef3"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/android/03-history.png",
+      "width": 1080,
+      "height": 2160,
+      "sha256": "1f9898fa6216608b9ab1a31b493b2de7978a9293df3e1023549189ee2154987b"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/android/04-add.png",
+      "width": 1080,
+      "height": 2160,
+      "sha256": "e12dcc21fece08ec5cd151badb2e74b02260249606de35ad519db260ca2a75b8"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/android/05-dark.png",
+      "width": 1080,
+      "height": 2160,
+      "sha256": "e181eaaac9669140ae6f24c9599f1e77ff59f2deabe9e38281a6124ce77db51e"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/android/06-language.png",
+      "width": 1080,
+      "height": 2160,
+      "sha256": "8c97f4b262b1dae37fa86f8f0a30c852812871299c39a9e96259325b5e7eee32"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/ios/01-people.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "78f47b11153c0939396e5c3f1adc856a2ccec299ecb644da7eb2c3bab91a8e22"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/ios/02-dial.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "fdd7824c571fb0c003af6ac63399e7ac23f2b2a2c3509b19725bfa7814e58d7f"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/ios/03-history.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "129e83a6511b51495424e6f263b9693e74505731f1b8351b80f173a818c8e131"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/ios/04-add.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "b0e4deaf227ab62d9efb0f8f6dc1437f2d3f61dba2cbf08ba831a83241cf3d9d"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/ios/05-dark.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "7f7d3748e8a0de7ec1a73f0f1851a8683e1c6d53f9250b4b51d430add2e8ac67"
+    },
+    {
+      "file": "store/assets/public-0.3.0/raw/ios/06-language.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "544421f031ce91afb3f3ece753db377f0752dc807c27f8b845c6da6a8dd812b3"
+    }
+  ],
+  "version": "0.3.0",
+  "locale": "en-US",
+  "generatedOn": "2026-11-08T15:14:18.320Z",
+  "status": "Listing preparation only; no review submission or public store publication.",
+  "sourceAppCommit": "914112a72d93c23399613661379ded6d150ddb0c",
+  "captureMode": "Current release UI, isolated E2E native builds with local demo-famcall authentication/contacts/history. Fictional 202-555-01xx numbers. App screens are genuine captures; not evidence of production calling.",
+  "appleDisplayType": "APP_IPHONE_67",
+  "photography": {
+    "file": "store/marketing/0.3.0/family-call-photo.png",
+    "origin": "AI-generated editorial illustration; no customer testimonial or app UI.",
+    "creativeBrief": "Two adult family members in separate warm cream, sage and forest-green homes, each holding a phone to the ear. Natural editorial photography, no text, marks, screens or identifiable location."
+  },
+  "assets": [
+    {
+      "file": "store/assets/public-0.3.0/google-play/en-US/phone/01-people.png",
+      "width": 1080,
+      "height": 1920,
+      "alpha": false,
+      "bytes": 119999,
+      "sha256": "f77589ff69b923bd5c41f61cdb5f4a553cc9e0899f80e6d36fe835eb4baba9e1"
+    },
+    {
+      "file": "store/assets/public-0.3.0/google-play/en-US/phone/02-dial.png",
+      "width": 1080,
+      "height": 1920,
+      "alpha": false,
+      "bytes": 118240,
+      "sha256": "bb3a7cb141d637f3e2efcd01e8acf41dffc3423ed17fa2005a2d411f28c0af2a"
+    },
+    {
+      "file": "store/assets/public-0.3.0/google-play/en-US/phone/03-history.png",
+      "width": 1080,
+      "height": 1920,
+      "alpha": false,
+      "bytes": 109343,
+      "sha256": "e50b48344c0dd4e9ba66f09c99c6ae2219ea260edfcf1e947915e8f3493fe0ef"
+    },
+    {
+      "file": "store/assets/public-0.3.0/google-play/en-US/phone/04-add.png",
+      "width": 1080,
+      "height": 1920,
+      "alpha": false,
+      "bytes": 127137,
+      "sha256": "df9ad8683c529e1c0a39f6e3afeab93aed26612bbe3d93003d490ea1de67e1f2"
+    },
+    {
+      "file": "store/assets/public-0.3.0/google-play/en-US/phone/05-dark.png",
+      "width": 1080,
+      "height": 1920,
+      "alpha": false,
+      "bytes": 118361,
+      "sha256": "fd2386a747743f63ca80d6d9b7d11468d9955ea4461701339e52666f8d6a84e8"
+    },
+    {
+      "file": "store/assets/public-0.3.0/google-play/en-US/phone/06-language.png",
+      "width": 1080,
+      "height": 1920,
+      "alpha": false,
+      "bytes": 98439,
+      "sha256": "f57d57bf3a6104468b95d54c1cedc548fffcaf00ec6d79c9ef4856aa43ea4152"
+    },
+    {
+      "file": "store/assets/public-0.3.0/apple/en-US/iphone-67/01-people.png",
+      "width": 1320,
+      "height": 2868,
+      "alpha": false,
+      "bytes": 158587,
+      "sha256": "5acbe3343ce8844d2f2195e69ba3b82008e63f6d3764fc3dd82ab6aa8f521508"
+    },
+    {
+      "file": "store/assets/public-0.3.0/apple/en-US/iphone-67/02-dial.png",
+      "width": 1320,
+      "height": 2868,
+      "alpha": false,
+      "bytes": 183740,
+      "sha256": "58ad0909e886cfaf74d368e3f5dbdb28ef077e3ab6a4e111f9148383f20676ab"
+    },
+    {
+      "file": "store/assets/public-0.3.0/apple/en-US/iphone-67/03-history.png",
+      "width": 1320,
+      "height": 2868,
+      "alpha": false,
+      "bytes": 191517,
+      "sha256": "0cefc1f8cb77b71e313f4757b54110077b92668bee67481e25364f16d7263e1b"
+    },
+    {
+      "file": "store/assets/public-0.3.0/apple/en-US/iphone-67/04-add.png",
+      "width": 1320,
+      "height": 2868,
+      "alpha": false,
+      "bytes": 161039,
+      "sha256": "a0d7561ea42010bdf6137792147f438885e2ec70cdee126819c2c88579758ddd"
+    },
+    {
+      "file": "store/assets/public-0.3.0/apple/en-US/iphone-67/05-dark.png",
+      "width": 1320,
+      "height": 2868,
+      "alpha": false,
+      "bytes": 147634,
+      "sha256": "5fbe2f54ff6c743546364eabea63ffb3e969557f6dee0423a54dd625a95302d0"
+    },
+    {
+      "file": "store/assets/public-0.3.0/apple/en-US/iphone-67/06-language.png",
+      "width": 1320,
+      "height": 2868,
+      "alpha": false,
+      "bytes": 131431,
+      "sha256": "05e387044ac997d6dd3a2043a2b55c2de8489d2ee58fb75f309a548a592760d5"
+    },
+    {
+      "file": "store/assets/public-0.3.0/icons/apple-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 37208,
+      "sha256": "11b3770e581ae1f780affbb23fa4ead635488e06dabef953a17eeda0d79a6237"
+    },
+    {
+      "file": "store/assets/public-0.3.0/icons/google-play-512.png",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "bytes": 27678,
+      "sha256": "2c546e4d806b02f6b12229eae5f6527d5a83fb1fc74d5bb7377c3815542f2ce4"
+    },
+    {
+      "file": "store/assets/public-0.3.0/google-play/en-US/feature-graphic-1024x500.png",
+      "width": 1024,
+      "height": 500,
+      "alpha": false,
+      "bytes": 29704,
+      "sha256": "66abf40c16befa20ac4efbfd2c5a9daf8bbf35050ff5eda95429734bc3c14b9a"
+    },
+    {
+      "file": "store/marketing/0.3.0/social-landscape-1200x630.png",
+      "width": 1200,
+      "height": 630,
+      "alpha": false,
+      "bytes": 550361,
+      "sha256": "c0d66b298b44a754607b27d88e208fd236589dcd4efc117ecb1a20631ef3aec6"
+    },
+    {
+      "file": "store/marketing/0.3.0/social-square-1080.png",
+      "width": 1080,
+      "height": 1080,
+      "alpha": false,
+      "bytes": 1330707,
+      "sha256": "2a0b1c88941946f450915101c488e0aa08cb4612fd9c8b335ca6a1a65b08235f"
+    },
+    {
+      "file": "store/marketing/0.3.0/social-portrait-1080x1350.png",
+      "width": 1080,
+      "height": 1350,
+      "alpha": false,
+      "bytes": 1615570,
+      "sha256": "d88f9eeb90ab1459436dff3c37db114219f4ee75039bca7319c3a7ca5ff284c9"
+    },
+    {
+      "file": "store/marketing/0.3.0/social-story-1080x1920.png",
+      "width": 1080,
+      "height": 1920,
+      "alpha": false,
+      "bytes": 1675023,
+      "sha256": "a89db89e11fee7e039535212e182648511510d198ca50fd686c0fc0a53c2ee0d"
+    },
+    {
+      "file": "store/assets/public-0.3.0/preview.png",
+      "width": 1800,
+      "height": 1580,
+      "alpha": false,
+      "bytes": 287837,
+      "sha256": "1d40c1b82529555c336afb16c422b840ca8d976ee95847d21a8ddc67519a7ae9"
+    }
+  ]
+}

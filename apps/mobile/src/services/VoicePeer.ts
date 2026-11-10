@@ -23,6 +23,7 @@ import {
 } from "@famcall/core";
 import { api, database } from "./firebase";
 import { MicrophonePermissionError } from "./errors";
+import { assertMicrophonePermission } from "./callReadiness";
 import {
   recordTestMetric,
   testTransport,
@@ -91,6 +92,10 @@ export class VoicePeer {
     return this.queue;
   }
   async start() {
+    // Incoming calls can arrive while locked. Never let capture become the
+    // first permission prompt; onboarding owns all permission requests.
+    await assertMicrophonePermission();
+    if (this.closed) return;
     await this.heartbeat();
     if (this.closed) return;
     this.heartbeatTimer = setInterval(() => { void this.heartbeat(); }, 30_000);

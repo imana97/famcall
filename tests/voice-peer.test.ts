@@ -17,7 +17,7 @@ const mocks = vi.hoisted(() => {
     getStats = vi.fn(async () => new Map());
     close = vi.fn();
   }
-  return { Peer, api: vi.fn(), getUserMedia: vi.fn(), track: { enabled: true, stop: vi.fn() } };
+  return { Peer, api: vi.fn(), getUserMedia: vi.fn(), assertMicrophone: vi.fn(), track: { enabled: true, stop: vi.fn() } };
 });
 vi.mock("react-native-webrtc", () => ({
   RTCPeerConnection: mocks.Peer,
@@ -30,6 +30,7 @@ vi.mock("@react-native-firebase/firestore", () => ({
   setDoc: vi.fn(async () => undefined), where: vi.fn(),
 }));
 vi.mock("../apps/mobile/src/services/firebase", () => ({ api: mocks.api, database: {} }));
+vi.mock("../apps/mobile/src/services/callReadiness", () => ({ assertMicrophonePermission: mocks.assertMicrophone }));
 vi.mock("../apps/mobile/src/services/e2eDiagnostics", () => ({
   testTransport: async () => null, recordTestMetric: vi.fn(),
 }));
@@ -49,6 +50,19 @@ const stream = () => ({
 beforeEach(() => {
   mocks.track.enabled = true;
   mocks.getUserMedia.mockReset().mockResolvedValue(stream());
+  mocks.assertMicrophone.mockReset().mockResolvedValue(undefined);
+});
+
+it("rejects a revoked microphone before a background answer can request capture or contact the server", async () => {
+  const permissionError = new MicrophonePermissionError();
+  mocks.api.mockClear();
+  mocks.assertMicrophone.mockRejectedValue(permissionError);
+  const voice = new VoicePeer({ id: "call", callerId: "alice", calleeId: "bob" } as ConstructorParameters<typeof VoicePeer>[0],
+    "bob", vi.fn(), vi.fn());
+  await expect(voice.start()).rejects.toBe(permissionError);
+  expect(mocks.getUserMedia).not.toHaveBeenCalled();
+  expect(mocks.api).not.toHaveBeenCalled();
+  voice.close();
 });
 
 describe("native voice connection retry policy", () => {

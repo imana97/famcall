@@ -1,92 +1,71 @@
 {
-  "checked_on": "2026-11-07",
+  "checked_on": "2026-11-08",
   "result": "PASS",
+  "version": "0.3.0",
   "checks": [
     {
+      "locale": "en-US",
       "field": "apple.name",
       "length": 27,
       "limit": 30,
-      "unit": "characters",
       "pass": true
     },
     {
+      "locale": "en-US",
       "field": "apple.subtitle",
       "length": 29,
       "limit": 30,
-      "unit": "characters",
       "pass": true
     },
     {
+      "locale": "en-US",
       "field": "apple.promotional_text",
-      "length": 149,
+      "length": 134,
       "limit": 170,
-      "unit": "characters",
       "pass": true
     },
     {
+      "locale": "en-US",
       "field": "apple.keywords",
-      "length": 73,
+      "length": 81,
       "limit": 100,
-      "unit": "bytes",
       "pass": true
     },
     {
+      "locale": "en-US",
       "field": "apple.description",
-      "length": 1162,
+      "length": 1683,
       "limit": 4000,
-      "unit": "characters",
       "pass": true
     },
     {
+      "locale": "en-US",
       "field": "google-play.title",
       "length": 27,
       "limit": 30,
-      "unit": "characters",
       "pass": true
     },
     {
+      "locale": "en-US",
       "field": "google-play.short_description",
-      "length": 70,
+      "length": 66,
       "limit": 80,
-      "unit": "characters",
       "pass": true
     },
     {
+      "locale": "en-US",
       "field": "google-play.full_description",
-      "length": 1162,
+      "length": 1683,
       "limit": 4000,
-      "unit": "characters",
-      "pass": true
-    },
-    {
-      "field": "beta.testflight_description",
-      "length": 620,
-      "limit": 4000,
-      "unit": "characters",
-      "pass": true
-    },
-    {
-      "field": "beta.testflight_what_to_test",
-      "length": 1081,
-      "limit": 4000,
-      "unit": "characters",
-      "pass": true
-    },
-    {
-      "field": "beta.play_internal_release_notes",
-      "length": 284,
-      "limit": 500,
-      "unit": "characters",
-      "pass": true
-    },
-    {
-      "field": "beta.production_release_notes",
-      "length": 213,
-      "limit": 500,
-      "unit": "characters",
       "pass": true
     }
   ],
-  "scope": "Text lengths and basic brand restrictions only; not store approval or functional validation.",
-  "brand_check": "PASS: location-neutral public copy; no unverified absolute reliability, price, or encryption promises."
+  "scope": "Store text limits, complete localized fields and brand restrictions; not a production publication decision.",
+  "brand_check": "PASS: location-neutral; no unverified rankings, price, security or absolute reliability claims.",
+  "apple_localizations": [
+    "en-US"
+  ],
+  "google_play_localizations": [
+    "en-US"
+  ]
 }
